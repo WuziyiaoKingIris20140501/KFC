@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_ticket_user_msg_list_back">
+    <![CDATA[
+      select distinct tu.userid AS TELPHONE,tlu.devicetoken AS DEVICETOKEN,tp.amount, '0' AS TYPE
+      from 
+      T_LM_TICKET_RULE tr
+      inner join T_LM_TICKET tlt on tlt.ticketrulecode = tr.ticketrulecode and tlt.status in ('1','2')
+      and trunc(TO_DATE(tr.ENDDATE,'yyyy-mm-dd')-TO_DATE(TO_CHAR(sysdate,'yyyy-mm-dd'),'yyyy-mm-dd')) = 7
+      inner join T_LM_TICKET_PACKAGE tp on tlt.packagecode=tp.packagecode
+      inner join T_LM_TICKET_USER tu on tu.packagecode = tp.packagecode and tu.status='0'
+      inner join t_Lm_User tlu on tu.userid=tlu.login_mobile and tlu.devicetoken is not null
+      union all
+      select distinct tu.userid AS TELPHONE,tlu.devicetoken AS DEVICETOKEN,tp.amount, '1' AS TYPE
+      from 
+      T_LM_TICKET_RULE tr
+      inner join T_LM_TICKET tlt on tlt.ticketrulecode = tr.ticketrulecode and tlt.status in ('1','2')
+      and trunc(TO_DATE(tr.ENDDATE,'yyyy-mm-dd')-TO_DATE(TO_CHAR(sysdate,'yyyy-mm-dd'),'yyyy-mm-dd')) = 14
+      inner join T_LM_TICKET_PACKAGE tp on tlt.packagecode=tp.packagecode
+      inner join T_LM_TICKET_USER tu on tu.packagecode = tp.packagecode and tu.status='0'
+      inner join t_Lm_User tlu on tu.userid=tlu.login_mobile and tlu.devicetoken is not null
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_ticket_user_msg_list_0">
+    <![CDATA[
+    select USERID,TELPHONE,DEVICETOKEN,version,regchanel_code,platform_code,CLIENT_CODE,max(ticketusercode) AS ticketusercode, '0' AS TYPE
+    from
+    (
+    select distinct tlu.id AS USERID, tlu.login_mobile AS TELPHONE, tlu.DEVICETOKEN, tlu.version, tlu.regchanel_code, 
+    tlu.platform_code, tlu.CLIENT_CODE,tu.ticketusercode, '0' AS TYPE
+    from
+    T_LM_TICKET_RULE tr
+    inner join T_LM_TICKET tlt on tlt.ticketrulecode = tr.ticketrulecode and tlt.status in ('1','2')
+    and trunc(TO_DATE(tr.ENDDATE,'yyyy-mm-dd')-TO_DATE(TO_CHAR(sysdate,'yyyy-mm-dd'),'yyyy-mm-dd')) = 7
+    inner join T_LM_TICKET_PACKAGE tp on tlt.packagecode=tp.packagecode
+    inner join T_LM_TICKET_USER tu on tu.packagecode = tp.packagecode and tu.status='0'
+    inner join t_Lm_User tlu on tu.userid=tlu.login_mobile and tlu.devicetoken is not null and tlu.version >= '3.2'
+    ) dt group by USERID,TELPHONE,DEVICETOKEN,version,regchanel_code,platform_code,CLIENT_CODE,TYPE
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_ticket_user_msg_list_1">
+    <![CDATA[
+        select USERID,TELPHONE,DEVICETOKEN,version,regchanel_code,platform_code,CLIENT_CODE,max(ticketusercode) AS ticketusercode, '1' AS TYPE
+    from
+    (
+    select distinct tlu.id AS USERID, tlu.login_mobile AS TELPHONE, tlu.DEVICETOKEN, tlu.version, tlu.regchanel_code, 
+    tlu.platform_code, tlu.CLIENT_CODE,tu.ticketusercode, '0' AS TYPE
+    from
+    T_LM_TICKET_RULE tr
+    inner join T_LM_TICKET tlt on tlt.ticketrulecode = tr.ticketrulecode and tlt.status in ('1','2')
+    and trunc(TO_DATE(tr.ENDDATE,'yyyy-mm-dd')-TO_DATE(TO_CHAR(sysdate,'yyyy-mm-dd'),'yyyy-mm-dd')) = 14
+    inner join T_LM_TICKET_PACKAGE tp on tlt.packagecode=tp.packagecode
+    inner join T_LM_TICKET_USER tu on tu.packagecode = tp.packagecode and tu.status='0'
+    inner join t_Lm_User tlu on tu.userid=tlu.login_mobile and tlu.devicetoken is not null and tlu.version >= '3.2'
+    ) dt group by USERID,TELPHONE,DEVICETOKEN,version,regchanel_code,platform_code,CLIENT_CODE,TYPE
+      ]]>
+  </sql>
+  
+
+</sqlList>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_list">
+    <![CDATA[  
+    select t.prop, t.longitude,t.latitude  from t_lm_b_prop t where t.longitude is not null and t.latitude is not null
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_save">
+    <![CDATA[  
+      update t_lm_b_prop
+      set LONGITUDE_BAIDU = :LONGITUDE,
+      LATITUDE_BAIDU = :LATITUDE
+      where prop = :HOTELID
+  ]]>
+  </sql>
+
+</sqlList>

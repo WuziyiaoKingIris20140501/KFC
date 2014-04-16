@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.JobConsole.DataAccess", "HotelVp.JobConsole.DataAccess\HotelVp.JobConsole.DataAccess.csproj", "{263D1248-DAB7-44C9-BC50-129269C3B9E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.JobConsole.Biz", "HotelVp.JobConsole.Biz\HotelVp.JobConsole.Biz.csproj", "{2D57745F-D692-498A-858D-93CDA7C68142}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.JobConsole.Entity", "HotelVp.JobConsole.Entity\HotelVp.JobConsole.Entity.csproj", "{38819AC5-8560-4F27-A83D-53AB76140B6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.JobConsole.ServiceAdapter", "HotelVp.JobConsole.ServiceAdapter\HotelVp.JobConsole.ServiceAdapter.csproj", "{FA4C3142-CD06-497B-8A56-890A31063EEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.JobConsole.StartSetting", "HotelVp.JobConsole.AutoReciveFax\HotelVp.JobConsole.StartSetting.csproj", "{61A775CF-74D5-4063-921E-C4488F3C4429}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://thltfs:8080/tfs/hotelvp
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = HotelVp.JobConsole.DataAccess\\HotelVp.JobConsole.DataAccess.csproj
+		SccProjectName1 = HotelVp.JobConsole.DataAccess
+		SccLocalPath1 = HotelVp.JobConsole.DataAccess
+		SccProjectUniqueName2 = HotelVp.JobConsole.Biz\\HotelVp.JobConsole.Biz.csproj
+		SccProjectName2 = HotelVp.JobConsole.Biz
+		SccLocalPath2 = HotelVp.JobConsole.Biz
+		SccProjectUniqueName3 = HotelVp.JobConsole.Entity\\HotelVp.JobConsole.Entity.csproj
+		SccProjectName3 = HotelVp.JobConsole.Entity
+		SccLocalPath3 = HotelVp.JobConsole.Entity
+		SccProjectUniqueName4 = HotelVp.JobConsole.ServiceAdapter\\HotelVp.JobConsole.ServiceAdapter.csproj
+		SccProjectName4 = HotelVp.JobConsole.ServiceAdapter
+		SccLocalPath4 = HotelVp.JobConsole.ServiceAdapter
+		SccProjectUniqueName5 = HotelVp.JobConsole.AutoReciveFax\\HotelVp.JobConsole.StartSetting.csproj
+		SccProjectName5 = HotelVp.JobConsole.AutoReciveFax
+		SccLocalPath5 = HotelVp.JobConsole.AutoReciveFax
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{263D1248-DAB7-44C9-BC50-129269C3B9E7}.Debug|x86.ActiveCfg = Debug|x86
+		{263D1248-DAB7-44C9-BC50-129269C3B9E7}.Debug|x86.Build.0 = Debug|x86
+		{263D1248-DAB7-44C9-BC50-129269C3B9E7}.Release|x86.ActiveCfg = Release|x86
+		{263D1248-DAB7-44C9-BC50-129269C3B9E7}.Release|x86.Build.0 = Release|x86
+		{2D57745F-D692-498A-858D-93CDA7C68142}.Debug|x86.ActiveCfg = Debug|x86
+		{2D57745F-D692-498A-858D-93CDA7C68142}.Debug|x86.Build.0 = Debug|x86
+		{2D57745F-D692-498A-858D-93CDA7C68142}.Release|x86.ActiveCfg = Release|x86
+		{2D57745F-D692-498A-858D-93CDA7C68142}.Release|x86.Build.0 = Release|x86
+		{38819AC5-8560-4F27-A83D-53AB76140B6D}.Debug|x86.ActiveCfg = Debug|x86
+		{38819AC5-8560-4F27-A83D-53AB76140B6D}.Debug|x86.Build.0 = Debug|x86
+		{38819AC5-8560-4F27-A83D-53AB76140B6D}.Release|x86.ActiveCfg = Release|x86
+		{38819AC5-8560-4F27-A83D-53AB76140B6D}.Release|x86.Build.0 = Release|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Debug|x86.ActiveCfg = Debug|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Debug|x86.Build.0 = Debug|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Release|x86.ActiveCfg = Release|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Release|x86.Build.0 = Release|x86
+		{61A775CF-74D5-4063-921E-C4488F3C4429}.Debug|x86.ActiveCfg = Debug|x86
+		{61A775CF-74D5-4063-921E-C4488F3C4429}.Debug|x86.Build.0 = Debug|x86
+		{61A775CF-74D5-4063-921E-C4488F3C4429}.Release|x86.ActiveCfg = Release|x86
+		{61A775CF-74D5-4063-921E-C4488F3C4429}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

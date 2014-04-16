@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  
+  <sql database="TUANDB" sqlId="AutoListNewSelect">
+    <![CDATA[
+    select '' AS IssueID, '[IssueID:{0}]订单问题单'||t.fog_order_num AS Title, '0' AS Priority, '1' AS IssueType ， '订单状态问题' AS TypeNm, '0' AS IssueStatus, '新建' AS DISStatus 
+    ,'0' AS IsIndemnify, '' AS IndemnifyPrice, '' AS TicketCode, '0' AS RelatedType, '订单' AS RelatedTypeNM, t.fog_order_num AS RelatedID
+    ,'IOC' AS AssigntoNm, 'IOC' AS Assignto, '' AS Remark, 'IOC' AS CreateUser, sysdate AS Create_Time, '' AS TicketAmount
+    from t_lm_order t
+    where 
+    sysdate-30/(24*60) >= t.create_time
+    and ((t.price_code = 'LMBAR2' and t.book_status_other = '1')
+    OR (t.price_code = 'LMBAR' and t.book_status = '1')) 
+    AND t.IS_RESERVE='0'
+    order by t.create_time desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="AutoListSelectHotel">
+    <![CDATA[
+    select '' AS IssueID, '[IssueID:{0}]酒店满房问题单'||t.hotel_id||'-'||TO_CHar(t.fog_order_num) AS Title, '2' AS Priority, '0' AS IssueType ， '酒店问题' AS TypeNm, '0' AS IssueStatus, '新建' AS DISStatus 
+    ,'0' AS IsIndemnify, '' AS IndemnifyPrice, '' AS TicketCode, '0' AS RelatedType, '订单' AS RelatedTypeNM, t.fog_order_num AS RelatedID
+    ,'IOC' AS AssigntoNm, 'IOC' AS Assignto, '本订单为CC取消单，取消原因为酒店满房' AS Remark, 'IOC' AS CreateUser, sysdate AS Create_Time, '' AS TicketAmount
+    from t_lm_order t
+    where 
+    TO_DATE(:StartDT, 'yyyy-mm-dd hh24:mi:ss') <= t.create_time AND t.create_time <= TO_DATE(:EndDT, 'yyyy-mm-dd hh24:mi:ss') AND
+    t.book_status_other='9' AND t.order_cancle_reason = 'CRC01' AND t.IS_RESERVE='0'
+    union all
+    select '' AS IssueID, '[IssueID:{0}]酒店变价问题单'||t.hotel_id||'-'||TO_CHar(t.fog_order_num) AS Title, '2' AS Priority, '0' AS IssueType ， '酒店问题' AS TypeNm, '0' AS IssueStatus, '新建' AS DISStatus 
+    ,'0' AS IsIndemnify, '' AS IndemnifyPrice, '' AS TicketCode, '0' AS RelatedType, '订单' AS RelatedTypeNM, t.fog_order_num AS RelatedID
+    ,'IOC' AS AssigntoNm, 'IOC' AS Assignto, '本订单为CC取消单，取消原因为酒店变价' AS Remark, 'IOC' AS CreateUser, sysdate AS Create_Time, '' AS TicketAmount
+    from t_lm_order t
+    where 
+    TO_DATE(:StartDT, 'yyyy-mm-dd hh24:mi:ss') <= t.create_time AND t.create_time <= TO_DATE(:EndDT, 'yyyy-mm-dd hh24:mi:ss') AND
+    t.book_status_other='9' AND t.order_cancle_reason = 'CRC06'
+    order by create_time desc
+  ]]>
+  </sql>
+
+</sqlList>

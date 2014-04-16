@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_b_pinying_hotel">
+    <![CDATA[  
+      select t.prop AS HOTELID, NVL(t.prop_name_zh,'') AS PROPNAME, '' AS LPINYIN, '' AS SPINYIN
+      from T_LM_B_PROP t
+      order by t.prop
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_pinying_hotel_save">
+    <![CDATA[  
+      update T_LM_B_PROP set  PINYIN_LONG=:LPINYIN,  PINYIN_SHORT=:SPINYIN
+         where PROP = :HOTELID
+  ]]>
+  </sql>
+
+</sqlList>

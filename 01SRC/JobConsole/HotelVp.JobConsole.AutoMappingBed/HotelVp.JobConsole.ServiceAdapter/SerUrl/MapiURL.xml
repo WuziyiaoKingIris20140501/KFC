@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mapiList>
+  <mapi lmApiID="SearchCityUrl">
+    <commandText>
+      <![CDATA[/show/getSupCity.json?clientCode=&useCode=IOS]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelListUrl">
+    <commandText>
+      <![CDATA[/show/hotel-list-v2.json?sysSource={0}&imgSize=200&cityId={1}&version=0&isTest=true&isToday={2}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelsByIDUrl">
+    <commandText>
+      <![CDATA[/show/hotel-list-v3.json?sysSource={0}&imgSize=200&cityId={1}&version=0&isTest=true&isToday={2}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelAmenityUrl">
+    <commandText>
+      <![CDATA[/show/propAmenityV2.html?prop={0}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelImagesUrl">
+    <commandText>
+      <![CDATA[/rest/hotel/image/{0}/{1}.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchServiceTelUrl">
+    <commandText>
+      <![CDATA[/sysinfoCity.html?clientCode=HOTELVP&useCode=IOS]]>
+    </commandText>
+  </mapi>
+
+    <mapi lmApiID="SearchCityUrlV2">
+      <commandText>
+        <![CDATA[/content/cityList.json?useCode={0}&useCodeVersion=0&clientCode=hotelvp]]>
+      </commandText>
+    </mapi>
+
+    <mapi lmApiID="getSearchHotelListUrlV2">
+      <commandText>
+        <![CDATA[/content/hotelList.json?useCode={0}&useCodeVersion=0&clientCode=hotelvp&imgSize=200&cityId={1}&hotelListVersion=0&isTest=true&isToday={2}]]>
+      </commandText>
+    </mapi>
+
+    <mapi lmApiID="SearchHotelsByIDUrlV2">
+      <commandText>
+        <![CDATA[/content/hotelList.json?useCode={0}&useCodeVersion=0&clientCode=hotelvp&imgSize=200&cityId={1}&hotelListVersion=0&isTest=true&isToday={2}]]>
+      </commandText>
+    </mapi>
+
+    <mapi lmApiID="SearchHotelAmenityUrlV2">
+      <commandText>
+        <![CDATA[/content/hotelAmenityList.json?useCode={0}&useCodeVersion=0&clientCode=hotelvp&hotelId={1}]]>
+      </commandText>
+    </mapi>
+
+    <mapi lmApiID="SearchHotelImagesUrlV2">
+      <commandText>
+        <![CDATA[/content/hotelImagesList.json?useCode={0}&useCodeVersion=0&clientCode=hotelvp&hotelId={1}&imgSize={2}]]>
+      </commandText>
+    </mapi>
+    <mapi lmApiID="SearchServiceTelUrlV2">
+      <commandText>
+        <![CDATA[/content/sysCityList.json?useCode={0}&useCodeVersion=0&clientCode=hotelvp]]>
+      </commandText>
+    </mapi>
+
+
+</mapiList>

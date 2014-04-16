@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  
+  <sql database="TUANDB" sqlId="t_lm_hotelroom_name">
+    <![CDATA[  
+    select ROOMID AS HOTELROOMCODE,name_zh AS HOTELROOMNM from fog_t_room t where prop=:HOTELID and ROOMID = :ROOMID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotelroom_info">
+    <![CDATA[  
+    select t.effect_date,t.room_type_code,t.room_type_name,t.room_num,t.status from t_lm_plan t 
+    inner join t_lm_b_prop lp on t.hotel_id=lp.prop
+    where 
+    t.effect_date=TO_DATE(:CurrtDate,'yyyy/mm/dd')
+    and t.hotel_id=:HotelID
+    and t.room_type_code=:RoomCode
+    and lp.status='active'
+    and lp.online_status='1'
+    and lp.type=0
+    and (t.room_num = 0 or t.status='0')
+    and TO_DATE(TO_CHAR(t.Gmt_Modified,'yyyy/mm/dd'),'yyyy/mm/dd') = TO_DATE(:CurrtDate,'yyyy/mm/dd')
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotelroom_info_less">
+    <![CDATA[  
+    select t.effect_date,t.room_type_code,t.room_type_name,t.room_num,t.status from t_lm_plan t 
+    inner join t_lm_b_prop lp on t.hotel_id=lp.prop
+    where 
+    t.effect_date=TO_DATE(:CurrtDate,'yyyy/mm/dd')
+    and t.hotel_id=:HotelID
+    and t.room_type_code=:RoomCode
+    and lp.status='active'
+    and lp.online_status='1'
+    and lp.type=0
+    and (t.room_num = 0 or t.status='0')
+    and TO_DATE(:StartDate,'yyyy/mm/dd hh24:mi:ss') <= t.Gmt_Modified
+    and t.Gmt_Modified <= TO_DATE(:EndDate,'yyyy/mm/dd hh24:mi:ss') 
+  ]]>
+  </sql>
+
+</sqlList>

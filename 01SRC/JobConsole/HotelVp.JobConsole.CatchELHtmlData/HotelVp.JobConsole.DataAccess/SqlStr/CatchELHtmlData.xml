@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_name">
+    <![CDATA[  
+      select NVL(t.prop_name_zh,'') AS PROPNAME
+      from T_LM_B_PROP t
+      where t.prop=:HotelID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_city_name">
+    <![CDATA[  
+      select tb.name_cn AS CITYNM
+      from T_LM_B_PROP t
+      left join t_lm_b_city tb on t.cityid=tb.city_id
+      where t.prop=:HotelID
+  ]]>
+  </sql>
+
+</sqlList>

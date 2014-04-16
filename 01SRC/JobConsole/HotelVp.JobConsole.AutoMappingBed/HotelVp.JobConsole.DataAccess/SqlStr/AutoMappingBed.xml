@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  
+  <sql database="TUANDB" sqlId="AutoSelectOrderList">
+    <![CDATA[
+    select t.id,t.fog_order_num,TO_CHAR(t.create_time,'yyyy-mm-dd hh24:mi:ss') AS create_time,TO_CHAR(t.in_date,'yyyy-mm-dd') AS in_date, t.VENDOR
+    from t_lm_order t 
+    where (:ORDEID IS NULL OR t.id > :ORDEID) AND fog_order_num IS NOT NULL 
+    and (t.VENDOR IS NULL OR t.VENDOR <> 'ELONG') and t.price_code='LMBAR2'
+    order by t.id asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="AutoGetMaxOrderID">
+    <![CDATA[
+    select max(t.order_id) AS MAXID from t_lm_order_cof t order by t.order_id desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_cof_insert">
+    <![CDATA[
+    merge into T_LM_ORDER_COF t1
+      using (select :ORDERID AS ORDER_ID,:FOGORDERNUM AS FOG_ORDER_NUM,:OPEUSER AS CREATE_USER, :CREATIME AS ORDER_CREATE_TIME, :INDATE AS IN_DATE, :VENDOR AS VENDOR from dual) t2 
+      on (t1.order_id= t2.ORDER_ID and (t1.FOG_ORDER_NUM IS NULL OR t1.FOG_ORDER_NUM = t2.FOG_ORDER_NUM))
+      when not matched then
+         insert values (T_LM_ORDER_COF_SEQ.nextval,t2.ORDER_ID, t2.FOG_ORDER_NUM,'0', t2.CREATE_USER,'','','','0',null,'0',null,'0',sysdate,t2.CREATE_USER,sysdate,t2.CREATE_USER,'',TO_DATE(t2.ORDER_CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),TO_DATE(t2.IN_DATE,'yyyy-mm-dd'),'0', t2.VENDOR)
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="AutoHotelRoomMappingList">
+    <![CDATA[
+    select distinct
+    tro.hotel_id AS Hotel_ID,
+    bp.prop_name_zh AS Hotel_Name,
+    tro.room_code AS Room_Code,
+    tro.room_name AS Room_Name,
+    bp.cityid AS City_ID,
+    sur.sup_hotel_id AS Mapping_Hotel,
+    sur.sup_room_id AS Mapping_Room,
+    sur.source AS MPType,
+    '' AS ROOMBED
+    from t_room tro
+    inner join t_sup_map_room sur on tro.hotel_id = sur.app_hotel_id and tro.room_code = sur.app_room_id and sur.source='ELONG'
+    inner join t_lm_b_prop bp on tro.hotel_id=bp.prop
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="GetMailBodyList">
+    <![CDATA[
+    select
+  count(distinct tro.hotel_id) AS Hotel_ID,
+  count(tro.room_code) AS Room_Code
+  from (select distinct trm.hotel_id, trm.room_code from t_room trm inner join t_price_code_room pcr on trm.hotel_id = pcr.hotel_id 
+  and pcr.room_code=trm.room_code and pcr.status='1' and pcr.price_code IN ('LMBAR','LMBAR2')) tro  
+  inner join t_lm_b_prop bp on tro.hotel_id=bp.prop
+  inner join t_lm_plan lp on lp.hotel_id = bp.prop and lp.room_type_code=tro.room_code and lp.effect_date=trunc(sysdate, 'dd')
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="SaveHotelRoomBed">
+    <![CDATA[
+    update T_ROOM set ROOM_AREA=:ROOMAREA, UPDATE_TIME=sysdate, UPDATE_USER=:UPDATEUSER where HOTEL_ID=:HOTELID and ROOM_CODE=:ROOMCODE
+  ]]>
+  </sql>
+
+
+</sqlList>

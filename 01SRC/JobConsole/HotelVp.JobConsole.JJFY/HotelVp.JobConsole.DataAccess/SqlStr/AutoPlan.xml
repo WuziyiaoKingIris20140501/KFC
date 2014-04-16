@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="GetOrderYesterDayList">
+    <![CDATA[  
+    select GUEST_TD,RESVID,NAME,UNIT_ID,ORDER_STATUS,MOBILE,ARRD,DEPD,CHANNEL,PLATFORM_CODE
+    FROM
+    JJZX_ORDER
+    where resvid='CC20140117013315'
+    order by RESVID Asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="GetOrderYesterDayList_bak">
+    <![CDATA[  
+    select GUEST_TD,RESVID,NAME,UNIT_ID,ORDER_STATUS,MOBILE,ARRD,DEPD,CHANNEL,PLATFORM_CODE
+    FROM
+    JJZX_ORDER
+    where GUEST_TD <> '0' and GUEST_TD is not null 
+    and (PLATFORM_CODE ='IOS' OR PLATFORM_CODE ='ANDROID')
+    and DATE_SUB(CURDATE(),INTERVAL 1 DAY) = date(ARRD)
+    and ORDER_STATUS IN ('I','O')
+    order by RESVID Asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="GetOrderYFComfirnList">
+    <![CDATA[
+    select RESVID,MOBILE from JJZX_FY
+    WHERE
+    SRESULT='0000'
+    and (GSTATUS is null or GSTATUS = '0' or GSTATUS='1')
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="InsertYFOrderList">
+    <![CDATA[  
+    insert into JJZX_FY 
+  (RESVID,GUEST_ID,NAME,UNIT_ID,ORDER_STATUS,MOBILE,ARRD,DEPD,CHANNEL,PLATFORM_CODE,MONEY,CZD,SRESULT,PRO,YYS,CODE,PRICE, MSGRES)
+  VALUES 
+  (?RESVID,?GUEST_ID,?NAME,?UNIT_ID,?ORDER_STATUS,?MOBILE,?ARRD,?DEPD,?CHANNEL,?PLATFORM_CODE,?MONEY,sysdate(),?SRESULT,?PRO,?YYS,?CODE,?PRICE,?MSGRES)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="UpdateYFOrderStatus">
+    <![CDATA[  
+  update JJZX_FY set GSTATUS=?GSTATUS, GRESULT=?GRESULT, MSGRES=?MSGRES where RESVID=?RESVID
+  ]]>
+  </sql>
+
+</sqlList>

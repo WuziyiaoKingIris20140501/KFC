@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_user_all_list">
+    <![CDATA[
+       select tlu.login_mobile AS TELPHONE,tlu.DEVICETOKEN from t_lm_user tlu
+      where tlu.devicetoken IS NOT NULL 
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_group_list">
+    <![CDATA[
+        select ult.login_mobile AS TELPHONE, tlu.DEVICETOKEN from t_lm_usergroup up
+      inner join t_lm_ugroup_ult ult
+      on up.id = ult.usergroup_id
+      inner join t_lm_user tlu
+      on tlu.login_mobile = ult.login_mobile AND tlu.devicetoken IS NOT NULL 
+      inner join (   
+      SELECT REGEXP_SUBSTR (:UserGroupList, '[^,]+', 1,rownum) AS commlist
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserGroupList) - LENGTH (REPLACE (:UserGroupList, ',', ''))) dt
+      on up.id=dt.commlist
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="insert_lm_user_group_list">
+    <![CDATA[
+        insert into freek_t_1
+        (col2, col4) VALUES (:TelPhone, :TaskID)
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_files_clear">
+    <![CDATA[
+        delete from freek_t_1 t where t.col4=:TaskID
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_files_list">
+    <![CDATA[
+        select tlu.login_mobile AS TELPHONE, tlu.DEVICETOKEN from freek_t_1 ft
+        inner join t_lm_user tlu
+        on tlu.login_mobile = ft.col2 AND tlu.devicetoken IS NOT NULL 
+        where ft.col4=:TaskID
+      ]]>
+  </sql>
+
+</sqlList>

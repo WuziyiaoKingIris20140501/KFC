@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  
+  <sql database="TUANDB" sqlId="AutoListSelect">
+    <![CDATA[
+    select t.contact_tel AS USERID,t.fog_order_num AS ORDERNO,t.create_time AS CREATETIME,t.hotel_name AS HOTELNM,t.guest_names AS USERNM from t_lm_order t 
+    where 
+    t.fog_resvtype <> 'c' 
+    AND  t.book_status_other <> '3'
+    AND (:STARTDTIME IS NULL OR (t.create_time >= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:ENDDTIME IS NULL OR (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') >= t.create_time)) 
+  ]]>
+  </sql>
+
+</sqlList>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  
+  <sql database="TUANDB" sqlId="t_fax_unknown_save">
+    <![CDATA[
+   insert into t_fax_unknown
+  (id, fax_url, create_time, update_time, operator, is_process, fax_id, fax_num)
+values
+  (T_FAX_UNKNOWN_SEQ.Nextval, :FAX_URL, SYSDATE, SYSDATE, :OPERATOR, '0', :FAX_ID, :FAX_NUM)
+  ]]>
+  </sql>
+
+</sqlList>
