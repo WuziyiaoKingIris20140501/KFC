@@ -1,0 +1,374 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    @*<meta http-equiv="X-UA-Compatible" content="IE=8,chrome=1"/>*@
+    <title>@ViewBag.Title</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width" />
+
+    @*以下为老header标签
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")*@
+
+    <link href="@Url.Content("~/Style/assets/css/twitter-bootstrap/bootstrap.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Style/assets/css/social.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Style/assets/css/social.plugins.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Style/assets/css/social.examples.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Style/assets/css/font-awesome.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Style/assets/js/datatables/media/DT_bootstrap.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Style/assets/css/twitter-bootstrap/bootstrap-responsive.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Style/assets/css/docs.css")" rel="stylesheet" type="text/css" />
+
+    <script src="@Url.Content("~/Scripts/jquery-1.9.1.js")" type="text/javascript"></script>
+    <link href="@Url.Content("~/Scripts/css/ui-lightness/jquery-ui-1.10.3.custom.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Scripts/css/ui-lightness/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/WdatePicker.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/viewjs/Global.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/viewjs/VLogin.js")" type="text/javascript"></script>
+
+   @* <script src="@Url.Content("~/Style/assets/js/jquery-ui/js/jquery-ui-1.10.1.custom.min.js")" type="text/javascript"></script>*@
+    <script src="@Url.Content("~/Style/assets/js/twitter-bootstrap/bootstrap.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Style/assets/js/jquery-slimscroll/jquery.slimscroll.min.js")" type="text/javascript"></script>
+
+    <!--[if lte IE 8]>
+    <script src="/templates/social/assets/js/placeholders/placeholders.min.js"></script>
+    <![endif]-->
+    <script src="@Url.Content("~/Style/assets/js/extents.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Style/assets/js/app.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Style/assets/js/datatables/media/js/jquery.dataTables.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Style/assets/js/tables.dynamic.js")" type="text/javascript"></script>
+
+    <style type="text/css">
+    #advanced-filtering .table input
+    {
+        margin-bottom: 0;
+    }
+    .wraper #main
+    {
+        margin-top: 40px;
+    }
+    </style>
+    <style type="text/css">
+        .ui-progressbar
+        {
+            position: relative;
+        }
+        
+        .progress-label
+        {
+            position: absolute;
+            left: 30%;
+            top: 4px;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #fff;
+        }
+        
+        .processbg
+        {
+            opacity: 0.5;
+            filter: alpha(opacity=50);
+            background: #666666;
+            z-index: 10000;
+            display: none;
+            bottom: 0;
+            left: 0;
+            position: fixed;
+            right: 0;
+            top: 0;
+        }
+        .dvProgressbar
+        {
+            position: absolute;
+            z-index: 10001;
+            top: 50%;
+            left: 55%;
+            display: none;
+            width: 200px;
+            margin-left: -150px !important; /*FF IE7 该值为本身宽的一半 */
+            margin-top: -50px !important; /*FF IE7 该值为本身高的一半*/
+            margin-left: 0px;
+            margin-top: 0px;
+            position: fixed !important; /*FF IE7*/
+            position: absolute; /*IE6*/
+            _top: expression(eval(document.compatMode &&
+                        document.compatMode=='CSS1Compat') ?
+                        documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+                        document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+            _left: expression(eval(document.compatMode &&
+                        document.compatMode=='CSS1Compat') ?
+                        documentElement.scrollLeft + (document.documentElement.clientWidth-this.offsetWidth)/2 :/*IE6*/
+                        document.body.scrollLeft + (document.body.clientWidth - this.clientWidth)/2); /*IE5 IE5.5*/
+        }
+    </style>
+    @RenderSection("Head", false)
+</head>
+<body style="font-family: Microsoft YaHei;">
+    <div class="wraper sidebar-full">
+        <aside class="social-sidebar sidebar-full">
+            <div class="user-settings">
+            <div class="arrow"></div>
+                <h3 class="user-settings-title">Settings shortcuts</h3>
+            </div>
+            <div class="social-sidebar-content">
+                <div class="scrollable">
+                    <div>
+                         <div class="user">
+                    <img class="avatar" width="25" height="25" src="@Url.Content("~/Style/assets/img/avatar-30.png")" alt="Julio Marquez">
+                    <span data-toggle="dropdown">@UserSession.Current.UserDspName</span>
+                    <i class="icon-user trigger-user-settings"></i>
+                    </div>
+                    <div class="navigation-sidebar">
+                        <i class="switch-sidebar-icon icon-chevron-left"></i>
+                        <i class="switch-sidebar-icon icon-align-justify"></i>
+                        <i class="switch-sidebar-full icon-chevron-right"></i>
+                    </div>
+                    </div>
+                    <section class="menu">
+                    <div class="accordion-group " id="menu_dashbord">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle " href="/Home/Index">
+                                <img src="@Url.Content("~/Style/assets/img/icons/stuttgart-icon-pack/32x32/home.png")" alt="Dashboard">
+                                <span>Dashboard </span><span class="badge">9</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="accordion-group " id="menu_settle">
+                        <div class="accordion-heading">
+                        <a class="accordion-toggle opened" data-toggle="collapse" data-parent="#accordion2" href="#collapse-tables">
+                            <img src="@Url.Content("~/Style/assets/img/icons/stuttgart-icon-pack/32x32/invoice.png")" alt="Tables">
+                            <span>清结算管理 </span><span class="arrow"></span>
+                        </a>
+                    </div>
+                    <ul id="collapse-tables" class="accordion-body collapse nav nav-list collapse in">
+                    <li id="item_settle"><a href="/Settlement/Index">账单管理</a></li>
+                    <li id="item_invoice"><a href="/Invoice/Index">发票管理</a></li>
+                    <li id="item_collect"><a href="/Collect/Index">收款记录</a></li>
+                    <li id="item_writeoff"><a href="/WriteOff/Index">回款销账</a></li>
+                </ul>
+                </div>
+                    </section>
+                </div>
+            </div>
+        </aside>
+        <header>
+            <nav class="navbar navbar-blue navbar-fixed-top social-navbar">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".social-sidebar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                </a>
+                <a class="brand" style="font-size:15px;font-weight:bold;">
+                    <span class="icon-home"></span>
+                    @Html.Raw(@ViewBag.SiteMapp)
+                </a>
+                <ul class="nav pull-right nav-indicators">
+                <li class="dropdown nav-tasks">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <span class="badge">13</span>
+                <i class="icon-tasks"></i>
+                </a>
+                <ul class="dropdown-menu">
+                <li class="nav-taks-header">
+                <a tabindex="-1" href="#">You have <strong>13</strong> tasks in progress</a>
+                </li>
+                <li>
+                <a>
+                <strong>Windows PC</strong><span class="pull-right">30%</span>
+                <div class="progress progress-danger active">
+                <div class="bar" style="width: 30%;"></div>
+                </div>
+                </a>
+                </li>
+                <li>
+                <a>
+                <strong>Mac</strong><span class="pull-right">40%</span>
+                <div class="progress progress-info active">
+                <div class="bar" style="width: 40%;"></div>
+                </div>
+                </a>
+                </li>
+                <li>
+                <a>
+                <strong>iPad/iPhone</strong><span class="pull-right">80%</span>
+                <div class="progress progress-striped active">
+                <div class="bar" style="width: 80%;"></div>
+                </div>
+                </a>
+                </li>
+                <li>
+                <a>
+                <strong>Android</strong><span class="pull-right">5%</span>
+                <div class="progress progress-success active">
+                <div class="bar" style="width: 5%;"></div>
+                </div>
+                </a>
+                </li>
+                <li>
+                <a>
+                <strong>Others</strong><span class="pull-right">15%</span>
+                <div class="progress progress-warning active">
+                <div class="bar" style="width: 15%;"></div>
+                </div>
+                </a>
+                </li>
+                <li class="nav-taks-footer">
+                <a tabindex="-1" href="#">View all tasks
+                </a>
+                </li>
+                </ul>
+                </li>
+                <li class="dropdown nav-messages">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <span class="badge">8</span>
+                <i class="icon-envelope-alt"></i>
+                </a>
+                <ul class="dropdown-menu">
+                <li class="nav-messages-header">
+                <a tabindex="-1" href="#">You have <strong>8</strong> new messages</a>
+                </li>
+                <li class="nav-message-body">
+                <a>
+                <img src="@Url.Content("~/Style/assets/img/avatars/user-55x55.png")" alt="User">
+                <div>
+                <small class="pull-right">Just Now</small>
+                <strong>Julio Marquez</strong>
+                </div>
+                <div>
+                Lorem ipsum dolor sit amet, consectetur...
+                </div>
+                </a>
+                </li>
+                <li class="nav-message-body">
+                <a>
+                <img src="@Url.Content("~/Style/assets/img/avatars/user-55x55.png")" alt="User">
+                <div>
+                <small class="pull-right">Just Now</small>
+                <strong>Julio Marquez</strong>
+                </div>
+                <div>
+                Lorem ipsum dolor sit amet, consectetur...
+                </div>
+                </a>
+                </li>
+                <li class="nav-message-body">
+                <a>
+                <img src="@Url.Content("~/Style/assets/img/avatars/user-55x55.png")" alt="User">
+                <div>
+                <small class="pull-right">Just Now</small>
+                <strong>Julio Marquez</strong>
+                </div>
+                <div>
+                Lorem ipsum dolor sit amet, consectetur...
+                </div>
+                </a>
+                </li>
+                <li class="nav-message-body">
+                <a>
+                <img src="@Url.Content("~/Style/assets/img/avatars/user-55x55.png")" alt="User">
+                <div>
+                <small class="pull-right">Just Now</small>
+                <strong>Julio Marquez</strong>
+                </div>
+                <div>
+                Lorem ipsum dolor sit amet, consectetur...
+                </div>
+                </a>
+                </li>
+                <li class="nav-messages-footer">
+                <a tabindex="-1" href="#">View all messages
+                </a>
+                </li>
+                </ul>
+                </li>
+                <li class="divider-vertical"></li>
+                <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-caret-down"></i></a>
+                <ul class="dropdown-menu">
+                <li><a href="/Account/LogOff" ><i class="icon-off"></i> Log Out</a></li>
+                <li class="divider"></li>
+                <li><a href="#"><i class="icon-info-sign"></i> Help</a></li>
+                </ul>
+                </li>
+                </ul>
+                </div>
+                </div>
+            </nav>
+        </header>
+        <div id="main">
+            @RenderBody()
+            <footer id="footer" style="height:5%">
+            <div class="container-fluid">
+                2013 © <em>Hotelvp Admin</em> by <a href="http://www.Hotelvp.com/" target="_blank">Hotelvp.com</a>.
+            </div>
+            </footer>
+        </div>
+    </div>
+    
+   @* <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/jquery-1.9.1.min.js"><\/script>')</script>*@
+
+   @* <script type="text/javascript">
+        $(function () {
+            $('#toggle-checkboxes').click(function () {
+                var $checkbox = $("table").find(':checkbox');
+                if ($(this).attr('checked')) {
+                    $checkbox.attr('checked', true);
+                } else {
+                    $checkbox.attr('checked', false);
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
+      /*<![CDATA[*/
+      var _gauges = _gauges || [];
+      (function() {
+        var t   = document.createElement('script');
+        t.type  = 'text/javascript';
+        t.async = true;
+        t.id    = 'gauges-tracker';
+        t.setAttribute('data-site-id', '');
+        t.src = '..///secure.gaug.es/track.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(t, s);
+      })();
+      /*]]>*/
+    </script>
+*@
+    <script type="text/javascript">
+        $(function () {
+            $("#progressbar").progressbar({
+                value: false
+            });
+            var progressbar = $("#progressbar");
+            var progressbarValue = progressbar.find(".ui-progressbar-value");
+            progressbarValue.css({
+                "background": '#F2F2F2'
+            });
+            $("#progressbar").hide();
+
+
+            $('div[id^="menu_"]').removeClass("active");
+            $('li[id^="item_"]').removeClass("active");
+
+           $("@ViewBag.MenuID").addClass("active");
+            if ("@ViewBag.MItemID" != "")
+            {
+                $("#menu_settle").addClass("active");
+                $("@ViewBag.MItemID").addClass("active");
+            }
+
+        });
+    </script>
+    <div id="dvProcessbg" class="processbg">
+    </div>
+    <div id="progressbar" class="dvProgressbar">
+        <div class="progress-label">
+            Loading...</div>
+    </div>
+</body>
+</html>

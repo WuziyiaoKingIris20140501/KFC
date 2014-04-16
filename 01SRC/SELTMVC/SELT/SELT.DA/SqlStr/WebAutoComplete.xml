@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_b_auto_hotel">
+    <![CDATA[  
+      select '['||prop||']'||prop_name_zh AS REVALUE_ALL from T_LM_B_PROP
+      where 
+      (:PARAMETERS IS NULL) OR (prop LIKE '%'||:PARAMETERS||'%' OR prop_name_zh LIKE '%'||:PARAMETERS||'%' OR pinyin_long LIKE '%'||:PARAMETERS||'%' OR pinyin_short LIKE '%'||:PARAMETERS||'%')
+      order by prop
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_b_auto_hotelgroup">
+    <![CDATA[  
+      select '['||group_code||']'||name_zh AS REVALUE_ALL from t_lm_b_hotelgroup
+      where 
+      (:PARAMETERS IS NULL) OR (NLS_LOWER(group_code) LIKE '%'||:PARAMETERS||'%' OR name_zh LIKE '%'||:PARAMETERS||'%' )
+      order by group_code
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_b_auto_usergroup">
+    <![CDATA[  
+      select '['||ID||']'||USERGROUP_NAME AS REVALUE_ALL from t_lm_usergroup
+      where 
+      (:PARAMETERS IS NULL) OR (ID LIKE '%'||:PARAMETERS||'%' OR NLS_LOWER(USERGROUP_NAME) LIKE '%'||:PARAMETERS||'%' )
+      order by ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_b_auto_hvptaginfo">
+    <![CDATA[ 
+      select '['||ID||']'||TAG_NAME AS REVALUE_ALL from t_tag_info
+      where
+      ((:PARAMETERS IS NULL) OR (NLS_LOWER(PINYIN_SHORT) LIKE '%'||:PARAMETERS||'%' OR NLS_LOWER(TAG_NAME) LIKE '%'||:PARAMETERS||'%' )) AND ((:CITYNAME IS NULL) OR (NLS_LOWER(CITY_ID) LIKE '%'||:CITYNAME||'%'))
+      order by ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_b_auto_bedtype">
+    <![CDATA[ 
+      select '['||bed_code||']'||bed_name AS REVALUE_ALL 
+      from t_room_bed
+      where ((:PARAMETERS IS NULL) OR (lower(bed_code) LIKE '%'||:PARAMETERS||'%') OR (lower(bed_name) LIKE '%'||:PARAMETERS||'%'))
+      order by id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_b_auto_tag">
+    <![CDATA[ 
+      select 
+    '['||tif.id||']'||lbc.name_cn||'-'||tif.tag_name||'商圈' AS REVALUE_ALL 
+    from
+    t_tag_info tif
+    left join t_lm_b_city lbc on tif.city_id= lbc.city_id
+    where
+    (:PARAMETERS IS NULL) OR 
+    (
+    (NLS_LOWER(tif.pinyin_long) LIKE '%'||:PARAMETERS||'%') OR 
+    (NLS_LOWER(tif.PINYIN_SHORT) LIKE '%'||:PARAMETERS||'%') OR 
+    (NLS_LOWER(tif.TAG_NAME) LIKE '%'||:PARAMETERS||'%' ) OR
+    (lbc.city_id LIKE '%'||:PARAMETERS||'%') OR
+    (lbc.name_cn LIKE '%'||:PARAMETERS||'%') OR
+    (NLS_LOWER(lbc.pinyin) LIKE '%'||:PARAMETERS||'%') OR
+    (NLS_LOWER(lbc.pinyin_short) LIKE '%'||:PARAMETERS||'%') OR
+    (NLS_LOWER(lbc.pinyin)||NLS_LOWER(tif.pinyin_long) LIKE '%'||:PARAMETERS||'%') OR
+    (NLS_LOWER(lbc.pinyin_short)||NLS_LOWER(tif.PINYIN_SHORT) LIKE '%'||:PARAMETERS||'%')
+    )
+    order by tif.id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelgroup">
+    <![CDATA[ 
+      select '['||GROUP_CODE||']'||NAME_ZH AS REVALUE_ALL 
+      from t_lm_b_hotelgroup
+      where
+      ((:PARAMETERS IS NULL) OR (NLS_LOWER(GROUP_CODE) LIKE '%'||:PARAMETERS||'%' OR NLS_LOWER(NAME_ZH) LIKE '%'||:PARAMETERS||'%' OR NLS_LOWER(NAME_EN) LIKE '%'||:PARAMETERS||'%'))
+      order by id
+  ]]>
+  </sql>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <sql database="TUANDB" sqlId="t_b_auto_city">
+    <![CDATA[  
+      select '['||city_id||']'||name_cn AS REVALUE_ALL from t_lm_b_city
+      where 
+      (:PARAMETERS IS NULL) OR (name_cn LIKE '%'||:PARAMETERS||'%' OR NLS_LOWER(name_en) LIKE '%'||:PARAMETERS||'%')
+      order by city_id
+  ]]>
+  </sql>
+  
+  <sql database="TUANDB" sqlId="t_b_auto_unit">
+    <![CDATA[  
+      select distinct '['||ut.id||']'||ut.unit_name AS REVALUE_ALL 
+      from 
+      t_lm_settlement_unit ut
+      inner join t_lm_settlement_unit_hotel uth on ut.id=uth.unit_id and ut.unit_name like '%'||:PARAMETERS||'%'
+      inner join t_lm_b_prop bp on uth.hotel_id=bp.prop and bp.prop_name_zh like '%'||:PARAMETERS||'%'
+      left join t_lm_b_hotelgroup hgp on bp.group_code=hgp.group_code and hgp.name_zh like '%'||:PARAMETERS||'%'
+  ]]>
+  </sql>
+
+</sqlList>

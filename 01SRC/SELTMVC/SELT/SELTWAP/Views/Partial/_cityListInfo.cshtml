@@ -1,0 +1,39 @@
+﻿@model System.Data.DataSet
+
+
+<table class="Tb_BodyCSS2" style="border:1px #d5d5d5 solid; padding:1px;">
+    <tr>
+        <th><input type="checkbox" id="chk_lis_all" onclick="SetChkAllStyle()"/></th>
+        <th>ID</th>
+        <th>城市名称</th>
+        <th>城市拼音</th>
+        <th>优先级</th>
+        <th>销售开始时间</th>
+        <th>在线状态</th>
+        <th>城市类型</th>
+        <th>创建时间</th>
+        <th>编辑时间</th>
+        <th>操作</th>
+    </tr>
+    @{
+        if (Model != null && Model.Tables.Count > 0 && Model.Tables[0].Rows.Count > 0)
+        {
+            for (int i = 0; i < Model.Tables[0].Rows.Count; i++)
+            {
+                <tr>
+                    <td><input type="checkbox" id="chk_lis_"+ @i.ToString()/></td>
+                    <td>@Model.Tables[0].Rows[i]["ID"].ToString()</td>
+                    <td>@Model.Tables[0].Rows[i]["CITYNM"].ToString()</td>
+                    <td>@Model.Tables[0].Rows[i]["PINYIN"].ToString()</td>
+                    <td>@Model.Tables[0].Rows[i]["SEQ"].ToString()</td>
+                    <td>@Model.Tables[0].Rows[i]["SALE_HOUR"].ToString()</td>
+                    <td>@Model.Tables[0].Rows[i]["ONLINESTATUS"].ToString()</td>
+                    <td>@Model.Tables[0].Rows[i]["CITYTYPES"].ToString()</td>
+                    <td>@Model.Tables[0].Rows[i]["CDTIME"].ToString()</td>
+                    <td>@Model.Tables[0].Rows[i]["UDTIME"].ToString()</td>
+                    <td><a>编辑</a></td>
+                </tr>
+            }
+        }
+    }
+</table>

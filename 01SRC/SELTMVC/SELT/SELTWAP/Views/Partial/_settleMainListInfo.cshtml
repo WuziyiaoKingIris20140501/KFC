@@ -1,0 +1,83 @@
+﻿@model System.Data.DataSet
+
+<div class="dataTables_wrapper form-inline" id="example_wrapper" role="grid">
+<div class="row-fluid">
+<table class="table table-bordered table-hover table-striped">
+<thead>
+    <tr>
+        <th style="width:15%">
+            账单号
+        </th>
+        <th style="width:35%">
+            结算单位
+        </th>
+        <th style="width:10%">
+            结算月
+        </th>
+        <th style="width:7%">
+            账期
+        </th>
+        <th style="width:12%">
+            账单金额
+        </th>
+        <th style="width:15%">
+            结算状态
+        </th>
+        <th style="width:7%">
+            操作
+        </th>
+    </tr>
+</thead>
+<tbody>
+@{
+    if (Model != null && Model.Tables.Count > 0 && Model.Tables[0].Rows.Count > 0)
+    {
+        for (int i = 0; i < Model.Tables[0].Rows.Count; i++)
+        {
+            var status = @Model.Tables[0].Rows[i]["SLSTATUS"].ToString();
+            <tr>
+                <td>@Model.Tables[0].Rows[i]["BILLID"].ToString()</td>
+                <td>@Model.Tables[0].Rows[i]["UNITNM"].ToString()</td>
+                <td>@Model.Tables[0].Rows[i]["SLMONTH"].ToString()</td>
+                <td>@Model.Tables[0].Rows[i]["TERMS"].ToString()</td>
+                <td>￥@Model.Tables[0].Rows[i]["ACTIVESLAMOUNT"].ToString()</td>
+                @{
+                    if (status == "0" || status == "1")
+                    {
+                        <td style="background-color: #F2DEDE;">@Model.Tables[0].Rows[i]["SLSTATUSDIS"].ToString()</td>
+                    }
+                    else
+                    {
+                        <td style="background-color: #DFF0D8;">@Model.Tables[0].Rows[i]["SLSTATUSDIS"].ToString()</td>
+                    }
+                }
+                <td><a id="aedit" href="#" onclick="fn_edit_settle_detial('@Model.Tables[0].Rows[i]["SLID"].ToString()')"><span class="label label-inverse"><i class="icon-edit"></i>编辑</span></a></td>
+            </tr>
+        }
+    }
+}
+</tbody>
+</table>
+</div>
+@Html.Raw(ViewBag.Pagers)
+</div>
+
+<script type="text/javascript">
+function fn_settle_main_research(arg) {
+    Global.LoadProcess();
+    $.ajax({
+        url: GetPath("/Settlement/ActionAjxSettleMainList"),
+        type: "POST",
+        dataType: "html",
+        data: {
+            pagecurrent: arg
+        },
+        success: function (data) {
+            $("#dvSettleMainList").html(data);
+            Global.UnLoadProcess();
+        },
+        error: function (data) {
+        }
+    });
+}
+</script>

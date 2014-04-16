@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_fc_city">
+    <![CDATA[  
+      select cityid, areaid, name_zh, name_en, name_zh||'('||pinyin_short||') '||pinyin AS cityNM from fog_t_city order by pinyin
+  ]]>   
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_city">
+    <![CDATA[  
+     SELECT lm.ID, lm.city_id AS cityID,lm.city_id AS citycode,lm.name_cn||'('||lm.pinyin_short||')' as cityNM , lm.pinyin, lm.status AS ONLINESTATUS, 
+    (CASE lm.status  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS, lm.SEQ,
+    lm.CREATE_TIME AS CDTIME, lm.UPDATE_TIME AS UDTIME,lm.TYPE AS CITYTYPES,SALE_HOUR,'['||lm.city_id||']'||lm.name_cn AS CONSULTVAL
+    from t_lm_b_city lm
+    where ((:CITYNAME IS NULL) OR (NLS_LOWER(lm.name_cn) LIKE '%'||NLS_LOWER(:CITYNAME)||'%') OR (NLS_LOWER(lm.pinyin_short) LIKE '%'||NLS_LOWER(:CITYNAME)||'%') OR (NLS_LOWER(lm.pinyin) LIKE '%'||NLS_LOWER(:CITYNAME)||'%'))
+    AND ((:ONLINESTATUS IS NULL) OR (lm.status=:ONLINESTATUS))
+    AND ((:StartDTime IS NULL) OR (to_date(:StartDTime, 'yyyy.mm.dd hh24:mi:ss') <= lm.CREATE_TIME))
+    AND ((:EndDTime IS NULL) OR (lm.CREATE_TIME <= to_date(:EndDTime, 'yyyy.mm.dd hh24:mi:ss')))  
+    AND rownum < 6
+    ORDER BY lm.SEQ  ASC 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_city_back">
+    <![CDATA[  
+    SELECT lm.ID, lm.ID AS cityID,lm.city_id AS citycode,fc.name_zh||'('||fc.pinyin_short||')' as cityNM , fc.pinyin, lm.status AS ONLINESTATUS, 
+    (CASE lm.status  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS,
+    lm.CREATE_TIME AS CDTIME, lm.UPDATE_TIME AS UDTIME
+    from t_lm_b_city lm inner join fog_t_city fc on fc.cityid=lm.city_id
+    where ((:CITYNAME IS NULL) OR (fc.name_zh LIKE '%'||:CITYNAME||'%') OR (fc.pinyin_short LIKE '%'||:CITYNAME||'%') OR (fc.pinyin LIKE '%'||:CITYNAME||'%'))
+    AND ((:ONLINESTATUS IS NULL) OR (lm.status=:ONLINESTATUS))
+    AND ((:StartDTime IS NULL) OR (to_date(:StartDTime, 'yyyy.mm.dd hh24:mi:ss') <= lm.CREATE_TIME))
+    AND ((:EndDTime IS NULL) OR (lm.CREATE_TIME <= to_date(:EndDTime, 'yyyy.mm.dd hh24:mi:ss'))) ORDER BY lm.ID DESC
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_city_sigle">
+    <![CDATA[  
+       select lm.city_id from t_lm_b_city lm 
+        where (lm.city_id = :CITYID)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fc_city_sigle">
+    <![CDATA[  
+      select cityid, areaid, name_zh, name_en, name_zh||'('||pinyin_short||') '||pinyin AS cityNM from fog_t_city where cityid=:CITYID
+  ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_city_insert">
+    <![CDATA[
+       insert into t_lm_b_city
+  (id, CITY_ID, area_id, name_cn, name_en, name_jp, seq, dareaid, gbcode, pinyin, pinyin_short, sname, lname, zipcode, phonecode, hotelnum, longitude, latitude，status, CREATE_TIME,UPDATE_TIME,TYPE,NAME,EL_CITY_ID,IS_HOT)
+  select :ID,
+  cityid, areaid, name_zh, name_en, name_jp, seq, dareaid, gbcode, pinyin, pinyin_short, sname, lname, zipcode, phonecode, hotelnum, longitude, latitude, '0', sysdate,sysdate,'10000000000000000000',name_zh,null,'00000000000000000000'
+  from fog_t_city where cityid=:CITYID
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_city_insert_back">
+    <![CDATA[
+       INSERT INTO t_lm_b_city(ID,  city_id,  Name_CN, Name_EN,  Area_ID,  status, CREATE_TIME, UPDATE_TIME) VALUES 
+       (:ID,  :CITYID,  :Name_CN,  :Name_EN,  :Area_ID, '0', SYSDATE, SYSDATE)
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_city_update">
+    <![CDATA[
+       UPDATE T_LM_B_CITY
+      SET 
+          EL_CITY_ID  = :ELCITYID,
+          NAME_CN = :NAMECN,
+          SEQ = :SEQ,
+          PINYIN = :PINYIN,
+          PINYIN_SHORT = :PINYINSHORT,
+          LONGITUDE = :LONGITUDE,
+          LATITUDE = :LATITUDE,
+          STATUS = :ONLINESTATUS, 
+          UPDATE_TIME = SYSDATE,
+          TYPE=:TYPE,
+          IS_HOT = :ISHOT,
+          SALE_HOUR = :SALEHOUR 
+      WHERE CITY_ID = :CITYID
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_city_update_back">
+    <![CDATA[
+       UPDATE t_lm_b_city SET status=:ONLINESTATUS, UPDATE_TIME=SYSDATE WHERE ID=:ID
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_city_main">
+    <![CDATA[
+       select id, city_id, el_city_id,area_id, name_cn, name_en, name_jp, seq, dareaid, gbcode, 
+      pinyin, pinyin_short, sname, lname, zipcode, phonecode, hotelnum, longitude, latitude, 
+      status, create_time, update_time,type as citytypes,is_hot,sale_hour
+      from t_lm_b_city where city_id=:CITYID
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_city_main_fog">
+    <![CDATA[
+      select cityid AS city_id, areaid, name_zh AS name_cn, name_en, name_jp, seq, dareaid, gbcode, pinyin, pinyin_short, 
+      sname, lname, zipcode, phonecode, hotelnum, longitude, latitude 
+      from fog_t_city where cityid=:CITYID
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="fog_t_city">
+    <![CDATA[
+       select cityid, areaid, name_zh, name_en,pinyin_short, name_zh||'('||pinyin_short||') '||pinyin AS cityNM from fog_t_city
+       where 1=1 and(name_zh like '%'||:name_zh||'%' or name_en like '%'||:name_en||'%' or pinyin_short like '%'||:pinyin_short||'%')
+       order by pinyin
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_b_fax_unknow">
+    <![CDATA[
+       select FAX_URL from  T_FAX_UNKNOWN  
+       where 
+       create_time >= TO_DATE('2013-11-03 00:00:00','yyyy-mm-dd hh24:mi:ss') 
+       and create_time <= TO_DATE('2013-11-04 00:00:00','yyyy-mm-dd hh24:mi:ss') 
+    ]]>
+  </sql>
+
+</sqlList>

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_detail_select">
+    <![CDATA[  
+    select 
+    id, unit_name, invoice_name, settlement_term, hotel_tax, 
+    settlement_address, settlement_per, settlement_tel, settlement_fax, 
+    settlement_sales, bill_item, hotel_taxno, hotel_payno, status,remark
+    from t_lm_settlement_unit
+    where id=:UnitID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_remark_update">
+    <![CDATA[  
+    update t_lm_settlement_unit
+    set remark=:UnitRemark,UPDATE_USER=:OPEUser,UPDATE_TIME=sysdate
+    where id=:UnitID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_order_select">
+    <![CDATA[  
+    select tlo.order_num, tlo.city_id AS CITYID, lbc.name_cn AS CITYNM,tlo.hotel_id AS HOTELID,tlo.hotel_name AS HOTELNM,tlo.in_date AS INDATE,
+    tlo.book_room_num AS ROOMNUM
+ ,tlo.guest_names AS GUESTNM,tlo.contact_name,tlo.contact_tel,tlo.book_type,tlo.create_time,tlo.user_id,tlo.book_status,
+ tlo.pay_status,tlo.hold_time,tlo.fog_order_num,tlo.out_date AS OUTDATE,tlo.book_remark,tlo.book_source,tlo.book_price,
+ tlo.room_type_code AS ROOMID,tlo.price_code,tlo.order_cancle_reason,tlo.book_total_price,tlo.login_mobile,
+  tlo.overtime,tlo.memo1,tlo.pro_desc,tlo.pro_content,tlo.is_network,tlo.breakfast_num,tlo.ticket_usercode,
+  tlo.ticket_amount,tlo.ticket_count,tlo.room_type_name AS ROOMNM,tlo.book_status_other,tlo.book_person_tel,
+  tlo.pay_method,tlo.is_reserve,tlo.fog_resvtype,tlo.fog_resvstatus,tlo.fog_auditstatus,tlo.lmbar_status,
+  tlo.pay_methoddesc,tlo.update_time,tlo.invoice_flg,tlo.invoice_code,tlo.promotion_amount,tlo.app_version,
+  tlo.is_delete,tlo.app_platform,tlo.order_channel,tlo.charge_desc,tlo.order_longitude,tlo.order_latitude,
+  tlo.is_gua,tlo.order_cancel_time,tlo.arrive_time,tlo.base_price,tlo.vendor,tlo.vendor_status,tlo.is_visitor,
+  tlo.first_day_price,tlo.third_price_code,bp.group_code AS GROUPID,hgp.name_zh AS GROUPNM,
+  from t_lm_order tlo
+  left join t_lm_b_city lbc on tlo.city_id=city_id
+  left join t_lm_b_prop bp on tlo.hotel_id=bp.prop
+  left join t_lm_b_hotelgroup hgp on bp.group_code=hgp.group_code
+  where fog_order_num=:OrderID
+  ]]>
+  </sql>
+
+</sqlList>

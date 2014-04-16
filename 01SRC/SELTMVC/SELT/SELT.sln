@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SELTWAP", "SELTWAP\SELTWAP.csproj", "{9D906E71-12A5-4466-A887-5E505B3F5B99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.SELT.Domain.Biz", "SELT.Biz\HotelVp.SELT.Domain.Biz.csproj", "{338C3214-2378-4A6C-981A-D31EE5D9AEA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.SELT.Domain.DA", "SELT.DA\HotelVp.SELT.Domain.DA.csproj", "{1DF92583-E2AE-46F3-9838-6357E8DF6085}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.SELT.Domain.Entity", "SELT.Entity\HotelVp.SELT.Domain.Entity.csproj", "{FDA6BCB2-C048-4C4C-8A10-942FAC222469}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.SELT.Domain.API", "SELT.API\HotelVp.SELT.Domain.API.csproj", "{4AEC6AA0-CDEA-4AC4-8E35-C7494345358C}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://thltfs:8080/tfs/hotelvp
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SELTWAP\\SELTWAP.csproj
+		SccProjectName1 = SELTWAP
+		SccLocalPath1 = SELTWAP
+		SccProjectUniqueName2 = SELT.Biz\\HotelVp.SELT.Domain.Biz.csproj
+		SccProjectName2 = SELT.Biz
+		SccLocalPath2 = SELT.Biz
+		SccProjectUniqueName3 = SELT.DA\\HotelVp.SELT.Domain.DA.csproj
+		SccProjectName3 = SELT.DA
+		SccLocalPath3 = SELT.DA
+		SccProjectUniqueName4 = SELT.Entity\\HotelVp.SELT.Domain.Entity.csproj
+		SccProjectName4 = SELT.Entity
+		SccLocalPath4 = SELT.Entity
+		SccProjectUniqueName5 = SELT.API\\HotelVp.SELT.Domain.API.csproj
+		SccProjectName5 = SELT.API
+		SccLocalPath5 = SELT.API
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9D906E71-12A5-4466-A887-5E505B3F5B99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D906E71-12A5-4466-A887-5E505B3F5B99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D906E71-12A5-4466-A887-5E505B3F5B99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D906E71-12A5-4466-A887-5E505B3F5B99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{338C3214-2378-4A6C-981A-D31EE5D9AEA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{338C3214-2378-4A6C-981A-D31EE5D9AEA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{338C3214-2378-4A6C-981A-D31EE5D9AEA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{338C3214-2378-4A6C-981A-D31EE5D9AEA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DF92583-E2AE-46F3-9838-6357E8DF6085}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DF92583-E2AE-46F3-9838-6357E8DF6085}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DF92583-E2AE-46F3-9838-6357E8DF6085}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DF92583-E2AE-46F3-9838-6357E8DF6085}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDA6BCB2-C048-4C4C-8A10-942FAC222469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDA6BCB2-C048-4C4C-8A10-942FAC222469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDA6BCB2-C048-4C4C-8A10-942FAC222469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDA6BCB2-C048-4C4C-8A10-942FAC222469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AEC6AA0-CDEA-4AC4-8E35-C7494345358C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AEC6AA0-CDEA-4AC4-8E35-C7494345358C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AEC6AA0-CDEA-4AC4-8E35-C7494345358C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AEC6AA0-CDEA-4AC4-8E35-C7494345358C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
