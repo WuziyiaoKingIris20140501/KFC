@@ -1,0 +1,90 @@
+﻿@*@model List<HotelVp.EBOK.Domain.API.Model.RoomList>*@
+    <div class="col-lg-12 text-center">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="date-table-bordered" id="main_date_tb">
+                 <tr style="width:100%;line-height:20px;">
+                     <td colspan="7" id="tdsel" style="width:100%;">
+                        @{
+                            var frommonth = DateTime.Parse(ViewBag.STDate as string).ToString("yyyy年MM月");
+                        }
+                        
+                        <div style="width:100%">
+                            <ul class="pager" style="height:20px;margin-top:5px">
+                                 <li class="previous" style="width:20%;float:left;margin-left:20px">
+                                       <a href="#" class="previous" onclick="fn_ordercm_prenextmonth(-1)">← 上月</a>
+                                 </li>
+                                 <li style="width:53%;float:left"><a href="#"><strong>@frommonth</strong></a></li>
+                                 <li class="previous" style="width:20%;float:right;margin-left:10px">
+                                    <a href="#" onclick="fn_ordercm_prenextmonth(1)">下月 →</a>
+                                </li>
+                            </ul>
+                        </div>
+                     </td>
+                 </tr>
+                <tr>
+                    <th style="color:#428BCA">周日</th>
+                    <th>周一</th>
+                    <th>周二</th>
+                    <th>周三</th>
+                    <th>周四</th>
+                    <th>周五</th>
+                    <th style="color:#428BCA">周六</th>
+                </tr>
+                @{
+                    var fromdate = DateTime.Parse(ViewBag.STDate as string);
+                    var enddate = DateTime.Parse(ViewBag.STDate as string).AddMonths(1).AddDays(-1);
+                    var todate = DateTime.Now;
+                    var datehtml = "";
+                    var tdid = "";
+                    var startweek = (int)fromdate.DayOfWeek;
+                    datehtml += "<tr>";
+
+                    for (int i = 0; i < startweek; i++)
+                    {
+                        datehtml += "<td id='tdep'></td>";
+                    }
+                    var mdays = int.Parse(enddate.Day.ToString());
+                    for (int j = 0; j < mdays; j++)
+                    {
+                        todate = fromdate.AddDays(j);
+                        if (todate.DayOfWeek == DayOfWeek.Sunday)
+                        {
+                            datehtml += "<tr>";
+                        }
+                        tdid = "tdDTP_" + todate.ToString("yyyy-MM-dd");
+                        datehtml += "<td id=";
+                        datehtml += tdid;
+                        datehtml += " onclick=fn_roomcm_review_dateptClick('";
+                        datehtml += tdid;
+                        datehtml += "')><strong>";
+                        datehtml += todate.Day.ToString().PadLeft(2, '0');
+                        datehtml += "</strong></td>";
+
+                        if (todate.DayOfWeek == DayOfWeek.Saturday)
+                        {
+                            datehtml += "</tr>";
+                        }
+                    }
+
+                    if (enddate.DayOfWeek != DayOfWeek.Saturday)
+                    {
+                        var endweek = 6 - ((int)enddate.DayOfWeek);
+                        for (int i = 0; i < endweek; i++)
+                        {
+                            datehtml += "<td id='tdep'></td>";
+                        }
+                        datehtml += "</tr>";
+                    }
+                }
+                @Html.Raw(datehtml)
+                <tr>
+                    <td colspan="7" id="tdbtn">
+                        <button class="btn btn-success" style="width:100px;" type="button" onclick="fn_roomcm_review_datetimepicker_hide()">确认</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    </div>
+    <input type="hidden" id="hidSTDateP" value="@ViewBag.STDate"/>

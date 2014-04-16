@@ -1,0 +1,23 @@
+﻿@model List<HotelVp.EBOK.Domain.API.Model.OrderList>
+ @{
+    if (Model != null && Model.Count > 0)
+    {
+        for (int i = 0; i < Model.Count; i++)
+        {
+            @Html.Raw("<tr>");
+            <td>@Model[i].fogOrderNum</td>
+            <td>@Model[i].guestNames</td>
+            <td>@Model[i].contactTel</td>
+            <td>@Model[i].inDate</td>
+            <td>@Model[i].outDate</td>
+            <td>@Model[i].roomTypeName</td>
+            <td>@Model[i].statusDesc</td>
+            @Html.Raw("</tr>");
+        }
+    }
+}
+<script language="javascript" type="text/javascript">
+     document.getElementById("hidPageNum").value = '@ViewBag.SPageNum';
+     document.getElementById("hidPgeSize").value = '@ViewBag.SPgeSize';
+     document.getElementById("hidHasNext").value = '@ViewBag.SHasNext';
+</script>

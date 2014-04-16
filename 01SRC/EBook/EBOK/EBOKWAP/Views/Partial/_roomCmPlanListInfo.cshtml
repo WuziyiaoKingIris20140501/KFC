@@ -1,0 +1,84 @@
+﻿@model System.Data.DataSet
+<div class="row" id="dvroomcmbody" style="margin-top:0px;">
+    <div class="col-lg-12 text-center">
+        <div class="panel panel-default">
+            <div class="panel-body">
+            <div class="table-responsive">
+                <div style="width:100%;"> 
+                    
+                    <div style="float:right;margin-right:5px">下线</div><div style="float:right;margin-right:3px;margin-top:3px;width:15px;height:15px;border:0px solid #ddddde;-moz-border-radius: 28px;-webkit-border-radius: 28px;border-radius:28px;background-color:#999999;position:relative;"></div>
+                    <div style="float:right;margin-right:5px">满房</div><div style="float:right;margin-right:3px;margin-top:3px;width:15px;height:15px;border:0px solid #ddddde;-moz-border-radius: 28px;-webkit-border-radius: 28px;border-radius:28px;background-color:#F0AD4E;position:relative;"></div>
+                    <div style="float:right;margin-right:5px">在售</div><div style="float:right;margin-right:3px;margin-top:3px;width:15px;height:15px;border:0px solid #ddddde;-moz-border-radius: 28px;-webkit-border-radius: 28px;border-radius:28px;background-color:#5CB85C;position:relative;"></div>
+                    
+                    
+                    
+                </div>
+                <table class="table table-bordered table-hover table-striped tablesorter">
+                <thead>
+                <tr>
+                    <th align="center" rowspan="2" class="header danger">
+                        <div style="margin:20px">日期</div>
+                    </th>
+                    <th colspan="@ViewBag.lm2Cols" class="header success">现付</th>
+                    <th colspan="@ViewBag.lmCols" class="header success">预付</th>
+                </tr>
+                <tr>
+                    @{
+                        for (int j = 1; j < Model.Tables[0].Columns.Count; j++)
+                        {
+                            var roominfo = Model.Tables[0].Columns[j].ColumnName;
+                            <th class="header warning">
+                                @*[@roominfo.Split('-')[1]]*@
+                                @roominfo.Split('-')[2] 
+                            </th>
+                        }
+                    
+                    }
+                </tr>
+                </thead>
+                    <tbody style="margin-top:-5px">
+                        @{
+                            if (Model != null && Model.Tables.Count > 0 && Model.Tables[0].Rows.Count > 0)
+                            {
+                                for (int i = 0; i < Model.Tables[0].Rows.Count; i++)
+                                {
+                                    @Html.Raw("<tr>");
+                                    for (int j = 0; j < Model.Tables[0].Columns.Count; j++)
+                                    {
+                                        var roominfo = Model.Tables[0].Rows[i][j].ToString();
+                                        if (roominfo.Contains('|'))
+                                        {
+                                            var rminfoList = roominfo.Split('|');
+                                            var status = rminfoList[0];
+                                            var roomNum = rminfoList[1];
+
+                                            if (status == "false")
+                                            {
+                                                <td><div style='float:left;width:15px;height:15px;border:0px solid #ddddde;-moz-border-radius: 28px;-webkit-border-radius: 28px;border-radius:28px;background-color:#999999;position:relative;margin-top:2px;'></div><div style='float:left;'>￥@rminfoList[2] / @rminfoList[1] 间</div></td>
+                                            }
+                                            else if (status == "true" && int.Parse(roomNum) == 0)
+                                            {
+                                                <td><div style='float:left;width:15px;height:15px;border:0px solid #ddddde;-moz-border-radius: 28px;-webkit-border-radius: 28px;border-radius:28px;background-color:#F0AD4E;position:relative;margin-top:2px;'></div><div style='float:left;'>￥@rminfoList[2] / @rminfoList[1] 间</div></td>
+                                            }
+                                            else
+                                            {
+                                                <td><div style='float:left;width:15px;height:15px;border:0px solid #ddddde;-moz-border-radius: 28px;-webkit-border-radius: 28px;border-radius:28px;background-color:#5CB85C;position:relative;margin-top:2px;'></div><div style='float:left;'>￥@rminfoList[2] / @rminfoList[1] 间</div></td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td>@roominfo
+                                            </td>
+                                        }
+                                    }
+                                    @Html.Raw("</tr>");
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>

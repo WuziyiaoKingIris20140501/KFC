@@ -1,0 +1,72 @@
+﻿@{
+    ViewBag.Title = "OrderCm";
+}
+<script src="@Url.Content("~/Scripts/viewjs/VOrderCm.js")" type="text/javascript"></script>
+
+<style type="text/css">
+        #warningMsg
+        {
+            position: absolute;
+            z-index: 100001;
+            top: 50%;
+            left: 55%;
+            width: 300px;
+            height: 130px;
+            margin-left: -150px !important; /*FF IE7 该值为本身宽的一半 */
+            margin-top: -50px !important; /*FF IE7 该值为本身高的一半*/
+            margin-left: 0px;
+            margin-top: 0px;
+            position: fixed !important; /*FF IE7*/
+            position: absolute; /*IE6*/
+            _top: expression(eval(document.compatMode &&
+                        document.compatMode=='CSS1Compat') ?
+                        documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+                        document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+            _left: expression(eval(document.compatMode &&
+                        document.compatMode=='CSS1Compat') ?
+                        documentElement.scrollLeft + (document.documentElement.clientWidth-this.offsetWidth)/2 :/*IE6*/
+                        document.body.scrollLeft + (document.body.clientWidth - this.clientWidth)/2); /*IE5 IE5.5*/
+        }
+    </style>
+
+<div id="page-wrapper">
+<div id="warningMsg" style="display:none;" class="alert alert-warning">
+    <strong>Warning!</strong> Best check yo self, you're not looking too good.
+    <div style="width:100%;text-align:center"><br />
+    <button class="btn btn-info" style="width:80px;" type="button" onclick="">确认</button>
+    <button class="btn btn-warning" style="width:80px;" type="button" onclick="fn_ordercm_index_msg_hide()">取消</button>
+    </div>
+</div>
+    <div style="margin-top:-15px">
+        <ul class="nav nav-pills" style="width:100%;font-weight:bold;">
+            <li id="liOcInToday" class="active" style="width:32%;text-align:center;background-color:#EEEEEE;color:#2A6496">
+                <a href="#" onclick="fn_ordercm_index_Change('1')">
+                <span style="font-size:24px;">今日待处理订单</span>
+                <span id="spOCInToday" class="badge">0</span>
+                </a>
+            </li>
+            <li id="liOcOffToday" style="width:32%;text-align:center;margin-left:2%;background-color:#EEEEEE;color:#2A6496">
+                <a href="#" onclick="fn_ordercm_index_Change('2')">
+                <span style="font-size:24px;">今日已处理订单</span>
+                <span id="spRCOffToday" class="badge">0</span>
+                </a>
+            </li>
+            <li id="liOcInHis" style="width:32%;text-align:center;margin-left:2%;background-color:#EEEEEE;color:#2A6496">
+                <a href="#" onclick="fn_ordercm_index_Change('3')">
+                <span style="font-size:24px;">历史订单查询</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="dvOderCmIndexMainList">
+    </div>
+</div>
+
+<input type="hidden" id="hidScrollFlag"/>
+ <script language="javascript" type="text/javascript">
+    $(function () {
+        fn_initial_LoacalVal('@ViewBag.MAC', '@ViewBag.HotelID', '@ViewBag.HotelNM');
+        fn_ordercm_main_span_count();
+    });
+</script>

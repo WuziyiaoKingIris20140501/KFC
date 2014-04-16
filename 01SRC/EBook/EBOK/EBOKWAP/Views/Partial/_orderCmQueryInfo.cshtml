@@ -1,0 +1,337 @@
+﻿@*@model List<HotelVp.EBOK.Domain.API.Model.RoomList>*@
+
+<div class="row" id="roomcmerrmsg" style="margin-top:15px;display:none">
+<div class="col-lg-12">
+<div class="alert alert-dismissable alert-danger">
+<strong id="dvmsgcontent">Oh snap!</strong>
+</div>
+</div>
+</div>
+
+<div class="row" id="dvroomcmbody" style="margin-top:15px;">
+    <div class="col-lg-12 text-center">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table style="width:100%;line-height:50px;">
+                <tr>
+                    <td style="width:10%;text-align:right;font-weight:bold;">查询日期：</td>
+                    <td style="text-align:left;">
+                        <div id="dvControlDate">
+                            <div style="float:left;margin-left:4px"><button class="btn btn-warning" id="btn_roomcm_review_today" type="button" onclick="fn_roomcm_review_date_change('#btn_roomcm_review_today')" >今日</button></div>
+                            <div style="float:left;margin-left:4px"><button class="btn btn-default" id="btn_roomcm_review_otherday" type="button"  onclick="fn_roomcm_review_date_change('#btn_roomcm_review_otherday')" >其他日期段</button></div>
+                            <div style="float:left;margin-left:5px;margin-top:-2px;display:none" id="dvstartDate"><input type="text" class="form-control" onclick="fn_roomcm_review_datetimepicker_show()" readonly="readonly" style="width:150px;height:40px;margin-top:10px" id="txt_roomcm_review_startdate"/></div>
+                            <div style="float:left;margin-left:-35px;display:none" id="dvDateBT">
+                                <a href="##" onclick="fn_roomcm_review_datetimepicker_show()">
+                                    <img src="@Url.Content("~/Style/menu/planmodify_b.png")" style="width:30px;height:29px;" alt=""/>
+                                </a>
+                            </div>
+                            <div style="float:left;margin-left:4px;margin-top:-2px;display:none" id="dvendDate">
+                            <input type="text" class="form-control" style="width:150px;height:40px;margin-top:10px" onclick="fn_roomcm_review_datetimepicker_show()" readonly="readonly" id="txt_roomcm_review_enddate"/>
+                            </div>
+                            <div style="float:left;margin-left:-35px;display:none" id="dvDateBT2">
+                                <a href="##" onclick="fn_roomcm_review_datetimepicker_show()">
+                                    <img src="@Url.Content("~/Style/menu/planmodify_b.png")" style="width:30px;height:29px;" alt=""/>
+                                </a>
+                            </div>
+                            <div style="float:left;margin-left:15px">
+                                入住人：
+                            </div>
+                            <div style="float:left;margin-left:4px">
+                                <input type="text" class="form-control" style="width:160px;height:40px;margin-top:8px" maxlength="20" placeholder="入住人或手机号" id="txt_roomcm_review_cusid"/>
+                            </div>
+                            <div style="float:left;margin-left:15px">
+                            <button class="btn btn-success" style="width:80px;" type="button" onclick="fn_ordercm_list_search()">搜索</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    </div>
+</div>
+<div id="dvOrderQueryList"></div>
+
+@*<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>  *@
+  
+   <script type="text/javascript">
+       function fn_ordercm_list_pages_search() {
+           Global.LoadProcess();
+           var searchDate = "";
+           if ($("#btn_roomcm_review_today").hasClass("btn-warning")) {
+               searchDate = "Sysdate";
+           }
+           else if ($("#btn_roomcm_review_otherday").hasClass("btn-warning")) {
+               searchDate = $("#txt_roomcm_review_startdate").val() + "_" + $("#txt_roomcm_review_enddate").val();
+           }
+           $.ajax({
+               url: GetPath("/OrderCm/AjxGetOrderQueryPageList"),
+               type: "POST",
+               async: true,
+               dataType: "html",
+               data: {
+                   mac: localStorage.getItem("mac"),
+                   hid: localStorage.getItem("hid"),
+                   cusid: $("#txt_roomcm_review_cusid").val(),
+                   sdate: searchDate,
+                   pageNum: document.getElementById("hidPageNum").value,
+                   pageSize: document.getElementById("hidPgeSize").value
+               },
+               success: function (data) {
+                   $("#tborderlist").append(data);
+                   if (document.getElementById("hidHasNext").value == "1") {
+                       $("#dvlamsg").html("↑上拉更多");
+                   }
+                   else {
+                       $("#dvlamsg").html("");
+                   }
+                   Global.UnLoadProcess();
+               },
+               error: function (data) {
+                   //Global.UnLoadProcess();
+               }
+           });
+       }
+
+       $(document).ready(function () {
+           var range = 50;             //距下边界长度/单位px  
+           var elemt = 500;           //插入元素高度/单位px  
+           var maxnum = 20;            //设置加载最多次数  
+           var num = 1;
+           var totalheight = 0;
+           var main = $("#content");                     //主体元素  
+           var bFlag = true;
+           $(window).scroll(function () {
+               if (document.getElementById("hidScrollFlag").value != "1") {
+                   return;
+               }
+
+               var srollPos = $(window).scrollTop();    //滚动条距顶部距离(页面超出窗口的高度)  
+
+               //console.log("滚动条到顶部的垂直高度: "+$(document).scrollTop());  
+               //console.log("页面的文档高度 ："+$(document).height());  
+               //console.log('浏览器的高度：'+$(window).height());  
+
+               totalheight = parseFloat($(window).height()) + parseFloat(srollPos);
+               var hasNext = document.getElementById("hidHasNext").value;
+               //alert(document.getElementById("hidHasNext").value);
+
+               if ((($(document).height() - range) <= totalheight && num != maxnum) && (hasNext == "1")) {
+                   if (bFlag) {
+                       fn_ordercm_list_pages_search();
+                       bFlag = false;
+                   }
+                   bFlag = true;
+                   num++;
+               }
+           });
+       });
+    </script>  
+@*    <div id="content" style="height:960px">  
+        <div id="follow">this is a scroll test;<br/>    页面下拉自动加载内容</div>  
+        <div style='border:1px solid tomato;margin-top:20px;color:#ac1;height:800' >hello world test DIV</div>  
+          
+    </div>  *@
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+#roomcminfoMsg
+{
+    position: absolute;
+    z-index: 100001;
+    top: 50%;
+    left: 55%;
+    width: 320px;
+    height: 170px;
+    text-align:center;
+    margin-left: -150px !important; /*FF IE7 该值为本身宽的一半 */
+    margin-top: -50px !important; /*FF IE7 该值为本身高的一半*/
+    margin-left: 0px;
+    margin-top: 0px;
+    position: fixed !important; /*FF IE7*/
+    position: absolute; /*IE6*/
+    _top: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+                document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+    _left: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollLeft + (document.documentElement.clientWidth-this.offsetWidth)/2 :/*IE6*/
+                document.body.scrollLeft + (document.body.clientWidth - this.clientWidth)/2); /*IE5 IE5.5*/
+}
+
+#dvDateTimePicker
+{
+    position: absolute;
+    z-index: 100001;
+    top: 25%;
+    left: 40%;
+    width: 550px;
+    height: 500px;
+    text-align:center;
+    margin-left: -150px !important; /*FF IE7 该值为本身宽的一半 */
+    margin-top: -50px !important; /*FF IE7 该值为本身高的一半*/
+    margin-left: 0px;
+    margin-top: 0px;
+    position: fixed !important; /*FF IE7*/
+    position: absolute; /*IE6*/
+    _top: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+                document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+    _left: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollLeft + (document.documentElement.clientWidth-this.offsetWidth)/2 :/*IE6*/
+                document.body.scrollLeft + (document.body.clientWidth - this.clientWidth)/2); /*IE5 IE5.5*/
+}
+
+.date-table-bordered
+{
+    width:100%;height:100%;line-height:50px;border:1px solid #DDDDDD;
+}
+
+.date-table-bordered > thead > tr > th, 
+.date-table-bordered > tbody > tr > th, 
+.date-table-bordered > tfoot > tr > th, 
+.date-table-bordered > thead > tr > td, 
+.date-table-bordered > tbody > tr > td, 
+.date-table-bordered > tfoot > tr > td
+{
+    border: 1px solid #DDDDDD;
+    text-align:center;
+    width:14%;
+}
+
+.date-table-bordered > tbody > tr > th {
+    background-color: #EEEEEE;
+}
+
+.date-table-bordered > tbody > tr > td > strong {
+    font-size:medium;
+}
+
+.date-table-bordered > tbody > tr > td {
+    cursor: pointer;
+}
+
+.date-table-bordered > tbody > tr > td > span {
+    color:#AAAAAA;
+}
+
+.date-table-select
+{
+    background-color: #F0AD4E;
+    border-color: #EEA236;
+    color: #FFFFFF;
+    }
+</style>
+
+<input type="hidden" id="hidFromDayDate" value="@ViewBag.FromDayDate"/>
+<input type="hidden" id="hidToDayDate" value="@ViewBag.ToDayDate"/>
+<input type="hidden" id="hidSTDate" value="@ViewBag.STDate"/>
+
+
+<div class="row" id="dvDateTimePicker" style="margin-top:15px;display:none;">
+    <div class="col-lg-12 text-center">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="date-table-bordered" id="main_date_tb">
+                 <tr style="width:100%;line-height:20px;">
+                     <td colspan="7" id="tdsel" style="width:100%;">
+                        @{
+                            var frommonth = DateTime.Parse(ViewBag.STDate as string).ToString("yyyy年MM月");
+                        }
+                        
+                        <div style="width:100%">
+                            <ul class="pager" style="height:20px;margin-top:5px">
+                                 <li class="previous" style="width:20%;float:left;margin-left:20px">
+                                       <a href="#" class="previous" onclick="fn_ordercm_prenextmonth(-1)">← 上月</a>
+                                 </li>
+                                 <li style="width:53%;float:left"><a href="#"><strong>@frommonth</strong></a></li>
+                                 <li class="previous" style="width:20%;float:right;margin-left:10px">
+                                    <a href="#" onclick="fn_ordercm_prenextmonth(1)">下月 →</a>
+                                </li>
+                            </ul>
+                        </div>
+                     </td>
+                 </tr>
+                <tr>
+                    <th style="color:#428BCA">周日</th>
+                    <th>周一</th>
+                    <th>周二</th>
+                    <th>周三</th>
+                    <th>周四</th>
+                    <th>周五</th>
+                    <th style="color:#428BCA">周六</th>
+                </tr>
+                @{
+                    var fromdate = DateTime.Parse(ViewBag.STDate as string);
+                    var enddate = DateTime.Parse(ViewBag.STDate as string).AddMonths(1).AddDays(-1);
+                    var todate = DateTime.Now;
+                    var datehtml = "";
+                    var tdid = "";
+                    var startweek = (int)fromdate.DayOfWeek;
+                    datehtml += "<tr>";
+
+                    for (int i = 0; i < startweek; i++)
+                    {
+                        datehtml += "<td id='tdep'></td>";
+                    }
+
+                    for (int j = 0; j <= 30; j++)
+                    {
+                        todate = fromdate.AddDays(j);
+                        if (todate.DayOfWeek == DayOfWeek.Sunday)
+                        {
+                            datehtml += "<tr>";
+                        }
+                        tdid = "tdDTP_" + todate.ToString("yyyy-MM-dd");
+                        datehtml += "<td id=";
+                        datehtml += tdid;
+                        datehtml += " onclick=fn_roomcm_review_dateptClick('";
+                        datehtml += tdid;
+                        datehtml += "')><strong>";
+                        datehtml += todate.Day.ToString().PadLeft(2, '0');
+                        datehtml += "</strong></td>";
+
+                        if (todate.DayOfWeek == DayOfWeek.Saturday)
+                        {
+                            datehtml += "</tr>";
+                        }
+                    }
+
+                    if (enddate.DayOfWeek != DayOfWeek.Saturday)
+                    {
+                        var endweek = 6 - ((int)enddate.DayOfWeek);
+                        for (int i = 0; i < endweek; i++)
+                        {
+                            datehtml += "<td id='tdep'></td>";
+                        }
+                        datehtml += "</tr>";
+                    }
+                }
+                @Html.Raw(datehtml)
+                <tr>
+                    <td colspan="7" id="tdbtn">
+                        <button class="btn btn-success" style="width:100px;" type="button" onclick="fn_roomcm_review_datetimepicker_hide()">确认</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    </div>
+</div>
+
+ <script language="javascript" type="text/javascript">
+     $(function () {
+         //         $("#txt_roomcm_review_startdate").val(document.getElementById("hidFromDayDate").value);
+         //         $("#txt_roomcm_review_enddate").val(document.getElementById("hidFromDayDate").value);
+     });
+</script>

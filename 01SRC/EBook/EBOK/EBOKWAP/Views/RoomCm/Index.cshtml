@@ -1,0 +1,145 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<script src="@Url.Content("~/Scripts/viewjs/VRoomCm.js")" type="text/javascript"></script>
+
+<style type="text/css">
+        #warningMsg
+        {
+            position: absolute;
+            z-index: 10001;
+            top: 50%;
+            left: 55%;
+            width: 300px;
+            height: 130px;
+            margin-left: -150px !important; /*FF IE7 该值为本身宽的一半 */
+            margin-top: -50px !important; /*FF IE7 该值为本身高的一半*/
+            margin-left: 0px;
+            margin-top: 0px;
+            position: fixed !important; /*FF IE7*/
+            position: absolute; /*IE6*/
+            _top: expression(eval(document.compatMode &&
+                        document.compatMode=='CSS1Compat') ?
+                        documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+                        document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+            _left: expression(eval(document.compatMode &&
+                        document.compatMode=='CSS1Compat') ?
+                        documentElement.scrollLeft + (document.documentElement.clientWidth-this.offsetWidth)/2 :/*IE6*/
+                        document.body.scrollLeft + (document.body.clientWidth - this.clientWidth)/2); /*IE5 IE5.5*/
+        }
+    </style>
+
+<div id="page-wrapper">
+    <div style="margin-top:-15px">
+        <ul class="nav nav-pills" style="width:100%;font-weight:bold;">
+            <li id="liRcInToday" class="active" style="width:32%;text-align:center;background-color:#EEEEEE;color:#2A6496">
+                <a href="#" onclick="fn_roomcm_index_Change('1')">
+                <span style="font-size:24px;"><span id="spToDayDate"></span> 今日房态</span>
+                <span id="spRCInToday" class="badge">0</span>
+                </a>
+            </li>
+            <li id="liRcOffToday" style="width:32%;text-align:center;margin-left:2%;background-color:#EEEEEE;color:#2A6496">
+                <a href="#" onclick="fn_roomcm_index_Change('2')">
+                <span style="font-size:24px;">房态设置</span>
+                </a>
+            </li>
+            <li id="liRcInHis" style="width:32%;text-align:center;margin-left:2%;background-color:#EEEEEE;color:#2A6496">
+                <a href="#" onclick="fn_roomcm_index_Change('3')">
+                <span style="font-size:24px;">房态查询</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="dvRoomCmIndexMainList">
+    </div>
+
+    @*<div class="row" style="margin-top:15px;">
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">[BB]高级大床房</h3>
+                </div>
+                <div class="panel-body"> 
+                    <div>当前房量：3</div>
+                    <div>销售价格：￥256/晚</div>
+                    <div>当前状态：在线</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">[BF]高级双床房</h3>
+                </div>
+                <div class="panel-body"> 
+                    <div>当前房量：1</div>
+                    <div>销售价格：￥456/晚</div>
+                    <div>当前状态：满房</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="row" style="margin-top:15px;">
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">[BB]高级大床房</h3>
+                </div>
+                <div class="panel-body"> 
+                    <div>当前房量：3</div>
+                    <div>销售价格：￥256/晚</div>
+                    <div>当前状态：在线</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">[BF]高级双床房</h3>
+                </div>
+                <div class="panel-body"> 
+                    <div>当前房量：1</div>
+                    <div>销售价格：￥456/晚</div>
+                    <div>当前状态：满房</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="row" style="margin-top:15px;">
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">[BB]高级大床房</h3>
+                </div>
+                <div class="panel-body"> 
+                    <div>当前房量：3</div>
+                    <div>销售价格：￥256/晚</div>
+                    <div>当前状态：在线</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">[BF]高级双床房</h3>
+                </div>
+                <div class="panel-body"> 
+                    <div>当前房量：1</div>
+                    <div>销售价格：￥456/晚</div>
+                    <div>当前状态：满房</div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+ 
+</div>
+
+ <script language="javascript" type="text/javascript">
+     $(function () {
+         fn_initial_RoomIndexList();
+         fn_ordercm_main_span_count();
+     });
+</script>

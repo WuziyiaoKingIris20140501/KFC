@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.EBOK.Domain.API", "EBOK.API\HotelVp.EBOK.Domain.API.csproj", "{A5791547-6BFD-4DAB-87AA-47241D666268}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.EBOK.Domain.Biz", "EBOK.Biz\HotelVp.EBOK.Domain.Biz.csproj", "{BFB95F86-7845-4611-A6D9-454AF608A567}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBOKWAP", "EBOKWAP\EBOKWAP.csproj", "{8506B8A2-E544-44F3-8393-124F8DDF1030}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://thltfs:8080/tfs/hotelvp
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = EBOK.API\\HotelVp.EBOK.Domain.API.csproj
+		SccProjectName1 = EBOK.API
+		SccLocalPath1 = EBOK.API
+		SccProjectUniqueName2 = EBOK.Biz\\HotelVp.EBOK.Domain.Biz.csproj
+		SccProjectName2 = EBOK.Biz
+		SccLocalPath2 = EBOK.Biz
+		SccProjectUniqueName3 = EBOKWAP\\EBOKWAP.csproj
+		SccProjectName3 = EBOKWAP
+		SccLocalPath3 = EBOKWAP
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A5791547-6BFD-4DAB-87AA-47241D666268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5791547-6BFD-4DAB-87AA-47241D666268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5791547-6BFD-4DAB-87AA-47241D666268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5791547-6BFD-4DAB-87AA-47241D666268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFB95F86-7845-4611-A6D9-454AF608A567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFB95F86-7845-4611-A6D9-454AF608A567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFB95F86-7845-4611-A6D9-454AF608A567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFB95F86-7845-4611-A6D9-454AF608A567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8506B8A2-E544-44F3-8393-124F8DDF1030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8506B8A2-E544-44F3-8393-124F8DDF1030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8506B8A2-E544-44F3-8393-124F8DDF1030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8506B8A2-E544-44F3-8393-124F8DDF1030}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

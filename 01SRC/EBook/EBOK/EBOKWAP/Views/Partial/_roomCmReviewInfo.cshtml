@@ -1,0 +1,334 @@
+﻿@model List<HotelVp.EBOK.Domain.API.Model.RoomList>
+
+<div class="row" id="roomcmerrmsg" style="margin-top:15px;display:none">
+<div class="col-lg-12">
+<div class="alert alert-dismissable alert-danger">
+<strong id="dvmsgcontent">Oh snap!</strong>
+</div>
+</div>
+</div>
+
+<div class="row" id="dvroomcmbody" style="margin-top:15px;">
+    <div class="col-lg-12 text-center">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table style="width:100%;line-height:65px;">
+                <tr>
+                    <td style="width:10%;text-align:right;font-weight:bold;">售卖日期：</td>
+                    <td style="width:90%;text-align:left;">
+                        <div id="dvControlDate">
+                            <div style="float:left;margin-left:15px"><button class="btn btn-default" id="btn_roomcm_review_today" type="button" onclick="fn_roomcm_review_date_change('#btn_roomcm_review_today')" >今日</button></div>
+                            <div style="float:left;margin-left:4px"><button class="btn btn-default" id="btn_roomcm_review_otherday" type="button"  onclick="fn_roomcm_review_date_change('#btn_roomcm_review_otherday')" >其他日期段</button></div>
+                            <div style="float:left;margin-left:5px;display:none" id="dvstartDate">
+                                <input type="text" class="form-control" readonly="readonly" onclick="fn_roomcm_review_datetimepicker_show()" style="width:150px;height:40px;margin-top:15px" id="txt_roomcm_review_startdate"/>
+                            </div>
+                            <div style="float:left;margin-left:-35px;display:none" id="dvDateBT">
+                                <a href="##" onclick="fn_roomcm_review_datetimepicker_show()">
+                                    <img src="@Url.Content("~/Style/menu/planmodify_b.png")" style="width:30px;height:29px;" alt=""/>
+                                </a>
+                            </div>
+                            <div style="float:left;margin-left:4px;display:none" id="dvendDate">
+                                <input type="text" class="form-control" style="width:150px;height:40px;margin-top:15px" onclick="fn_roomcm_review_datetimepicker_show()" readonly="readonly" id="txt_roomcm_review_enddate"/>
+                            </div>
+                            <div style="float:left;margin-left:-35px;display:none" id="dvDateBT2">
+                                <a href="##" onclick="fn_roomcm_review_datetimepicker_show()">
+                                    <img src="@Url.Content("~/Style/menu/planmodify_b.png")" style="width:30px;height:29px;" alt=""/>
+                                </a>
+                            </div>
+
+
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:10%;text-align:right;font-weight:bold">售卖时间：</td>
+                    <td style="width:60%;text-align:left;"><button class="btn btn-warning" style="margin-left:15px" type="button">18:00 - 04:00</button></td>
+                </tr>
+                <tr>
+                    <td style="width:10%;text-align:right;font-weight:bold">售卖房型：</td>
+                    <td style="width:60%;text-align:left;" id="tdRoomCdList" >
+                        @*<button class="btn btn-default" style="margin-left:15px" type="button">时尚大床房 288/晚</button> 
+                        <button class="btn btn-default" type="button">标准间  288/晚</button> 
+                        <button class="btn btn-default" type="button">双人间  288/晚</button> 
+                        <button class="btn btn-default" type="button">六人间   288/晚</button>*@
+                        @{
+                            if (Model != null && Model.Count > 0)
+                            {
+                                for (int i = 0; i < Model.Count; i++)
+                                {
+                                    var ratecode = (Model[i].rateCode == "LMBAR") ? "(预付)" : "(现付)";
+                                    var btnid = "btn_roomcm_review_roomcd_" + Model[i].rateCode + "_" + Model[i].roomTypeCode;
+                                    if (i % 3 == 0)
+                                    {
+                                            @*@Html.Raw("<div class='row' style='margin-top:15px;'>");*@
+                                        <button class="btn btn-default" style="margin-left:15px" type="button" id=@btnid onclick="fn_roomcm_review_roomcd_change('#@btnid')">@Model[i].roomTypeName@ratecode ￥@Model[i].twoPrice/晚</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-default" type="button" id=@btnid onclick="fn_roomcm_review_roomcd_change('#@btnid')">@Model[i].roomTypeName@ratecode ￥@Model[i].twoPrice/晚</button> 
+                                    }
+                                }
+                                <button class="btn btn-primary" type="button" id='btnAll' onclick="fn_roomcm_review_roomcd_all_change()">全选</button> 
+                            }
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:10%;text-align:right;font-weight:bold">每日房量：</td>
+                    <td style="width:60%;text-align:left;" id="tdRoomnum"><div><div style="float:left;"><button class="btn btn-default" style="margin-left:15px;display:none;" type="button" id="btn_roomcm_review_offline" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_offline')" value="-1">下线</button> <button class="btn btn-default" style="margin-left:15px;"  type="button" id="btn_roomcm_review_full" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_full')" value="0">满房</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num1" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num1')" value="1">1</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num2" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num2')" value="2">2</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num3" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num3')" value="3">3</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num4" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num4')" value="4">4</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num5" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num5')" value="5">5</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num6" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num6')" value="6">6</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num7" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num7')" value="7">7</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num8" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num8')" value="8">8</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num9" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num9')" value="9">9</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_num10" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_num10')" value="10">10</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_mornum" onclick="fn_roomcm_review_roomnum_change('#btn_roomcm_review_mornum')" value="mornum">更多</button></div><div style="float:left;margin-left:4px"><input type="text" class="form-control" style="width:50px;margin-top:10px;display:none" id="txt_roomcm_review_mornum" maxlength="3"/></div></div></td>
+                </tr>
+                <tr>
+                    <td style="width:10%;text-align:right;font-weight:bold">早餐情况：</td>
+                    <td style="width:60%;text-align:left;" id="tdBrefa"><div><div style="float:left;"><button class="btn btn-default" style="margin-left:15px" type="button" id="btn_roomcm_review_nobrefa" onclick="fn_roomcm_review_brefa_change('#btn_roomcm_review_nobrefa')" value="0">不含早</button> <button class="btn btn-default" type="button" id="btn_roomcm_review_sigbrefa" onclick="fn_roomcm_review_brefa_change('#btn_roomcm_review_sigbrefa')" value="1">单早</button> <button class="btn btn-default" type="button" id="btn_roomcm_review_dobbrefa" onclick="fn_roomcm_review_brefa_change('#btn_roomcm_review_dobbrefa')"  value="2">双早</button> <button class="btn btn-default" type="button" id="btn_roomcm_review_morbrefa" onclick="fn_roomcm_review_brefa_change('#btn_roomcm_review_morbrefa')">更多</button></div><div style="float:left;margin-left:4px"><input type="text" class="form-control" style="width:50px;margin-top:10px;display:none" id="txt_roomcm_review_morbrefa" maxlength="3"/></div></div></td>
+                </tr>
+                <tr>
+                    <td style="width:10%;text-align:right;font-weight:bold">宽带情况：</td>
+                    <td style="width:60%;text-align:left;" id="tdInter"><button class="btn btn-default" style="margin-left:15px" type="button" id="btn_roomcm_review_freewifi" onclick="fn_roomcm_review_inter_change('#btn_roomcm_review_freewifi')" value="true">免费宽带</button><button class="btn btn-default" style="margin-left:4px" type="button" id="btn_roomcm_review_nointer" onclick="fn_roomcm_review_inter_change('#btn_roomcm_review_nointer')" value="false">无宽带</button></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                    <button class="btn btn-success" style="width:130px;" type="button" onclick="fn_roomcm_save_rooms_check()">确认保存</button>
+                    <button class="btn btn-danger" style="width:130px;margin-left:40px" type="button" onclick="fn_roomcm_clear_data()">撤销</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+<style type="text/css">
+#roomcminfoMsg
+{
+    position: absolute;
+    z-index: 100001;
+    top: 25%;
+    left: 48%;
+    width: 500px;
+    height: 500px;
+    text-align:center;
+    margin-left: -150px !important; /*FF IE7 该值为本身宽的一半 */
+    margin-top: -50px !important; /*FF IE7 该值为本身高的一半*/
+    margin-left: 0px;
+    margin-top: 0px;
+    position: fixed !important; /*FF IE7*/
+    position: absolute; /*IE6*/
+    _top: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+                document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+    _left: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollLeft + (document.documentElement.clientWidth-this.offsetWidth)/2 :/*IE6*/
+                document.body.scrollLeft + (document.body.clientWidth - this.clientWidth)/2); /*IE5 IE5.5*/
+}
+
+#roomcmsucMsg
+{
+    position: absolute;
+    z-index: 100001;
+    top: 50%;
+    left: 55%;
+    width: 300px;
+    height: 70px;
+    text-align:center;
+    margin-left: -150px !important; /*FF IE7 该值为本身宽的一半 */
+    margin-top: -50px !important; /*FF IE7 该值为本身高的一半*/
+    margin-left: 0px;
+    margin-top: 0px;
+    position: fixed !important; /*FF IE7*/
+    position: absolute; /*IE6*/
+    _top: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+                document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+    _left: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollLeft + (document.documentElement.clientWidth-this.offsetWidth)/2 :/*IE6*/
+                document.body.scrollLeft + (document.body.clientWidth - this.clientWidth)/2); /*IE5 IE5.5*/
+}
+
+#dvDateTimePicker
+{
+    position: absolute;
+    z-index: 100001;
+    top: 25%;
+    left: 40%;
+    width: 550px;
+    height: 500px;
+    text-align:center;
+    margin-left: -150px !important; /*FF IE7 该值为本身宽的一半 */
+    margin-top: -50px !important; /*FF IE7 该值为本身高的一半*/
+    margin-left: 0px;
+    margin-top: 0px;
+    position: fixed !important; /*FF IE7*/
+    position: absolute; /*IE6*/
+    _top: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+                document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+    _left: expression(eval(document.compatMode &&
+                document.compatMode=='CSS1Compat') ?
+                documentElement.scrollLeft + (document.documentElement.clientWidth-this.offsetWidth)/2 :/*IE6*/
+                document.body.scrollLeft + (document.body.clientWidth - this.clientWidth)/2); /*IE5 IE5.5*/
+}
+
+.date-table-bordered
+{
+    width:100%;height:100%;line-height:50px;border:1px solid #DDDDDD;
+}
+
+.date-table-bordered > thead > tr > th, 
+.date-table-bordered > tbody > tr > th, 
+.date-table-bordered > tfoot > tr > th, 
+.date-table-bordered > thead > tr > td, 
+.date-table-bordered > tbody > tr > td, 
+.date-table-bordered > tfoot > tr > td
+{
+    border: 1px solid #DDDDDD;
+    text-align:center;
+    width:14%;
+}
+
+.date-table-bordered > tbody > tr > th {
+    background-color: #EEEEEE;
+}
+
+.date-table-bordered > tbody > tr > td > strong {
+    font-size:medium;
+}
+
+.date-table-bordered > tbody > tr > td {
+    cursor: pointer;
+}
+
+.date-table-bordered > tbody > tr > td > span {
+    color:#AAAAAA;
+}
+
+.date-table-select
+{
+    background-color: #F0AD4E;
+    border-color: #EEA236;
+    color: #FFFFFF;
+    }
+</style>
+
+<div id="roomcminfoMsg" style="display:none;" class="alert alert-info">
+    <strong style="font-size:28px;">Info:请选择操作人</strong><button class="close" type="button" style="font-size: 2em;" onclick="fn_roomcm_index_msg_hide()">×</button>
+    <div style="width:100%;height:100%;text-align:center"><br />
+@*    @foreach (var cmUser in ViewData["CnUser"] as Dictionary<string, string>)
+    {
+        var btnuserid = "btn_roomcm_review_opeuser_" + @cmUser.Key;
+        <button class="btn btn-info" style="width:120px;margin-left:8px;margin-top:10px;font-size:24px" type="button" id=@btnuserid onclick="fn_roomcm_review_roomcd_save('@cmUser.Key')">@cmUser.Value</button>
+    }*@
+
+    @{
+        var inum = 1;
+        foreach (var cmUser in ViewData["CnUser"] as Dictionary<string, string>)
+        {
+            var btnuserid = "btn_roomcm_review_opeuser_" + cmUser.Key;
+
+            if (inum % 2 == 0)
+            {
+                <button class="btn btn-info" style="width:150px;margin-left:40px;margin-top:20px;font-size:24px" type="button" id=@btnuserid onclick="fn_roomcm_review_roomcd_save('@cmUser.Key')">@cmUser.Value</button>
+            }
+            else
+            {
+                <button class="btn btn-info" style="width:150px;margin-top:20px;font-size:24px" type="button" id=@btnuserid onclick="fn_roomcm_review_roomcd_save('@cmUser.Key')">@cmUser.Value</button>
+            }
+            inum = inum + 1;
+        }
+    }
+    </div>
+</div>
+
+<div id="roomcmsucMsg" style="display:none;" class="alert alert-dismissable alert-success" onclick="fn_roomcm_index_msg_suc_hide()">
+    @*<button class="close" type="button" onclick="fn_roomcm_index_msg_suc_hide()">×</button>
+    <i class="fa fa-check fa-5x"></i>*@
+    <div style="margin-top:-9px"><strong class="fa fa-check fa-2x"></strong><strong class="fa-2x">保存完成!</strong></div>
+</div>
+
+<input type="hidden" id="hidFromDayDate" value="@ViewBag.FromDayDate"/>
+<input type="hidden" id="hidToDayDate" value="@ViewBag.ToDayDate"/>
+
+
+<div class="row" id="dvDateTimePicker" style="margin-top:15px;display:none;">
+    <div class="col-lg-12 text-center">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="date-table-bordered" id="main_date_tb">
+                 <tr style="line-height:30px">
+                     <td colspan="7" id="tdsel">
+                           <strong>请选择操作日期</strong>
+                     </td>
+                 </tr>
+                <tr>
+                    <th style="color:#428BCA">周日</th>
+                    <th>周一</th>
+                    <th>周二</th>
+                    <th>周三</th>
+                    <th>周四</th>
+                    <th>周五</th>
+                    <th style="color:#428BCA">周六</th>
+                </tr>
+                @{
+                    var fromdate = DateTime.Parse(ViewBag.FromDayDate as string);
+                    var enddate = DateTime.Parse(ViewBag.ToDayDate as string);
+                    var todate = DateTime.Now;
+                    var datehtml = "";
+                    var tdid = "";
+                    var startweek = (int)fromdate.DayOfWeek;
+                    datehtml += "<tr>";
+
+                    for (int i = 0; i < startweek; i++)
+                    {
+                        datehtml += "<td id='tdep'></td>";
+                    }
+
+                    for (int j = 0; j <= 30; j++)
+                    {
+                        todate = fromdate.AddDays(j);
+                        if (todate.DayOfWeek == DayOfWeek.Sunday)
+                        {
+                            datehtml += "<tr>";
+                        }
+                        tdid = "tdDTP_" + todate.ToString("yyyy-MM-dd");
+                        datehtml += "<td id=";
+                        datehtml += tdid;
+                        datehtml += " onclick=fn_roomcm_review_dateptClick('";
+                        datehtml += tdid;
+                        datehtml += "')><strong>";
+                        datehtml += todate.Day.ToString().PadLeft(2, '0');
+                        datehtml += "</strong><span> / ";
+                        datehtml += todate.Month.ToString();
+                        datehtml += "月</span></td>";
+
+                        if (todate.DayOfWeek == DayOfWeek.Saturday)
+                        {
+                            datehtml += "</tr>";
+                        }
+                    }
+
+                    if (enddate.DayOfWeek != DayOfWeek.Saturday)
+                    {
+                        var endweek = 6 - ((int)enddate.DayOfWeek);
+                        for (int i = 0; i < endweek; i++)
+                        {
+                            datehtml += "<td id='tdep'></td>";
+                        }
+                        datehtml += "</tr>";
+                    }
+                }
+                @Html.Raw(datehtml)
+                <tr>
+                    <td colspan="7" id="tdbtn">
+                        <button class="btn btn-success" style="width:100px;" type="button" onclick="fn_roomcm_review_datetimepicker_hide()">确认</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    </div>
+</div>
