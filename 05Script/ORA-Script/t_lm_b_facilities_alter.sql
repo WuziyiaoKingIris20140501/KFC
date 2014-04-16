@@ -1,0 +1,1 @@
+ALTER TABLE t_lm_b_facilities ADD SEQ NUMBER;

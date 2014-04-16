@@ -1,0 +1,33 @@
+USE [CMS]
+GO
+
+/****** Object:  Table [dbo].[APPContent_Ignore]    Script Date: 03/12/2012 12:08:11 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[APPContent_Ignore](
+	[nid] [int] IDENTITY(1,1) NOT NULL,
+	[HOTELID] [Nvarchar](255) NULL,
+	[TYPE] [Nvarchar](255) NULL,
+	[IGNORETYPE] [nvarchar](1) NULL,
+	[STATUS] [Nvarchar](1) NULL,
+	[USERID] [Nvarchar](50) NULL,
+	[CREATETIME] [datetime] NULL,
+ CONSTRAINT [pk_APPContent_Ignore] PRIMARY KEY CLUSTERED 
+(
+	[nid] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
