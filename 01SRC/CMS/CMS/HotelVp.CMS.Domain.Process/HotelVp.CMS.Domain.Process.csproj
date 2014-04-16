@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HotelVp.CMS.Domain.Process</RootNamespace>
+    <AssemblyName>HotelVp.CMS.Domain.Process</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>%24/HotelVPBackend/CMS/01SRC/CMS/CMS/HotelVp.CMS.Domain.Process</SccProjectName>
+    <SccLocalPath>.</SccLocalPath>
+    <SccAuxPath>http://10.0.0.24:8080/tfs/hotelvp</SccAuxPath>
+    <SccProvider>{4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="HotelVp.Common, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\04Ref\HotelVp.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CashBack\CashBackBP.cs" />
+    <Compile Include="Common\LdapAuthentication.cs" />
+    <Compile Include="Common\MasterInfoBP.cs" />
+    <Compile Include="Common\WebAutoCompleteBP.cs" />
+    <Compile Include="Cruise\CruiseInfoBP.cs" />
+    <Compile Include="eBooking\eBookingUserBP.cs" />
+    <Compile Include="GeneralSetting\OrderSearchBP.cs" />
+    <Compile Include="GeneralSetting\TagInfoBP.cs" />
+    <Compile Include="HotelPlan\HotelPlanInfoBP.cs" />
+    <Compile Include="Hotel\HotelsConsultRoomManagerBP.cs" />
+    <Compile Include="Hotel\HotelInfoEXBP.cs" />
+    <Compile Include="Hotel\HotelBlackBP.cs" />
+    <Compile Include="Image\ImageBP.cs" />
+    <Compile Include="ELong\ELRelationBP.cs" />
+    <Compile Include="Issue\IssueInfoBP.cs" />
+    <Compile Include="GeneralSetting\PartnerBP.cs" />
+    <Compile Include="Hotel\APPContentBP.cs" />
+    <Compile Include="Invoice\InvoiceBP.cs" />
+    <Compile Include="GeneralSetting\ChannelBP.cs" />
+    <Compile Include="GeneralSetting\CityBP.cs" />
+    <Compile Include="Common\CommonBP.cs" />
+    <Compile Include="Destination\DestinationBP.cs" />
+    <Compile Include="GeneralSetting\DbSearchBP.cs" />
+    <Compile Include="GeneralSetting\FAQBP.cs" />
+    <Compile Include="GeneralSetting\HotelGroupBP.cs" />
+    <Compile Include="GeneralSetting\RegChannelBP.cs" />
+    <Compile Include="GeneralSetting\PaymentBP.cs" />
+    <Compile Include="GeneralSetting\PlatformBP.cs" />
+    <Compile Include="GeneralSetting\LmSystemLogBP.cs" />
+    <Compile Include="Hotel\HotelInfoBP.cs" />
+    <Compile Include="Hotel\HotelFacilitiesBP.cs" />
+    <Compile Include="Order\OrderFeedbackBP.cs" />
+    <Compile Include="Order\OrderInfoBP.cs" />
+    <Compile Include="Promotion\PromotionBP.cs" />
+    <Compile Include="Promotion\PromotionTypeBP.cs" />
+    <Compile Include="Push\PushBP.cs" />
+    <Compile Include="ReportCenter\ReportCenterBP.cs" />
+    <Compile Include="Security\MenuBP.cs" />
+    <Compile Include="Security\RoleBP.cs" />
+    <Compile Include="Security\UserElementBP.cs" />
+    <Compile Include="SendFaxByWebTurnPicture\WebSiteThumbnailBP.cs" />
+    <Compile Include="Settlement\SeltBP.cs" />
+    <Compile Include="Ticket\TicketInfoBP.cs" />
+    <Compile Include="UserGroup\UserSearchBP.cs" />
+    <Compile Include="UserGroup\UserGroupBP.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HotelVp.CMS.Domain.DataAccess\HotelVp.CMS.Domain.DataAccess.csproj">
+      <Project>{8954506C-B345-4A6C-892C-C3B880066A4E}</Project>
+      <Name>HotelVp.CMS.Domain.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HotelVp.CMS.Domain.Entity\HotelVp.CMS.Domain.Entity.csproj">
+      <Project>{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}</Project>
+      <Name>HotelVp.CMS.Domain.Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HotelVp.CMS.Domain.ServiceAdapter\HotelVp.CMS.Domain.ServiceAdapter.csproj">
+      <Project>{FA4C3142-CD06-497B-8A56-890A31063EEE}</Project>
+      <Name>HotelVp.CMS.Domain.ServiceAdapter</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

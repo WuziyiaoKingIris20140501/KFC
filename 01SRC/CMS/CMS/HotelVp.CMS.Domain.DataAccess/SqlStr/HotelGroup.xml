@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_b_hotelgroup">
+    <![CDATA[  
+      select lp.ID, lp.GROUP_CODE AS GROUPCODE, lp.NAME_ZH AS GROUPNM, lp.DESCRIPTION_ZH AS GROUPDESC, 
+      (CASE lp.BANDTYPE  WHEN 'H' THEN '豪华型' WHEN 'J' THEN '经济型'  ELSE '无'  END ) as GROUPTYPE, lp.STATUS,
+      (CASE lp.status WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS,
+      lp.BANDTYPE from t_lm_b_hotelgroup lp 
+       where
+      ((:ID IS NULL) OR (lp.id = :ID)) order by lp.ID desc
+  ]]>   
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelgroup_sigle">
+    <![CDATA[  
+       select lm.GROUP_CODE AS GROUPCODE,lm.NAME_ZH AS GROUPNM from t_lm_b_hotelgroup lm 
+        where (lm.GROUP_CODE = :GROUPCODE)
+        OR (lm.NAME_ZH = :GROUPNM)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelgroup_updatesigle">
+    <![CDATA[  
+       select lm.GROUP_CODE AS GROUPCODE,lm.NAME_ZH AS GROUPNM from t_lm_b_hotelgroup lm 
+        where (lm.ID <> :ID)
+        AND (lm.NAME_ZH = :GROUPNM)
+  ]]>
+  </sql>
+  
+  <sql database ="TUANDB" sqlId="t_lm_b_hotelgroup_insert">
+    <![CDATA[
+       INSERT INTO T_LM_B_HOTELGROUP
+  (ID, GROUP_CODE, NAME_ZH,DESCRIPTION_ZH, BANDTYPE, STATUS, CREATE_TIME, UPDATE_TIME)
+VALUES
+  (:ID, :GROUPCODE, :NAMEZH,:DESCRIPTIONZH,:BANDTYPE, :ONLINESTATUS, SYSDATE, SYSDATE)
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_hotelgroup_update">
+    <![CDATA[
+      update t_lm_b_hotelgroup
+       set group_code = :GROUPCODE,
+           name_zh = :NAMEZH,
+           description_zh = :DESCRIPTIONZH,
+           bandtype = :BANDTYPE,
+           status = :ONLINESTATUS,
+           update_time = sysdate
+      where id = :ID
+    ]]>
+  </sql>
+  
+</sqlList>

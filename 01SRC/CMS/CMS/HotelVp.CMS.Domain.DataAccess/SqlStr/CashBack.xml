@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_b_order_info_list_by_order">
+    <![CDATA[
+    select t.fog_order_num,t.hotel_name,TO_CHAR(t.in_date, 'yyyy-mm-dd') AS INDATE,t.contact_name,t.ticket_usercode,t.ticket_amount,t.book_total_price,
+    t.login_mobile,tlu.can_applictaion_amount,tlu.audit_amount,tlu.pulling_amount,t.FOG_AUDITSTATUS,'' AS CashTaskStatus, '' AS CashSN
+    from t_lm_order t
+    left join t_lm_cash_user tlu
+    on t.login_mobile=tlu.user_id
+    where t.fog_order_num=:ORDERNO
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_order_info_list_by_user">
+    <![CDATA[
+    select tlu.can_applictaion_amount,tlu.audit_amount,tlu.pulling_amount
+    from t_lm_cash_user tlu
+    where tlu.user_id=:USERID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_cash_status">
+    <![CDATA[
+    select :CashSN AS CashSN, status
+    from t_lm_cash where SN=:CashSN
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_cash_info_update">
+    <![CDATA[
+    update t_lm_cash
+     set 
+         bank_name = :BANKNAME,
+         bank_branch = :BANKBRANCH,
+         bank_card_number = :BANKCARDNUMBER,
+         bank_card_owner = :BANKCARDOWNER,
+         alipay_account = :ALIPAYACCOUNT,
+         recharge_phone_number = :PHONENUMBER,
+         process_remark=:REMARK,
+         apply_type=:APPLYTYPE,
+         SOURCE_CHANNEL='CMS',
+         ALIPAY_ACCOUNT_NAME=:USERNAME
+   where sn = :SN
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_cash_his_info_update">
+    <![CDATA[
+    update T_LM_CASH_HIS
+     set 
+         TYPE='2'
+   where sn = :SN
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_cash_edit_alipayname">
+    <![CDATA[
+    update t_lm_cash set ALIPAY_ACCOUNT_NAME = :ALIPAYACCOUNTNAME where SN= :SN
+  ]]>
+  </sql>
+
+</sqlList>

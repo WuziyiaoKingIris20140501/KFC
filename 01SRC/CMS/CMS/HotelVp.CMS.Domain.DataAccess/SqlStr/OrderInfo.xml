@@ -1,0 +1,1464 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_b_citylist">
+    <![CDATA[
+     select CITY_ID,NAME_CN from t_lm_b_city where STATUS='1' order by seq asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderinfo_select">
+    <![CDATA[
+        select FOG_ORDER_NUM,CITY_ID,HOTEL_ID,HOTEL_NAME,ROOM_TYPE_NAME,IN_DATE,GUEST_NAMES,CONTACT_NAME,CONTACT_TEL,
+        BOOK_STATUS,PAY_STATUS,BOOK_SOURCE,BOOK_PRICE,BOOK_ROOM_NUM,BOOK_TOTAL_PRICE,TICKET_AMOUNT,TICKET_USERCODE,TICKET_AMOUNT,
+        TICKET_COUNT,CREATE_TIME,LOGIN_MOBILE,PRICE_CODE,PROMOTION_AMOUNT  from T_LM_ORDER 
+        where ((:HOTEL_ID IS NULL) OR (HOTEL_ID=:HOTEL_ID))
+        AND ((:HOTEL_NAME IS NULL) OR (HOTEL_NAME LIKE '%'||:HOTEL_NAME||'%'))
+        AND ((:CITY_ID IS NULL) OR (CITY_ID=:CITY_ID))
+        AND ((:StartDate IS NULL) OR (IN_DATE >= to_date(:StartDate,'yyyy-MM-dd')))
+        AND ((:EndDate IS NULL) OR (IN_DATE <= to_date(:EndDate,'yyyy-MM-dd')))
+        AND ((:BOOK_STATUS IS NULL) OR (BOOK_STATUS=:BOOK_STATUS))
+        AND ((:PAY_STATUS IS NULL) OR (PAY_STATUS=:PAY_STATUS))
+        AND ((:FOG_ORDER_NUM IS NULL) OR (FOG_ORDER_NUM=:FOG_ORDER_NUM))  
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderconfirminfo_select">
+    <![CDATA[
+      select toc.order_id, toc.fog_order_num AS ORDERID, toc.status, 
+      CASE WHEN toc.status = '0' THEN '待操作' when toc.status = '1' then '可操作' when toc.status = '2' then '操作中' when toc.status = '3' then '需跟进' ELSE '' END AS MODIFYST,
+      toc.ope_user, toc.fax_system, toc.fax_no,
+      toc.fax_image_url, toc.fax_status, 
+      
+      CASE WHEN toc.fax_status = '0' THEN '待发送' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) <= 1) then '发送中' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) > 1) then '重发中'  when toc.fax_status = '2' then '发送成功'  ELSE '发送失败' END AS FAXSEND,
+      
+      
+      toc.fax_dtime, toc.fax_number, toc.fax_fdtime, toc.create_time, 
+      toc.create_user, toc.update_time, toc.update_user AS MODIFYPE,tc.NAME_CN AS CITYNM,t.HOTEL_ID,t.HOTEL_NAME AS HOTELNM,
+      t.GUEST_NAMES AS GUESTNAMES,TO_CHAR(t.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss') AS CREATETIME,t.LOGIN_MOBILE AS LOGINMOBILE,
+
+      CASE 
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '3' THEN '用户取消'
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '9' THEN 'CC取消'
+      WHEN t.fog_resvstatus is null OR t.fog_resvstatus = '0' THEN '待酒店确认' 
+      when t.fog_resvstatus = '1' then '酒店已确认' 
+      when t.fog_resvstatus = '2' then '问题单(手工单)' 
+      when t.fog_resvstatus = '9' then '酒店反悔' 
+      when t.fog_resvstatus = 'h' then 'HOLD状态' 
+      ELSE '' END AS HOTELDIS,
+      
+      t.create_time AS ORDECTIME,t.book_status_other AS BOOKSTATUS,sysdate AS REDDIS,
+       CASE when toc.FOLLOW_UP = '1' then '是' ELSE '' END AS FOLLOWUP,
+       
+       
+      CASE WHEN t.BOOK_STATUS_OTHER= '0' OR t.BOOK_STATUS_OTHER= '1' THEN '新建' 
+      WHEN t.BOOK_STATUS_OTHER= '3' THEN '用户取消' 
+      WHEN t.BOOK_STATUS_OTHER= '5' THEN 'NO-SHOW' 
+      WHEN t.BOOK_STATUS_OTHER= '6' THEN '已完成' 
+      WHEN t.BOOK_STATUS_OTHER= '7' THEN '已入住' 
+      WHEN t.BOOK_STATUS_OTHER= '8' THEN '离店' 
+      WHEN t.BOOK_STATUS_OTHER= '9' THEN 'CC取消' 
+      ELSE '' END AS ORSTATUS
+      
+      from t_lm_order_cof toc
+      inner join T_LM_ORDER t on t.FOG_ORDER_NUM = toc.fog_order_num 
+      and ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+        AND (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+      left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+      where ((:CityID IS NULL) OR (t.CITY_ID=:CityID))
+      AND ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+      AND ((:UserID IS NULL) OR (t.LOGIN_MOBILE = :UserID))
+      AND ((:OrderID IS NULL) OR (toc.FOG_ORDER_NUM = :OrderID))
+      AND ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      AND ((:CStatus IS NULL) OR (toc.status=:CStatus))
+      AND ((:FStatus IS NULL) OR (toc.fax_status=:FStatus))
+      AND ((:FollowUp IS NULL) OR (toc.FOLLOW_UP=:FollowUp))
+      AND ((:StartDate IS NULL) OR (t.CREATE_TIME>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:EndDate IS NULL) OR (t.CREATE_TIME<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:FaxSNumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) >= TO_NUMBER(:FaxSNumber)))
+      AND ((:FaxENumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) <= TO_NUMBER(:FaxENumber)))
+      AND (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+      AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderconfirminfo_select_all_bak">
+    <![CDATA[
+      select toc.order_id, toc.fog_order_num AS ORDERID, toc.status, 
+      CASE WHEN toc.status = '0' THEN '待操作' when toc.status = '1' then '可操作' when toc.status = '2' then '操作中' when toc.status = '3' then '需跟进' ELSE '' END AS MODIFYST,
+      toc.ope_user, toc.fax_system, toc.fax_no,
+      toc.fax_image_url, toc.fax_status, 
+      
+      CASE WHEN nvl(pt.fax_status,99) = '0' OR pt.fax_status IS NULL THEN '待发' when nvl(pt.fax_status,99) = '2' then '失败'  when nvl(pt.fax_status,99) = '1' then '成功'  ELSE '未发' END AS FAXSEND,
+      CASE WHEN nvl(qt.fax_status,99) = '0' THEN '回传中' when nvl(qt.fax_status,99) = '2' then '失败'  when nvl(qt.fax_status,99) = '1' then '成功'  ELSE '未回传' END AS REFAXSTATUS,
+      
+      toc.fax_dtime, toc.fax_number, toc.fax_fdtime, toc.create_time, 
+      toc.create_user, toc.update_time, toc.update_user AS MODIFYPE,tc.NAME AS CITYNM,t.HOTEL_ID,t.HOTEL_NAME AS HOTELNM,
+      t.GUEST_NAMES AS GUESTNAMES,TO_CHAR(t.CREATE_TIME,'mm-dd hh24:mi:ss') AS CREATETIME,t.LOGIN_MOBILE AS LOGINMOBILE,
+
+      CASE 
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '3' THEN '用户取消'
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '9' THEN 'CC取消'
+      WHEN t.fog_resvstatus is null OR t.fog_resvstatus = '0' THEN '待酒店确认' 
+      when t.fog_resvstatus = '1' then '酒店已确认' 
+      when t.fog_resvstatus = '2' then '问题单(手工单)' 
+      when t.fog_resvstatus = '9' then '酒店反悔' 
+      when t.fog_resvstatus = 'h' then 'HOLD状态' 
+      ELSE '' END AS HOTELDIS,
+      
+      t.create_time AS ORDECTIME,t.book_status_other AS BOOKSTATUS,sysdate AS REDDIS,
+       CASE when toc.FOLLOW_UP = '1' then '是' ELSE '' END AS FOLLOWUP,
+       
+       
+      CASE WHEN t.BOOK_STATUS_OTHER= '0' OR t.BOOK_STATUS_OTHER= '1' THEN '新建' 
+      WHEN t.BOOK_STATUS_OTHER= '3' THEN '用户取消' 
+      WHEN t.BOOK_STATUS_OTHER= '5' THEN 'NO-SHOW' 
+      WHEN t.BOOK_STATUS_OTHER= '6' THEN '已完成' 
+      WHEN t.BOOK_STATUS_OTHER= '7' THEN '已入住' 
+      WHEN t.BOOK_STATUS_OTHER= '8' THEN '离店' 
+      WHEN t.BOOK_STATUS_OTHER= '9' THEN 'CC取消' 
+      ELSE '' END AS ORSTATUS
+      
+      from t_lm_order_cof toc
+      inner join T_LM_ORDER t on t.FOG_ORDER_NUM = toc.fog_order_num 
+      and ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+        AND (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+      left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='1' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) pt on t.fog_order_num=pt.LINK_ID
+  
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='2' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) qt on pt.LINK_ID=qt.LINK_ID and pt.barcode=qt.barcode
+      
+      where ((:CityID IS NULL) OR (t.CITY_ID=:CityID))
+      AND ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+      AND ((:UserID IS NULL) OR (t.LOGIN_MOBILE = :UserID))
+      AND ((:OrderID IS NULL) OR (toc.FOG_ORDER_NUM = :OrderID))
+      AND ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      AND ((:CStatus IS NULL) OR (toc.status=:CStatus))
+      AND ((:FStatus IS NULL) OR (:FStatus = '0' and (pt.fax_status='0' or pt.fax_status is null)) OR (pt.fax_status=:FStatus))
+      AND ((:FollowUp IS NULL) OR (toc.FOLLOW_UP=:FollowUp))
+      AND ((:StartDate IS NULL) OR (t.CREATE_TIME>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:EndDate IS NULL) OR (t.CREATE_TIME<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:FaxSNumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) >= TO_NUMBER(:FaxSNumber)))
+      AND ((:FaxENumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) <= TO_NUMBER(:FaxENumber)))
+      AND (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+      AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderconfirminfo_select_all">
+    <![CDATA[
+      select toc.order_id,t.price_code, toc.fog_order_num AS ORDERID, toc.status, 
+      CASE WHEN toc.status = '0' THEN '待操作' when toc.status = '1' then '可操作' when toc.status = '2' then '操作中' when toc.status = '3' then '需跟进' ELSE '' END AS MODIFYST,
+      toc.ope_user, toc.fax_system, toc.fax_no,
+      toc.fax_image_url, toc.fax_status, 
+      
+      CASE WHEN nvl(pt.fax_status,99) = '0' OR pt.fax_status IS NULL THEN '待发' when nvl(pt.fax_status,99) = '2' then '失败'  when nvl(pt.fax_status,99) = '1' then '成功'  ELSE '未发' END AS FAXSEND,
+      CASE WHEN nvl(qt.fax_status,99) = '0' THEN '回传中' when nvl(qt.fax_status,99) = '2' then '失败'  when nvl(qt.fax_status,99) = '1' then '成功'  ELSE '未回传' END AS REFAXSTATUS,
+      
+      toc.fax_dtime, toc.fax_number, toc.fax_fdtime, toc.create_time, 
+      toc.create_user, toc.update_time, toc.update_user AS MODIFYPE,tc.NAME AS CITYNM,t.HOTEL_ID,t.HOTEL_NAME AS HOTELNM,
+      t.GUEST_NAMES AS GUESTNAMES,TO_CHAR(t.CREATE_TIME,'mm-dd hh24:mi:ss') AS CREATETIME,t.LOGIN_MOBILE AS LOGINMOBILE,
+
+      CASE 
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '3' THEN '用户取消'
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '9' THEN 'CC取消'
+      WHEN t.fog_resvstatus is null OR t.fog_resvstatus = '0' THEN '待酒店确认' 
+      when t.fog_resvstatus = '1' then '酒店已确认' 
+      when t.fog_resvstatus = '2' then '问题单(手工单)' 
+      when t.fog_resvstatus = '9' then '酒店反悔' 
+      when t.fog_resvstatus = 'h' then 'HOLD状态' 
+      ELSE '' END AS HOTELDIS,
+      
+      t.create_time AS ORDECTIME,t.book_status_other AS BOOKSTATUS,sysdate AS REDDIS,
+       CASE when toc.FOLLOW_UP = '1' then '是' ELSE '' END AS FOLLOWUP,
+       
+       
+      CASE WHEN t.BOOK_STATUS_OTHER= '0' OR t.BOOK_STATUS_OTHER= '1' THEN '新建' 
+      WHEN t.BOOK_STATUS_OTHER= '3' THEN '用户取消' 
+      WHEN t.BOOK_STATUS_OTHER= '5' THEN 'NO-SHOW' 
+      WHEN t.BOOK_STATUS_OTHER= '6' THEN '已完成' 
+      WHEN t.BOOK_STATUS_OTHER= '7' THEN '已入住' 
+      WHEN t.BOOK_STATUS_OTHER= '8' THEN '离店' 
+      WHEN t.BOOK_STATUS_OTHER= '9' THEN 'CC取消' 
+      ELSE '' END AS ORSTATUS,
+      CASE WHEN T.PRICE_CODE='LMBAR2' THEN ''
+      WHEN T.PRICE_CODE='LMBAR' AND PAY_STATUS='1' THEN '支付成功'
+      WHEN T.PRICE_CODE='LMBAR' AND PAY_STATUS='7' THEN '已退款'
+      WHEN T.PRICE_CODE='LMBAR' AND PAY_STATUS<>'1' AND PAY_STATUS<>'10' AND PAY_STATUS<>'7' THEN '待支付'
+      ELSE '' END AS PAYSTATUS
+      
+      from t_lm_order_cof toc
+      inner join T_LM_ORDER t on t.FOG_ORDER_NUM = toc.fog_order_num 
+      and ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+         AND (:PriceCode IS NULL OR (t.PRICE_CODE in (SELECT REGEXP_SUBSTR (:PriceCode, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PriceCode) - LENGTH (REPLACE (:PriceCode, ',', '')))))
+      
+       AND 
+     (
+     (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+      
+      OR
+      
+     (:BStatus IS NULL OR (t.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:BStatus, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatus) - LENGTH (REPLACE (:BStatus, ',', '')))))      
+      )
+      left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='1' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) pt on t.fog_order_num=pt.LINK_ID
+  
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='2' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) qt on pt.LINK_ID=qt.LINK_ID and pt.barcode=qt.barcode
+      
+      where ((:CityID IS NULL) OR (t.CITY_ID=:CityID))
+      AND ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+      AND ((:UserID IS NULL) OR (t.LOGIN_MOBILE = :UserID))
+      AND ((:OrderID IS NULL) OR (toc.FOG_ORDER_NUM = :OrderID))
+      AND ((:CStatus IS NULL) OR (toc.status=:CStatus))
+      AND ((:FStatus IS NULL) OR (:FStatus = '0' and (pt.fax_status='0' or pt.fax_status is null)) OR (pt.fax_status=:FStatus))
+      AND ((:FollowUp IS NULL) OR (toc.FOLLOW_UP=:FollowUp))
+      AND ((:StartDate IS NULL) OR (t.CREATE_TIME>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:EndDate IS NULL) OR (t.CREATE_TIME<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:FaxSNumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) >= TO_NUMBER(:FaxSNumber)))
+      AND ((:FaxENumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) <= TO_NUMBER(:FaxENumber)))
+      AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+      AND (t.price_code='LMBAR2' OR (t.price_code='LMBAR' AND T.PAY_STATUS='1'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderconfirmmginfo_select">
+    <![CDATA[
+      select 
+    t.fog_order_num AS ORDERID,                           
+    t.HOTEL_ID||'-'||t.fog_order_num AS HOTELID,
+    t.hotel_name AS HOTELNM, 
+    '' AS AUDITPER,
+    '' AS AUDITTEL,
+    '' AS AUDITPERTEL,
+    t.guest_names AS GTNAME,
+    TO_CHAR(t.in_date,'mm/dd') || ' - ' || TO_CHAR(t.out_date,'mm/dd') AS INOUTDT,
+    too.CONFIRM_NUM AS HCONNU,
+    sh.sales_account AS HVPNM,
+    case when t.FOG_AUDITSTATUS is null then '未审核' when t.FOG_AUDITSTATUS = '5' then 'NoShow' when t.FOG_AUDITSTATUS = '7' then '入住中' when t.FOG_AUDITSTATUS = '8' then '离店' else '' end AS ORDERST
+    from T_LM_ORDER t
+    left join t_lm_sales_history sh 
+    on t.hotel_id = sh.hotel_id and sh.status='1' 
+    and sh.start_date <= t.create_time 
+    and t.create_time <= sh.end_date
+    left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+    left join T_LM_ORDER_OPE too on t.fog_order_num = too.FOG_ORDER_NUM 
+    where ((:CityID IS NULL) OR (t.CITY_ID=:CityID))
+    AND ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+    AND ((:UserID IS NULL) OR (t.LOGIN_MOBILE = :UserID))
+    AND ((:OrderID IS NULL) OR (t.FOG_ORDER_NUM = :OrderID))
+    AND ((:FGStatus = '9') OR (:FGStatus IS NULL AND t.FOG_AUDITSTATUS IS NULL) OR (t.FOG_AUDITSTATUS=:FGStatus))
+    AND ((:StartDate IS NULL) OR (t.out_date>= to_date(:StartDate,'yyyy-MM-dd')))
+    AND ((:EndDate IS NULL) OR (t.out_date<= to_date(:EndDate,'yyyy-MM-dd')))
+    AND t.FOG_ORDER_NUM IS NOT NULL
+    AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderappromginfo_select">
+    <![CDATA[
+      select 
+        t.fog_order_num AS ORDERID, 
+    t.HOTEL_ID||'-'||t.fog_order_num AS HOTELID,
+    t.hotel_name AS HOTELNM, 
+    '['||t.room_type_code||']'||t.room_type_name||'-'||t.book_room_num||'间' AS ROOMNM,
+    t.LOGIN_MOBILE AS LOGINMOBILE,
+    t.guest_names AS GTNAME,
+    TO_CHAR(t.in_date,'mm/dd') || ' - ' || TO_CHAR(t.out_date,'mm/dd') AS INOUTDT,
+    too.CONFIRM_NUM AS HCONNU,
+    sh.sales_account AS HVPNM,
+    case when t.FOG_AUDITSTATUS is null then '未审核' when t.FOG_AUDITSTATUS = '5' then 'NoShow' when t.FOG_AUDITSTATUS = '7' then '入住中' when t.FOG_AUDITSTATUS = '8' then '离店' else '' end AS ORDERST
+    from T_LM_ORDER t
+    left join t_lm_sales_history sh 
+    on t.hotel_id = sh.hotel_id and sh.status='1' 
+    and sh.start_date <= t.create_time 
+    and t.create_time <= sh.end_date
+    left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+    left join T_LM_ORDER_OPE too on t.fog_order_num = too.FOG_ORDER_NUM 
+    where ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+    AND ((:StartDate IS NULL) OR (t.out_date>= to_date(:StartDate,'yyyy-MM-dd')))
+    AND ((:EndDate IS NULL) OR (t.out_date<= to_date(:EndDate,'yyyy-MM-dd')))
+    AND t.FOG_ORDER_NUM IS NOT NULL
+    AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    AND ((:OrderID IS NULL) OR (t.FOG_ORDER_NUM = :OrderID))
+    AND ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderappromginfo_fax_select">
+    <![CDATA[
+      select 
+    t.fog_order_num AS ORDERID, 
+    t.HOTEL_ID||'-'||t.fog_order_num AS HOTELID,
+    t.hotel_name AS HOTELNM, 
+    '['||t.room_type_code||']'||t.room_type_name||'-'||t.book_room_num||'间' AS ROOMNM,
+    t.LOGIN_MOBILE AS LOGINMOBILE,
+    t.guest_names AS GTNAME,
+    TO_CHAR(t.in_date,'mm/dd') || ' - ' || TO_CHAR(t.out_date,'mm/dd') AS INOUTDT,
+    too.CONFIRM_NUM AS HCONNU,
+    sh.sales_account AS HVPNM,
+    case when t.FOG_AUDITSTATUS is null then '未审核' when t.FOG_AUDITSTATUS = '5' then 'NoShow' when t.FOG_AUDITSTATUS = '7' then '入住中' when t.FOG_AUDITSTATUS = '8' then '离店' else '' end AS ORDERST
+    from T_LM_ORDER t
+    left join t_lm_sales_history sh 
+    on t.hotel_id = sh.hotel_id and sh.status='1' 
+    and sh.start_date <= t.create_time 
+    and t.create_time <= sh.end_date
+    left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+    left join T_LM_ORDER_OPE too on t.fog_order_num = too.FOG_ORDER_NUM 
+    where ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+    AND ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+    AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+    AND t.FOG_ORDER_NUM IS NOT NULL
+    AND (((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    AND ((:OrderID IS NULL) OR (t.FOG_ORDER_NUM = :OrderID))
+    AND ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderappromginfo_fax_select_order">
+    <![CDATA[
+      select distinct
+    t.fog_order_num AS ORDERID, 
+    t.HOTEL_ID||'-'||t.fog_order_num AS HOTELID,
+    t.hotel_name AS HOTELNM, 
+    '['||t.room_type_code||']'||t.room_type_name||'-'||t.book_room_num||'间' AS ROOMNM,
+    t.LOGIN_MOBILE AS LOGINMOBILE,
+    t.guest_names AS GTNAME,
+    TO_CHAR(t.in_date,'mm/dd') || ' - ' || TO_CHAR(t.out_date,'mm/dd') AS INOUTDT,
+    too.CONFIRM_NUM AS HCONNU,
+    sh.sales_account AS HVPNM,
+    case when t.FOG_AUDITSTATUS is null then '未审核' when t.FOG_AUDITSTATUS = '5' then 'NoShow' when t.FOG_AUDITSTATUS = '7' then '入住中' when t.FOG_AUDITSTATUS = '8' then '离店' else '' end AS ORDERST
+    from T_LM_ORDER t
+    left join t_lm_sales_history sh 
+    on t.hotel_id = sh.hotel_id and sh.status='1' 
+    and sh.start_date <= t.create_time 
+    and t.create_time <= sh.end_date
+    left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+    left join T_LM_ORDER_OPE too on t.fog_order_num = too.FOG_ORDER_NUM 
+    left join t_fax tf on tf.link_id=t.hotel_id and tf.link_type='4' and tf.fax_type='1'
+    where 
+    ((:FaxNum IS NULL) OR (tf.barcode = :FaxNum))
+    AND t.FOG_ORDER_NUM IS NOT NULL
+    AND (((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    AND ((:OrderID IS NULL) OR (t.FOG_ORDER_NUM = :OrderID))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderappromginfo_fax_select_hotel">
+    <![CDATA[
+      select distinct
+    t.fog_order_num AS ORDERID, 
+    t.HOTEL_ID||'-'||t.fog_order_num AS HOTELID,
+    t.hotel_name AS HOTELNM, 
+    '['||t.room_type_code||']'||t.room_type_name||'-'||t.book_room_num||'间' AS ROOMNM,
+    t.LOGIN_MOBILE AS LOGINMOBILE,
+    t.guest_names AS GTNAME,
+    TO_CHAR(t.in_date,'mm/dd') || ' - ' || TO_CHAR(t.out_date,'mm/dd') AS INOUTDT,
+    too.CONFIRM_NUM AS HCONNU,
+    sh.sales_account AS HVPNM,
+    case when t.FOG_AUDITSTATUS is null then '未审核' when t.FOG_AUDITSTATUS = '5' then 'NoShow' when t.FOG_AUDITSTATUS = '7' then '入住中' when t.FOG_AUDITSTATUS = '8' then '离店' else '' end AS ORDERST
+    from T_LM_ORDER t
+    left join t_lm_sales_history sh 
+    on t.hotel_id = sh.hotel_id and sh.status='1' 
+    and sh.start_date <= t.create_time 
+    and t.create_time <= sh.end_date
+    left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+    left join T_LM_ORDER_OPE too on t.fog_order_num = too.FOG_ORDER_NUM 
+    left join t_fax tf on tf.link_id=t.hotel_id and tf.link_type='4' and tf.fax_type='1'
+    left join t_lm_b_prop bp on bp.prop = t.hotel_id
+    where 
+    ((:FaxNum IS NULL) OR (tf.barcode = :FaxNum))
+    AND t.FOG_ORDER_NUM IS NOT NULL
+    AND (((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    AND ((:OrderID IS NULL) OR (t.FOG_ORDER_NUM = :OrderID))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+    AND ((:HOTELID IS NULL) OR (t.hotel_id=:HOTELID))  
+    AND ((:CITYID IS NULL) OR (t.CITY_ID=:CITYID)) 
+    AND ((:TRADEAREAID IS NULL) OR (bp.tradearea_id=:TRADEAREAID)) 
+    AND ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+    AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+    AND ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderappromginfo_print_select">
+    <![CDATA[
+      select 
+    t.fog_order_num || '<br/>' AS ORDERID,
+    t.ROOM_TYPE_NAME AS ROOMNM, 
+    t.guest_names AS GUESTNM,
+    t.book_total_price AS ROOMPR,
+    t.book_room_num AS ROOMNUM,
+    TO_CHAR(t.in_date,'mm/dd') || '至' || TO_CHAR(t.out_date,'mm/dd') AS INOUTDT,
+    '          ' AS ROOMID,
+    '          ' AS APPRNUM
+    from T_LM_ORDER t
+    where ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+    AND ((:StartDate IS NULL) OR (t.out_date>= to_date(:StartDate,'yyyy-MM-dd')))
+    AND ((:EndDate IS NULL) OR (t.out_date<= to_date(:EndDate,'yyyy-MM-dd')))
+    AND t.FOG_ORDER_NUM IS NOT NULL
+    AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    AND ((:OrderID IS NULL) OR (t.FOG_ORDER_NUM = :OrderID))
+    AND ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+    ORDER BY t.fog_order_num asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderappromginfo_fax_print_select">
+    <![CDATA[
+      select 
+    t.fog_order_num || '<br/>' AS ORDERID,
+    t.ROOM_TYPE_NAME AS ROOMNM, 
+    t.guest_names AS GUESTNM,
+    t.book_total_price AS ROOMPR,
+    t.book_room_num AS ROOMNUM,
+    TO_CHAR(t.in_date,'mm/dd') || '至' || TO_CHAR(t.out_date,'mm/dd') AS INOUTDT,
+    '          ' AS ROOMID,
+    '          ' AS APPRNUM
+    from T_LM_ORDER t
+    where ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+    AND (:OrderList IS NULL OR (t.fog_order_num in (SELECT REGEXP_SUBSTR (:OrderList, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:OrderList) - LENGTH (REPLACE (:OrderList, ',', '')))))
+    ORDER BY t.fog_order_num asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotelex_print_select">
+    <![CDATA[
+    select bp.prop as hotel_id, bp.prop_name_zh,hex.linkman, hex.linktel, hex.linkmail, 
+    hex.linkfax,hex.ex_time, hex.ex_mode 
+    from t_lm_b_prop bp
+    left join t_lm_hotel_ex hex on hex.hotel_id = bp.prop AND hex.type='3'
+    where bp.prop=:HotelID 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderconfirminfo_select_back">
+    <![CDATA[
+      select toc.order_id, toc.fog_order_num AS ORDERID, toc.status, 
+      CASE WHEN toc.status = '0' THEN '待操作' when toc.status = '1' then '可操作' when toc.status = '2' then '操作中' when toc.status = '3' then '需跟进' ELSE '' END AS MODIFYST,
+      toc.ope_user, toc.fax_system, toc.fax_no,
+      toc.fax_image_url, toc.fax_status, 
+      
+      CASE WHEN toc.fax_status = '0' THEN '待发送' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) <= 1) then '发送中' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) > 1) then '重发中'  when toc.fax_status = '2' then '发送成功'  ELSE '发送失败' END AS FAXSEND,
+      
+      
+      toc.fax_dtime, toc.fax_number, toc.fax_fdtime, toc.create_time, 
+      toc.create_user, toc.update_time, toc.update_user AS MODIFYPE,tc.NAME_CN AS CITYNM,t.HOTEL_ID,t.HOTEL_NAME AS HOTELNM,
+      t.GUEST_NAMES AS GUESTNAMES,TO_CHAR(t.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss') AS CREATETIME,t.LOGIN_MOBILE AS LOGINMOBILE,
+      CASE WHEN t.fog_resvstatus is null or t.fog_resvstatus = '0' THEN '待酒店确认' 
+      when t.fog_resvstatus = '1' then '酒店已确认' 
+      when t.fog_resvstatus = '2' then '问题单(手工单)' 
+      when t.fog_resvstatus = '9' then '酒店反悔' 
+      when t.fog_resvstatus = 'h' then 'HOLD状态' 
+      ELSE '' END AS HOTELDIS,
+      
+      t.create_time AS ORDECTIME,t.book_status_other AS BOOKSTATUS,sysdate AS REDDIS,
+       CASE when toc.FOLLOW_UP = '1' then '是' ELSE '' END AS FOLLOWUP
+      from t_lm_order_cof toc
+      inner join T_LM_ORDER t on t.FOG_ORDER_NUM = toc.fog_order_num 
+      and ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      AND ((:BStatusOther IS NULL) OR (t.BOOK_STATUS_OTHER = :BStatusOther))
+      left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+      where ((:CityID IS NULL) OR (t.CITY_ID=:CityID))
+      AND ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+      AND ((:UserID IS NULL) OR (t.LOGIN_MOBILE = :UserID))
+      AND ((:OrderID IS NULL) OR (toc.FOG_ORDER_NUM = :OrderID))
+      AND ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      AND ((:CStatus IS NULL) OR (toc.status=:CStatus))
+      AND ((:FStatus IS NULL) OR (toc.fax_status=:FStatus))
+      AND ((:FollowUp IS NULL) OR (toc.FOLLOW_UP=:FollowUp))
+      AND ((:StartDate IS NULL) OR (t.CREATE_TIME>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:EndDate IS NULL) OR (t.CREATE_TIME<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:FaxSNumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) >= TO_NUMBER(:FaxSNumber)))
+      AND ((:FaxENumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) <= TO_NUMBER(:FaxENumber)))
+      AND ((:BStatusOther IS NULL) OR (t.BOOK_STATUS_OTHER = :BStatusOther))
+      AND toc.VENDOR IN ('HOMEINNS','MOTEL168')
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderconfirminfo_select_init">
+    <![CDATA[
+      select toc.order_id, toc.fog_order_num AS ORDERID, toc.status, 
+      CASE WHEN toc.status = '0' THEN '待操作' when toc.status = '1' then '可操作' when toc.status = '2' then '操作中' when toc.status = '3' then '需跟进' ELSE '' END AS MODIFYST,
+      toc.ope_user, toc.fax_system, toc.fax_no,
+      toc.fax_image_url, toc.fax_status, 
+      
+      CASE WHEN toc.fax_status = '0' THEN '待发送' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) <= 1) then '发送中' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) > 1) then '重发中'  when toc.fax_status = '2' then '发送成功'  ELSE '发送失败' END AS FAXSEND,
+      
+      toc.fax_dtime, toc.fax_number, toc.fax_fdtime, toc.create_time, 
+      toc.create_user, toc.update_time, toc.update_user AS MODIFYPE,tc.NAME_CN AS CITYNM,t.HOTEL_ID,t.HOTEL_NAME AS HOTELNM,
+      t.GUEST_NAMES AS GUESTNAMES,TO_CHAR(t.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss') AS CREATETIME,t.LOGIN_MOBILE AS LOGINMOBILE,
+      
+      CASE 
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '3' THEN '用户取消'
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '9' THEN 'CC取消'
+      WHEN t.fog_resvstatus is null or t.fog_resvstatus = '0' THEN '待酒店确认' 
+      when t.fog_resvstatus = '1' then '酒店已确认' 
+      when t.fog_resvstatus = '2' then '问题单(手工单)' 
+      when t.fog_resvstatus = '9' then '酒店反悔' 
+      when t.fog_resvstatus = 'h' then 'HOLD状态' 
+      ELSE '' END AS HOTELDIS,
+      
+      t.create_time AS ORDECTIME,t.book_status_other AS BOOKSTATUS,sysdate AS REDDIS,
+       CASE when toc.FOLLOW_UP = '1' then '是' ELSE '' END AS FOLLOWUP,
+       
+       
+      CASE WHEN t.BOOK_STATUS_OTHER= '0' OR t.BOOK_STATUS_OTHER= '1' THEN '新建' 
+      WHEN t.BOOK_STATUS_OTHER= '3' THEN '用户取消' 
+      WHEN t.BOOK_STATUS_OTHER= '5' THEN 'NO-SHOW' 
+      WHEN t.BOOK_STATUS_OTHER= '6' THEN '已完成' 
+      WHEN t.BOOK_STATUS_OTHER= '7' THEN '已入住' 
+      WHEN t.BOOK_STATUS_OTHER= '8' THEN '离店' 
+      WHEN t.BOOK_STATUS_OTHER= '9' THEN 'CC取消' 
+      ELSE '' END AS ORSTATUS
+       
+       
+      from t_lm_order_cof toc
+      inner join T_LM_ORDER t on t.FOG_ORDER_NUM = toc.fog_order_num 
+      and ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      
+      AND (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+
+      left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+      where ((:CityID IS NULL) OR (t.CITY_ID=:CityID))
+      AND ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+      AND ((:UserID IS NULL) OR (t.LOGIN_MOBILE = :UserID))
+      AND ((:OrderID IS NULL) OR (toc.FOG_ORDER_NUM = :OrderID))
+      AND ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      AND ((:CStatus IS NULL) OR (toc.status=:CStatus))
+      AND ((:FStatus IS NULL) OR (toc.fax_status=:FStatus))
+      AND ((:FollowUp IS NULL) OR (toc.FOLLOW_UP=:FollowUp))
+      AND ((:StartDate IS NULL) OR (t.CREATE_TIME>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:EndDate IS NULL) OR (t.CREATE_TIME<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:FaxSNumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) >= TO_NUMBER(:FaxSNumber)))
+      AND ((:FaxENumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) <= TO_NUMBER(:FaxENumber)))
+
+      AND (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+      AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderconfirminfo_select_init_all_bak">
+    <![CDATA[
+      select toc.order_id, toc.fog_order_num AS ORDERID, toc.status, 
+      CASE WHEN toc.status = '0' THEN '待操作' when toc.status = '1' then '可操作' when toc.status = '2' then '操作中' when toc.status = '3' then '需跟进' ELSE '' END AS MODIFYST,
+      toc.ope_user, toc.fax_system, toc.fax_no,
+      toc.fax_image_url, toc.fax_status, 
+      
+      CASE WHEN nvl(pt.fax_status,99) = '0' OR pt.fax_status IS NULL THEN '待发' when nvl(pt.fax_status,99) = '2' then '失败'  when nvl(pt.fax_status,99) = '1' then '成功'  ELSE '未发' END AS FAXSEND,
+      CASE WHEN nvl(qt.fax_status,99) = '0' THEN '回传中' when nvl(qt.fax_status,99) = '2' then '失败'  when nvl(qt.fax_status,99) = '1' then '成功'  ELSE '未回传' END AS REFAXSTATUS,
+      
+      toc.fax_dtime, toc.fax_number, toc.fax_fdtime, toc.create_time, 
+      toc.create_user, toc.update_time, toc.update_user AS MODIFYPE,tc.NAME AS CITYNM,t.HOTEL_ID,t.HOTEL_NAME AS HOTELNM,
+      t.GUEST_NAMES AS GUESTNAMES,TO_CHAR(t.CREATE_TIME,'mm-dd hh24:mi:ss') AS CREATETIME,t.LOGIN_MOBILE AS LOGINMOBILE,
+      
+      CASE 
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '3' THEN '用户取消'
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '9' THEN 'CC取消'
+      WHEN t.fog_resvstatus is null or t.fog_resvstatus = '0' THEN '待酒店确认' 
+      when t.fog_resvstatus = '1' then '酒店已确认' 
+      when t.fog_resvstatus = '2' then '问题单(手工单)' 
+      when t.fog_resvstatus = '9' then '酒店反悔' 
+      when t.fog_resvstatus = 'h' then 'HOLD状态' 
+      ELSE '' END AS HOTELDIS,
+      
+      t.create_time AS ORDECTIME,t.book_status_other AS BOOKSTATUS,sysdate AS REDDIS,
+       CASE when toc.FOLLOW_UP = '1' then '是' ELSE '' END AS FOLLOWUP,
+       
+       
+      CASE WHEN t.BOOK_STATUS_OTHER= '0' OR t.BOOK_STATUS_OTHER= '1' THEN '新建' 
+      WHEN t.BOOK_STATUS_OTHER= '3' THEN '用户取消' 
+      WHEN t.BOOK_STATUS_OTHER= '5' THEN 'NO-SHOW' 
+      WHEN t.BOOK_STATUS_OTHER= '6' THEN '已完成' 
+      WHEN t.BOOK_STATUS_OTHER= '7' THEN '已入住' 
+      WHEN t.BOOK_STATUS_OTHER= '8' THEN '离店' 
+      WHEN t.BOOK_STATUS_OTHER= '9' THEN 'CC取消' 
+      ELSE '' END AS ORSTATUS
+       
+       
+      from t_lm_order_cof toc
+      inner join T_LM_ORDER t on t.FOG_ORDER_NUM = toc.fog_order_num 
+      and ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      
+      AND (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+
+      left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='1' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) pt on t.fog_order_num=pt.LINK_ID
+
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='2' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) qt on pt.LINK_ID=qt.LINK_ID and pt.barcode=qt.barcode
+  
+      where ((:CityID IS NULL) OR (t.CITY_ID=:CityID))
+      AND ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+      AND ((:UserID IS NULL) OR (t.LOGIN_MOBILE = :UserID))
+      AND ((:OrderID IS NULL) OR (toc.FOG_ORDER_NUM = :OrderID))
+      AND ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      AND ((:CStatus IS NULL) OR (toc.status=:CStatus))
+      AND ((:FStatus IS NULL) OR (:FStatus = '0' and (pt.fax_status='0' or pt.fax_status is null)) OR (pt.fax_status=:FStatus))
+      AND ((:FollowUp IS NULL) OR (toc.FOLLOW_UP=:FollowUp))
+      AND ((:StartDate IS NULL) OR (t.CREATE_TIME>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:EndDate IS NULL) OR (t.CREATE_TIME<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:FaxSNumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) >= TO_NUMBER(:FaxSNumber)))
+      AND ((:FaxENumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) <= TO_NUMBER(:FaxENumber)))
+
+      AND (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+      AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderconfirminfo_select_init_all">
+    <![CDATA[
+       select toc.order_id, t.price_code, toc.fog_order_num AS ORDERID, toc.status, 
+      CASE WHEN toc.status = '0' THEN '待操作' when toc.status = '1' then '可操作' when toc.status = '2' then '操作中' when toc.status = '3' then '需跟进' ELSE '' END AS MODIFYST,
+      toc.ope_user, toc.fax_system, toc.fax_no,
+      toc.fax_image_url, toc.fax_status, 
+      
+      CASE WHEN nvl(pt.fax_status,99) = '0' OR pt.fax_status IS NULL THEN '待发' when nvl(pt.fax_status,99) = '2' then '失败'  when nvl(pt.fax_status,99) = '1' then '成功'  ELSE '未发' END AS FAXSEND,
+      CASE WHEN nvl(qt.fax_status,99) = '0' THEN '回传中' when nvl(qt.fax_status,99) = '2' then '失败'  when nvl(qt.fax_status,99) = '1' then '成功'  ELSE '未回传' END AS REFAXSTATUS,
+      
+      toc.fax_dtime, toc.fax_number, toc.fax_fdtime, toc.create_time, 
+      toc.create_user, toc.update_time, toc.update_user AS MODIFYPE,tc.NAME AS CITYNM,t.HOTEL_ID,t.HOTEL_NAME AS HOTELNM,
+      t.GUEST_NAMES AS GUESTNAMES,TO_CHAR(t.CREATE_TIME,'mm-dd hh24:mi:ss') AS CREATETIME,t.LOGIN_MOBILE AS LOGINMOBILE,
+
+      CASE 
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '3' THEN '用户取消'
+      WHEN t.fog_resvstatus is null and t.BOOK_STATUS_OTHER= '9' THEN 'CC取消'
+      WHEN t.fog_resvstatus is null OR t.fog_resvstatus = '0' THEN '待酒店确认' 
+      when t.fog_resvstatus = '1' then '酒店已确认' 
+      when t.fog_resvstatus = '2' then '问题单(手工单)' 
+      when t.fog_resvstatus = '9' then '酒店反悔' 
+      when t.fog_resvstatus = 'h' then 'HOLD状态' 
+      ELSE '' END AS HOTELDIS,
+      
+      t.create_time AS ORDECTIME,t.book_status_other AS BOOKSTATUS,sysdate AS REDDIS,
+       CASE when toc.FOLLOW_UP = '1' then '是' ELSE '' END AS FOLLOWUP,
+       
+       
+      CASE WHEN t.BOOK_STATUS_OTHER= '0' OR t.BOOK_STATUS_OTHER= '1' THEN '新建' 
+      WHEN t.BOOK_STATUS_OTHER= '3' THEN '用户取消' 
+      WHEN t.BOOK_STATUS_OTHER= '5' THEN 'NO-SHOW' 
+      WHEN t.BOOK_STATUS_OTHER= '6' THEN '已完成' 
+      WHEN t.BOOK_STATUS_OTHER= '7' THEN '已入住' 
+      WHEN t.BOOK_STATUS_OTHER= '8' THEN '离店' 
+      WHEN t.BOOK_STATUS_OTHER= '9' THEN 'CC取消' 
+      ELSE '' END AS ORSTATUS,
+      CASE WHEN T.PRICE_CODE='LMBAR2' THEN ''
+      WHEN T.PRICE_CODE='LMBAR' AND PAY_STATUS='1' THEN '支付成功'
+      WHEN T.PRICE_CODE='LMBAR' AND PAY_STATUS='7' THEN '已退款'
+      WHEN T.PRICE_CODE='LMBAR' AND PAY_STATUS<>'1' AND PAY_STATUS<>'10' AND PAY_STATUS<>'7' THEN '待支付'
+      ELSE '' END AS PAYSTATUS
+      
+      from t_lm_order_cof toc
+      inner join T_LM_ORDER t on t.FOG_ORDER_NUM = toc.fog_order_num 
+      and ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      
+      AND (:PriceCode IS NULL OR (t.PRICE_CODE in (SELECT REGEXP_SUBSTR (:PriceCode, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PriceCode) - LENGTH (REPLACE (:PriceCode, ',', '')))))
+      
+       AND 
+     (
+     (:BStatusOther IS NULL OR (t.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:BStatusOther, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatusOther) - LENGTH (REPLACE (:BStatusOther, ',', '')))))
+      
+      OR
+      
+     (:BStatus IS NULL OR (t.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:BStatus, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:BStatus) - LENGTH (REPLACE (:BStatus, ',', '')))))
+      )
+      
+      
+      left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='1' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) pt on t.fog_order_num=pt.LINK_ID
+  
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='2' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) qt on pt.LINK_ID=qt.LINK_ID and pt.barcode=qt.barcode
+      
+      where ((:CityID IS NULL) OR (t.CITY_ID=:CityID))
+      AND ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+      AND ((:UserID IS NULL) OR (t.LOGIN_MOBILE = :UserID))
+      AND ((:OrderID IS NULL) OR (toc.FOG_ORDER_NUM = :OrderID))
+      AND ((:CStatus IS NULL) OR (toc.status=:CStatus))
+      AND ((:FStatus IS NULL) OR (:FStatus = '0' and (pt.fax_status='0' or pt.fax_status is null)) OR (pt.fax_status=:FStatus))
+      AND ((:FollowUp IS NULL) OR (toc.FOLLOW_UP=:FollowUp))
+      AND ((:StartDate IS NULL) OR (t.CREATE_TIME>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:EndDate IS NULL) OR (t.CREATE_TIME<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:FaxSNumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) >= TO_NUMBER(:FaxSNumber)))
+      AND ((:FaxENumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) <= TO_NUMBER(:FaxENumber)))
+      AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+      AND (t.price_code='LMBAR2' OR (t.price_code='LMBAR' AND T.PAY_STATUS='1'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderconfirminfo_select_init_back">
+    <![CDATA[
+      select toc.order_id, toc.fog_order_num AS ORDERID, toc.status, 
+      CASE WHEN toc.status = '0' THEN '待操作' when toc.status = '1' then '可操作' when toc.status = '2' then '操作中' when toc.status = '3' then '需跟进' ELSE '' END AS MODIFYST,
+      toc.ope_user, toc.fax_system, toc.fax_no,
+      toc.fax_image_url, toc.fax_status, 
+      
+      CASE WHEN toc.fax_status = '0' THEN '待发送' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) <= 1) then '发送中' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) > 1) then '重发中'  when toc.fax_status = '2' then '发送成功'  ELSE '发送失败' END AS FAXSEND,
+      
+      
+      toc.fax_dtime, toc.fax_number, toc.fax_fdtime, toc.create_time, 
+      toc.create_user, toc.update_time, toc.update_user AS MODIFYPE,tc.NAME_CN AS CITYNM,t.HOTEL_ID,t.HOTEL_NAME AS HOTELNM,
+      t.GUEST_NAMES AS GUESTNAMES,TO_CHAR(t.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss') AS CREATETIME,t.LOGIN_MOBILE AS LOGINMOBILE,
+      CASE WHEN t.fog_resvstatus is null or t.fog_resvstatus = '0' THEN '待酒店确认' 
+      when t.fog_resvstatus = '1' then '酒店已确认' 
+      when t.fog_resvstatus = '2' then '问题单(手工单)' 
+      when t.fog_resvstatus = '9' then '酒店反悔' 
+      when t.fog_resvstatus = 'h' then 'HOLD状态' 
+      ELSE '' END AS HOTELDIS,
+      
+      t.create_time AS ORDECTIME,t.book_status_other AS BOOKSTATUS,sysdate AS REDDIS,
+       CASE when toc.FOLLOW_UP = '1' then '是' ELSE '' END AS FOLLOWUP
+      from t_lm_order_cof toc
+      inner join T_LM_ORDER t on t.FOG_ORDER_NUM = toc.fog_order_num 
+      and ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      AND ((:BStatusOther IS NULL) OR (t.BOOK_STATUS_OTHER = :BStatusOther))
+      left join T_LM_B_CITY tc on t.CITY_ID = tc.CITY_ID
+      where ((:CityID IS NULL) OR (t.CITY_ID=:CityID))
+      AND ((:HotelID IS NULL) OR (t.HOTEL_ID = :HotelID))
+      AND ((:UserID IS NULL) OR (t.LOGIN_MOBILE = :UserID))
+      AND ((:OrderID IS NULL) OR (toc.FOG_ORDER_NUM = :OrderID))
+      AND ((:HotelConfirm IS NULL) OR (:HotelConfirm = '0' and (t.fog_resvstatus=:HotelConfirm or t.fog_resvstatus is null)) OR (t.fog_resvstatus=:HotelConfirm))
+      AND ((:CStatus IS NULL) OR (toc.status=:CStatus))
+      AND ((:FStatus IS NULL) OR (toc.fax_status=:FStatus))
+      AND ((:FollowUp IS NULL) OR (toc.FOLLOW_UP=:FollowUp))
+      AND ((:StartDate IS NULL) OR (t.CREATE_TIME>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:EndDate IS NULL) OR (t.CREATE_TIME<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+      AND ((:FaxSNumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) >= TO_NUMBER(:FaxSNumber)))
+      AND ((:FaxENumber IS NULL) OR (TO_NUMBER(toc.FAX_NUMBER) <= TO_NUMBER(:FaxENumber)))
+      AND ((:BStatusOther IS NULL) OR (t.BOOK_STATUS_OTHER = :BStatusOther))
+      AND t.BOOK_STATUS_OTHER <> '3' AND t.BOOK_STATUS_OTHER <> '9'
+      AND toc.VENDOR IN ('HOMEINNS','MOTEL168')
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_check">
+    <![CDATA[
+      select order_id, fog_order_num, status, ope_user, create_time, create_user, update_time, 
+      update_user from t_lm_order_cof where fog_order_num=:ORDERID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_cof_lock">
+    <![CDATA[
+      update t_lm_order_cof set status='2',ope_user=:OPEUSER , update_time=sysdate, 
+      update_user= :OPEUSER where fog_order_num=:ORDERID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_cof_unlock">
+    <![CDATA[
+      update t_lm_order_cof set status='1',ope_user=:OPEUSER , update_time=sysdate, 
+      update_user= :OPEUSER where fog_order_num=:ORDERID and ope_user=:OPEUSER and status='2'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_cof_hotel_unlock">
+    <![CDATA[
+      update t_lm_order_cof cf set 
+      cf.status='1',
+      cf.ope_user=:OPEUSER,
+      cf.update_time=sysdate, 
+      cf.update_user= :OPEUSER
+      where exists 
+      (select t.fog_order_num from t_lm_order_cof t 
+       inner join t_lm_order lo on t.fog_order_num=lo.fog_order_num 
+       AND t.ope_user=:OPEUSER and t.status='2' AND lo.hotel_id=:HOTELID
+       where cf.fog_order_num=t.fog_order_num
+      )
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_main_select">
+    <![CDATA[
+    select t.id as order_id, t.order_num, t.city_id, t.hotel_id, t.hotel_name, TO_CHAR(t.in_date, 'yyyy-mm-dd') AS in_date_nm, t.in_date, t.book_room_num, t.guest_names, t.contact_name,
+  t.contact_tel, t.book_type, TO_CHAR(t.create_time, 'yyyy-mm-dd hh24:mi:ss') AS create_time, t.user_id,
+  
+  CASE WHEN t.BOOK_STATUS = '0' THEN '新建' when t.BOOK_STATUS = '1' then '新建入FOG成功' when t.BOOK_STATUS = '2' then '新建入fog失败' when t.BOOK_STATUS = '3' then '超时' when t.BOOK_STATUS = '4' then '取消单' when t.BOOK_STATUS = '5' then '成功' ELSE '' END AS book_status_nm,t.BOOK_STATUS,
+  CASE WHEN t.pay_status = '0' THEN '未支付' when t.pay_status = '1' then '支付成功' when t.pay_status = '2' then '等待支付' when t.pay_status = '3' then '支付中' when t.pay_status = '4' then '支付失败' when t.pay_status = '5' then '支付确认中' when t.pay_status = '6' then '异常取消' ELSE '' END AS pay_status_nm,t.pay_status,
+  t.hold_time, t.fog_order_num,TO_CHAR(t.out_date, 'yyyy-mm-dd') AS out_date_nm, t.out_date,t.ORDER_CHANNEL,t.LOGIN_MOBILE,t.ARRIVE_TIME,t.BOOK_REMARK,
+  t.book_remark, t.book_source, t.book_price, t.room_type_code,t.price_code,t.BOOK_REMARK,
+  CASE WHEN t.price_code = 'LMBAR' THEN 'LMBAR(预付)' when t.price_code = 'LMBAR2' then 'LMBAR2(现付)' when t.price_code = 'BAR' then 'BAR(常规现付)' when t.price_code = 'BARB' then 'BARB(常规现付)' ELSE '' END AS price_code_nm,
+  t.order_cancle_reason, TO_CHAR(t.order_cancel_time, 'yyyy-mm-dd hh24:mi:ss') AS ordercanceltime, t.ORDER_CANCLE_REASON,t.book_total_price,
+  t.login_mobile, t.overtime, t.memo1, t.pro_desc, t.pro_content, t.is_network, t.breakfast_num, t.ticket_usercode, t.ticket_amount,
+  t.ticket_count, t.room_type_name,
+  t.MEMO1,
+  CASE WHEN t.book_status_other = '0' THEN '新建' when t.book_status_other = '1' then '预订成功等待确认' when t.book_status_other = '2' then '新建入fog失败' when t.book_status_other = '3' then '用户取消' when t.book_status_other = '4' then '可入住已确认' when t.book_status_other = '5' then 'NO-SHOW' when t.book_status_other = '6' then '已完成' when t.book_status_other = '7' then '入住中' when t.book_status_other = '8' then '已离店' when t.book_status_other = '9' then 'CC取消' ELSE '' END AS book_status_other_nm,t.book_status_other,
+  t.book_person_tel,
+  CASE WHEN t.IS_GUA = '0' THEN '非担保单' when t.IS_GUA = '1' then '担保单' ELSE '' END AS is_gua_nm,
+  CASE WHEN t.pay_method = '0' THEN '到店付款' when t.pay_method = '1' then '支付宝' when t.pay_method = '2' then '快钱' when t.pay_method = '3' then '银联' when t.pay_method = '4' then '抵扣券' ELSE '' END AS pay_method,
+  CASE WHEN t.is_reserve = '0' THEN '即时订单' when t.is_reserve = '1' then '非即时订单' ELSE '' END AS is_reserve,t.fog_resvtype,
+  CASE WHEN t.fog_resvtype = 'n' THEN '新单' when t.fog_resvtype = 'e' then '修改单' when t.fog_resvtype = 'c' then '取消单' ELSE '' END AS fog_resvtype_nm,
+  CASE WHEN t.fog_resvstatus = '0' THEN '待酒店确认' when t.fog_resvstatus = '1' then '酒店已确认' ELSE '' END AS fog_resvstatus_nm,t.fog_resvstatus,t.fog_auditstatus,
+  CASE WHEN t.fog_auditstatus = '5' THEN 'NoShow' when t.fog_auditstatus = '7' then '入住中' when t.fog_auditstatus = '8' then '离店' ELSE '' END AS fog_auditstatus_nm,
+  CASE WHEN t.lmbar_status = '6' THEN '已完成' ELSE '' END AS lmbar_status, t.pay_methoddesc, t.update_time,t.app_platform,t.PROMOTION_AMOUNT
+  ,case when t.price_code = 'BAR' then ftp.phone else p.linktel end as linktel
+  ,p.fax,p.linkfax,tp.packagename,tog.RESV_GUA_DESC,tog.RESV_CXL_DESC,tog.RESV_GUA_HOLD_TIME,tog.USER_HOLD_TIME,toc.FOLLOW_UP,toc.FAX_FDTIME, too.CONFIRM_NUM,too.APPROVE_NUM,too.INROOM_NUM,too.ORDER_NS_REASON,t.VENDOR
+  from t_lm_order t
+  left join t_lm_b_prop p on t.hotel_id=p.prop
+  left join t_lm_ticket_user tu on t.ticket_usercode = tu.ticketusercode
+  left join t_lm_ticket_package tp on tu.packagecode = tp.packagecode
+  left join T_LM_ORDER_GUA tog on t.fog_order_num=tog.FOG_ORDER_NUM
+  left join T_LM_ORDER_COF toc on t.fog_order_num=toc.FOG_ORDER_NUM
+  left join FOG_T_PROP ftp on ftp.prop=t.hotel_id
+  left join T_LM_ORDER_OPE too on t.fog_order_num=too.FOG_ORDER_NUM
+  where t.fog_order_num=:ORDERID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_detail_select">
+    <![CDATA[
+    select t.id as order_id, t.order_num, t.city_id, t.hotel_id, t.hotel_name, TO_CHAR(t.in_date, 'yyyy-mm-dd') AS in_date_nm, t.in_date, t.book_room_num, t.guest_names, t.contact_name,
+  t.contact_tel, t.book_type, TO_CHAR(t.create_time, 'yyyy-mm-dd hh24:mi:ss') AS create_time, t.user_id,
+  
+  CASE WHEN t.BOOK_STATUS = '0' THEN '新建' when t.BOOK_STATUS = '1' then '新建入FOG成功' when t.BOOK_STATUS = '2' then '新建入fog失败' when t.BOOK_STATUS = '3' then '超时' when t.BOOK_STATUS = '4' then '取消单' when t.BOOK_STATUS = '5' then '成功' ELSE '' END AS book_status_nm,t.BOOK_STATUS,
+  CASE WHEN t.pay_status = '0' THEN '未支付' when t.pay_status = '1' then '支付成功' when t.pay_status = '2' then '等待支付' when t.pay_status = '3' then '支付中' when t.pay_status = '4' then '支付失败' when t.pay_status = '5' then '支付确认中' when t.pay_status = '6' then '异常取消' ELSE '' END AS pay_status_nm,t.pay_status,
+  t.hold_time, t.fog_order_num,TO_CHAR(t.out_date, 'yyyy-mm-dd') AS out_date_nm, t.out_date,t.ORDER_CHANNEL,t.LOGIN_MOBILE,t.ARRIVE_TIME,
+  t.book_remark, t.book_source, t.book_price, t.room_type_code,t.price_code,t.BOOK_REMARK,
+  CASE WHEN t.price_code = 'LMBAR' THEN 'LMBAR(预付)' when t.price_code = 'LMBAR2' then 'LMBAR2(现付)' when t.price_code = 'BAR' then 'BAR(常规现付)' when t.price_code = 'BARB' then 'BARB(常规现付)' ELSE '' END AS price_code_nm,
+  t.order_cancle_reason, TO_CHAR(t.order_cancel_time, 'yyyy-mm-dd hh24:mi:ss') AS ordercanceltime, t.ORDER_CANCLE_REASON,t.book_total_price,
+  t.login_mobile, t.overtime, t.memo1, t.pro_desc, t.pro_content, t.is_network, t.breakfast_num, t.ticket_usercode, t.ticket_amount,
+  t.ticket_count, t.room_type_name,
+  t.MEMO1,
+  CASE WHEN t.book_status_other = '0' THEN '新建' when t.book_status_other = '1' then '预订成功等待确认' when t.book_status_other = '2' then '新建入fog失败' when t.book_status_other = '3' then '用户取消' when t.book_status_other = '4' then '可入住已确认' when t.book_status_other = '5' then 'NO-SHOW' when t.book_status_other = '6' then '已完成' when t.book_status_other = '7' then '入住中' when t.book_status_other = '8' then '已离店' when t.book_status_other = '9' then 'CC取消' ELSE '' END AS book_status_other_nm,t.book_status_other,
+  t.book_person_tel,
+  CASE WHEN t.IS_GUA = '0' THEN '非担保单' when t.IS_GUA = '1' then '担保单' ELSE '' END AS is_gua_nm,
+  CASE WHEN t.pay_method = '0' THEN '到店付款' when t.pay_method = '1' then '支付宝' when t.pay_method = '2' then '快钱' when t.pay_method = '3' then '银联' when t.pay_method = '4' then '抵扣券' ELSE '' END AS pay_method,
+  CASE WHEN t.is_reserve = '0' THEN '即时订单' when t.is_reserve = '1' then '非即时订单' ELSE '' END AS is_reserve,t.fog_resvtype,
+  CASE WHEN t.fog_resvtype = 'n' THEN '新单' when t.fog_resvtype = 'e' then '修改单' when t.fog_resvtype = 'c' then '取消单' ELSE '' END AS fog_resvtype_nm,
+  CASE WHEN t.fog_resvstatus = '0' THEN '待酒店确认' when t.fog_resvstatus = '1' then '酒店已确认' ELSE '' END AS fog_resvstatus_nm,t.fog_resvstatus,t.fog_auditstatus,
+  CASE WHEN t.fog_auditstatus = '5' THEN 'NoShow' when t.fog_auditstatus = '7' then '入住中' when t.fog_auditstatus = '8' then '离店' ELSE '' END AS fog_auditstatus_nm,
+  CASE WHEN t.lmbar_status = '6' THEN '已完成' ELSE '' END AS lmbar_status, t.pay_methoddesc, t.update_time,t.app_platform,t.PROMOTION_AMOUNT
+ ,p.linktel as linktel
+  ,p.fax,p.linkfax,tp.packagename,toc.FOLLOW_UP,toc.FAX_FDTIME, too.CONFIRM_NUM,
+  too.APPROVE_NUM,too.INROOM_NUM,too.ORDER_NS_REASON,t.VENDOR,hx.linkman AS HXlinkman, hx.linktel AS HXlinktel, hx.remark AS HXremark,
+  CASE WHEN toc.fax_status = '0' THEN '待发送' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) <= 1) then '发送中' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) > 1) then '重发中'  when toc.fax_status = '2' then '发送成功'  ELSE '发送失败' END AS FAXSTATUS
+  from 
+  (select * from t_lm_order where fog_order_num=:ORDERID) t
+  left join t_lm_b_prop p on t.hotel_id=p.prop
+  left join t_lm_ticket_user tu on t.ticket_usercode = tu.ticketusercode
+  left join t_lm_ticket_package tp on tu.packagecode = tp.packagecode
+  left join T_LM_ORDER_COF toc on t.fog_order_num=toc.FOG_ORDER_NUM
+  left join T_LM_ORDER_OPE too on t.fog_order_num=too.FOG_ORDER_NUM
+  left join t_lm_hotel_ex hx on t.hotel_id=hx.hotel_id and hx.type='2'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_detail_select_all_bak">
+    <![CDATA[
+    select t.id as order_id, t.order_num, t.city_id, t.hotel_id, t.hotel_name, TO_CHAR(t.in_date, 'yyyy-mm-dd') AS in_date_nm, t.in_date, t.book_room_num, t.guest_names, t.contact_name,
+  t.contact_tel, t.book_type, TO_CHAR(t.create_time, 'yyyy-mm-dd hh24:mi:ss') AS create_time, t.user_id,
+  
+  CASE WHEN t.BOOK_STATUS = '0' THEN '新建' when t.BOOK_STATUS = '1' then '新建入FOG成功' when t.BOOK_STATUS = '2' then '新建入fog失败' when t.BOOK_STATUS = '3' then '超时' when t.BOOK_STATUS = '4' then '取消单' when t.BOOK_STATUS = '5' then '成功' ELSE '' END AS book_status_nm,t.BOOK_STATUS,
+  CASE WHEN t.pay_status = '0' THEN '未支付' when t.pay_status = '1' then '支付成功' when t.pay_status = '2' then '等待支付' when t.pay_status = '3' then '支付中' when t.pay_status = '4' then '支付失败' when t.pay_status = '5' then '支付确认中' when t.pay_status = '6' then '异常取消' ELSE '' END AS pay_status_nm,t.pay_status,
+  t.hold_time, t.fog_order_num,TO_CHAR(t.out_date, 'yyyy-mm-dd') AS out_date_nm, t.out_date,t.ORDER_CHANNEL,t.LOGIN_MOBILE,t.ARRIVE_TIME,
+  t.book_remark, t.book_source, t.book_price, t.room_type_code,t.price_code,t.BOOK_REMARK,
+  CASE WHEN t.price_code = 'LMBAR' THEN 'LMBAR(预付)' when t.price_code = 'LMBAR2' then 'LMBAR2(现付)' when t.price_code = 'BAR' then 'BAR(常规现付)' when t.price_code = 'BARB' then 'BARB(常规现付)' ELSE '' END AS price_code_nm,
+  t.order_cancle_reason, TO_CHAR(t.order_cancel_time, 'yyyy-mm-dd hh24:mi:ss') AS ordercanceltime, t.ORDER_CANCLE_REASON,t.book_total_price,
+  t.login_mobile, t.overtime, t.memo1, t.pro_desc, t.pro_content, t.is_network, t.breakfast_num, t.ticket_usercode, t.ticket_amount,
+  t.ticket_count, t.room_type_name,
+  t.MEMO1,
+  CASE WHEN t.book_status_other = '0' THEN '新建' when t.book_status_other = '1' then '预订成功等待确认' when t.book_status_other = '2' then '新建入fog失败' when t.book_status_other = '3' then '用户取消' when t.book_status_other = '4' then '可入住已确认' when t.book_status_other = '5' then 'NO-SHOW' when t.book_status_other = '6' then '已完成' when t.book_status_other = '7' then '入住中' when t.book_status_other = '8' then '已离店' when t.book_status_other = '9' then 'CC取消' ELSE '' END AS book_status_other_nm,t.book_status_other,
+  t.book_person_tel,
+  CASE WHEN t.IS_GUA = '0' THEN '非担保单' when t.IS_GUA = '1' then '担保单' ELSE '' END AS is_gua_nm,
+  CASE WHEN t.pay_method = '0' THEN '到店付款' when t.pay_method = '1' then '支付宝' when t.pay_method = '2' then '快钱' when t.pay_method = '3' then '银联' when t.pay_method = '4' then '抵扣券' ELSE '' END AS pay_method,
+  CASE WHEN t.is_reserve = '0' THEN '即时订单' when t.is_reserve = '1' then '非即时订单' ELSE '' END AS is_reserve,t.fog_resvtype,
+  CASE WHEN t.fog_resvtype = 'n' THEN '新单' when t.fog_resvtype = 'e' then '修改单' when t.fog_resvtype = 'c' then '取消单' ELSE '' END AS fog_resvtype_nm,
+  CASE WHEN t.fog_resvstatus = '0' THEN '待酒店确认' when t.fog_resvstatus = '1' then '酒店已确认' ELSE '' END AS fog_resvstatus_nm,t.fog_resvstatus,t.fog_auditstatus,
+  CASE WHEN t.fog_auditstatus = '5' THEN 'NoShow' when t.fog_auditstatus = '7' then '入住中' when t.fog_auditstatus = '8' then '离店' ELSE '' END AS fog_auditstatus_nm,
+  CASE WHEN t.lmbar_status = '6' THEN '已完成' ELSE '' END AS lmbar_status, t.pay_methoddesc, t.update_time,t.app_platform,t.PROMOTION_AMOUNT
+ ,p.linktel as linktel,p.linkman as linkman
+  ,p.fax,p.linkfax,tp.packagename,toc.FOLLOW_UP,toc.FAX_FDTIME, too.CONFIRM_NUM,
+  too.APPROVE_NUM,too.INROOM_NUM,too.ORDER_NS_REASON,t.VENDOR,hx.linkman AS HXlinkman, hx.linktel AS HXlinktel, hx.remark AS HXremark,
+  CASE WHEN nvl(pt.fax_status,99) = '0' OR pt.fax_status IS NULL THEN '待发' when nvl(pt.fax_status,99) = '2' then '失败'  when nvl(pt.fax_status,99) = '1' then '成功'  ELSE '未发' END AS FAXSTATUS,
+  CASE WHEN nvl(qt.fax_status,99) = '0' THEN '回传中' when nvl(qt.fax_status,99) = '2' then '回传失败'  when nvl(qt.fax_status,99) = '1' then '回传成功'  ELSE '未回传' END AS REFAXSTATUS,
+  CASE WHEN nvl(rt.fax_status,99) = '0' THEN '待发' when nvl(rt.fax_status,99) = '2' then '失败'  when nvl(rt.fax_status,99) = '1' then '成功'  ELSE '未发' END AS CAFAXSTATUS,
+  CASE WHEN nvl(st.fax_status,99) = '0' THEN '回传中' when nvl(st.fax_status,99) = '2' then '回传失败'  when nvl(st.fax_status,99) = '1' then '回传成功'  ELSE '未回传' END AS RECAFAXSTATUS,case when toc.status = '2' then toc.ope_user else '无人' end OpeUser
+  from 
+  (select * from t_lm_order where fog_order_num=:ORDERID) t
+  left join t_lm_b_prop p on t.hotel_id=p.prop
+  left join t_lm_ticket_user tu on t.ticket_usercode = tu.ticketusercode
+  left join t_lm_ticket_package tp on tu.packagecode = tp.packagecode
+  left join T_LM_ORDER_COF toc on t.fog_order_num=toc.FOG_ORDER_NUM
+  left join T_LM_ORDER_OPE too on t.fog_order_num=too.FOG_ORDER_NUM
+  left join t_lm_hotel_ex hx on t.hotel_id=hx.hotel_id and hx.type='2'
+  left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+  select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+  where t.LINK_TYPE='1' and t.FAX_TYPE='1' group by t.LINK_ID) dt 
+  inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) pt on t.fog_order_num=pt.LINK_ID
+  
+  left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+  select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+  where t.LINK_TYPE='1' and t.FAX_TYPE='2' group by t.LINK_ID) dt 
+  inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) qt on pt.LINK_ID=qt.LINK_ID and pt.barcode=qt.barcode
+  
+  left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+  select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+  where t.LINK_TYPE='2' and t.FAX_TYPE='1' group by t.LINK_ID) dt 
+  inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) rt on t.fog_order_num=rt.LINK_ID
+  
+  left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+  select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+  where t.LINK_TYPE='2' and t.FAX_TYPE='2' group by t.LINK_ID) dt 
+  inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) st on rt.LINK_ID=st.LINK_ID and rt.barcode=st.barcode
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_detail_select_all">
+    <![CDATA[
+     select t.id as order_id, t.order_num, t.city_id, t.hotel_id, t.hotel_name, TO_CHAR(t.in_date, 'yyyy-mm-dd') AS in_date_nm, 
+    t.in_date, t.book_room_num, t.guest_names, t.contact_name,
+      t.contact_tel, t.book_type, TO_CHAR(t.create_time, 'yyyy-mm-dd hh24:mi:ss') AS create_time, t.user_id,  
+  
+      CASE WHEN t.BOOK_STATUS = '0' THEN '新建' WHEN t.BOOK_STATUS = '1' THEN '入PayCenter成功' WHEN t.BOOK_STATUS = '2' THEN '失败'
+      WHEN t.BOOK_STATUS = '3' THEN '超时' WHEN t.BOOK_STATUS = '4' THEN '取消单' WHEN t.BOOK_STATUS = '5' THEN '成功单' WHEN t.BOOK_STATUS = '6' THEN 'CC确认'
+      WHEN t.BOOK_STATUS = '7' THEN 'CC取消' WHEN t.BOOK_STATUS = '8' THEN '已完成' WHEN t.BOOK_STATUS = '9' THEN '离店' WHEN t.BOOK_STATUS = '10' THEN 'NO-SHOW'
+      ELSE '' END AS book_status_nm,t.BOOK_STATUS,
+   
+      CASE WHEN T.PRICE_CODE='LMBAR2' THEN ''
+      WHEN T.PRICE_CODE='LMBAR' AND t.PAY_STATUS='1' THEN '支付成功'
+      WHEN T.PRICE_CODE='LMBAR' AND t.PAY_STATUS='7' THEN '已退款'
+      ELSE '待支付' END AS pay_status_nm,t.pay_status,
+   
+   
+      t.hold_time, t.fog_order_num,TO_CHAR(t.out_date, 'yyyy-mm-dd') AS out_date_nm, t.out_date,t.ORDER_CHANNEL,t.LOGIN_MOBILE,t.ARRIVE_TIME,
+      t.book_remark, t.book_source, t.book_price, t.room_type_code,t.price_code,t.BOOK_REMARK,
+  
+      CASE WHEN t.price_code = 'LMBAR' THEN 'LMBAR(预付)' when t.price_code = 'LMBAR2' then 'LMBAR2(现付)' 
+      when t.price_code = 'BAR' then 'BAR(常规现付)' when t.price_code = 'BARB' then 'BARB(常规现付)' ELSE '' END AS price_code_nm,
+  
+      t.order_cancle_reason, TO_CHAR(t.order_cancel_time, 'yyyy-mm-dd hh24:mi:ss') AS ordercanceltime, t.ORDER_CANCLE_REASON,t.book_total_price,
+      t.login_mobile, t.overtime, t.memo1, t.pro_desc, t.pro_content, t.is_network, t.breakfast_num, t.ticket_usercode, t.ticket_amount,
+      t.ticket_count, t.room_type_name,
+      t.MEMO1,
+      CASE WHEN t.book_status_other = '0' THEN '新建' when t.book_status_other = '1' then '预订成功等待确认' when t.book_status_other = '2' then '新建入fog失败' 
+      when t.book_status_other = '3' then '用户取消' when t.book_status_other = '4' then '可入住已确认' when t.book_status_other = '5' then 'NO-SHOW' 
+      when t.book_status_other = '6' then '已完成' when t.book_status_other = '7' then '入住中' when t.book_status_other = '8' then '已离店' 
+      when t.book_status_other = '9' then 'CC取消' ELSE '' END AS book_status_other_nm,t.book_status_other,
+  
+      t.book_person_tel,
+      CASE WHEN t.IS_GUA = '0' THEN '非担保单' when t.IS_GUA = '1' then '担保单' ELSE '' END AS is_gua_nm,
+      CASE WHEN t.pay_method = '0' THEN '到店付款' when t.pay_method = '1' then '支付宝' when t.pay_method = '2' then '快钱' 
+      when t.pay_method = '3' then '银联' when t.pay_method = '4' then '抵扣券' ELSE '' END AS pay_method,
+  
+      CASE WHEN t.is_reserve = '0' THEN '即时订单' when t.is_reserve = '1' then '非即时订单' ELSE '' END AS is_reserve,t.fog_resvtype,
+      CASE WHEN t.fog_resvtype = 'n' THEN '新单' when t.fog_resvtype = 'e' then '修改单' when t.fog_resvtype = 'c' then '取消单' ELSE '' END AS fog_resvtype_nm,
+      CASE WHEN t.fog_resvstatus = '0' THEN '待酒店确认' when t.fog_resvstatus = '1' then '酒店已确认' ELSE '' END AS fog_resvstatus_nm,t.fog_resvstatus,t.fog_auditstatus,
+      CASE WHEN t.fog_auditstatus = '5' THEN 'NoShow' when t.fog_auditstatus = '7' then '入住中' when t.fog_auditstatus = '8' then '离店' ELSE '' END AS fog_auditstatus_nm,
+      CASE WHEN t.lmbar_status = '6' THEN '已完成' ELSE '' END AS lmbar_status, t.pay_methoddesc, t.update_time,t.app_platform,t.PROMOTION_AMOUNT
+     ,p.linktel as linktel,p.linkman as linkman
+      ,p.fax,p.linkfax,tp.packagename,toc.FOLLOW_UP,toc.FAX_FDTIME, too.CONFIRM_NUM,
+      too.APPROVE_NUM,too.INROOM_NUM,too.ORDER_NS_REASON,t.VENDOR,hx.linkman AS HXlinkman, hx.linktel AS HXlinktel, hx.remark AS HXremark,
+      CASE WHEN nvl(pt.fax_status,99) = '0' OR pt.fax_status IS NULL THEN '待发' when nvl(pt.fax_status,99) = '2' then '失败'  when nvl(pt.fax_status,99) = '1' then '成功'  ELSE '未发' END AS FAXSTATUS,
+      CASE WHEN nvl(qt.fax_status,99) = '0' THEN '回传中' when nvl(qt.fax_status,99) = '2' then '回传失败'  when nvl(qt.fax_status,99) = '1' then '回传成功'  ELSE '未回传' END AS REFAXSTATUS,
+      CASE WHEN nvl(rt.fax_status,99) = '0' THEN '待发' when nvl(rt.fax_status,99) = '2' then '失败'  when nvl(rt.fax_status,99) = '1' then '成功'  ELSE '未发' END AS CAFAXSTATUS,
+      CASE WHEN nvl(st.fax_status,99) = '0' THEN '回传中' when nvl(st.fax_status,99) = '2' then '回传失败'  when nvl(st.fax_status,99) = '1' then '回传成功'  ELSE '未回传' END AS RECAFAXSTATUS,case when toc.status = '2' then toc.ope_user else '无人' end OpeUser
+      from 
+      (select * from t_lm_order where fog_order_num=:ORDERID) t
+      left join t_lm_b_prop p on t.hotel_id=p.prop
+      left join t_lm_ticket_user tu on t.ticket_usercode = tu.ticketusercode
+      left join t_lm_ticket_package tp on tu.packagecode = tp.packagecode
+      left join T_LM_ORDER_COF toc on t.fog_order_num=toc.FOG_ORDER_NUM
+      left join T_LM_ORDER_OPE too on t.fog_order_num=too.FOG_ORDER_NUM
+      left join t_lm_hotel_ex hx on t.hotel_id=hx.hotel_id and hx.type='2'
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='1' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) pt on t.fog_order_num=pt.LINK_ID
+  
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='1' and t.FAX_TYPE='2' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) qt on pt.LINK_ID=qt.LINK_ID and pt.barcode=qt.barcode
+  
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='2' and t.FAX_TYPE='1' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) rt on t.fog_order_num=rt.LINK_ID
+  
+      left join (select dt.LINK_ID,d.barcode,d.fax_status from ( 
+      select t.LINK_ID,MAX(t.CREATE_TIME) AS MCREATETIME from t_fax t 
+      where t.LINK_TYPE='2' and t.FAX_TYPE='2' group by t.LINK_ID) dt 
+      inner join t_fax d on d.link_id=dt.LINK_ID and dt.MCREATETIME = d.create_time) st on rt.LINK_ID=st.LINK_ID and rt.barcode=st.barcode
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_detail_rest_select">
+    <![CDATA[
+    select 
+  CASE WHEN t.BOOK_STATUS = '0' THEN '新建' when t.BOOK_STATUS = '1' then '新建入FOG成功' when t.BOOK_STATUS = '2' then '新建入fog失败' when t.BOOK_STATUS = '3' then '超时' when t.BOOK_STATUS = '4' then '取消单' when t.BOOK_STATUS = '5' then '成功' ELSE '' END AS book_status_nm,t.BOOK_STATUS,
+  t.fog_order_num,t.price_code,t.BOOK_REMARK,
+  CASE WHEN t.book_status_other = '0' THEN '新建' when t.book_status_other = '1' then '预订成功等待确认' when t.book_status_other = '2' then '新建入fog失败' when t.book_status_other = '3' then '用户取消' when t.book_status_other = '4' then '可入住已确认' when t.book_status_other = '5' then 'NO-SHOW' when t.book_status_other = '6' then '已完成' when t.book_status_other = '7' then '入住中' when t.book_status_other = '8' then '已离店' when t.book_status_other = '9' then 'CC取消' ELSE '' END AS book_status_other_nm,t.book_status_other,
+  CASE WHEN toc.fax_status = '0' THEN '待发送' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) <= 1) then '发送中' when toc.fax_status = '1' and (TO_NUMBER(toc.FAX_NUMBER) > 1) then '重发中'  when toc.fax_status = '2' then '发送成功'  ELSE '发送失败' END AS FAXSTATUS
+  from 
+  (select * from t_lm_order where fog_order_num=:ORDERID) t
+  left join T_LM_ORDER_COF toc on t.fog_order_num=toc.FOG_ORDER_NUM
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_main_select_chk">
+    <![CDATA[
+  select id from t_lm_order where fog_order_num=:ORDERID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_main_select_byprint">
+    <![CDATA[
+        select t.id as order_id, t.order_num, t.city_id, t.hotel_id, t.hotel_name, TO_CHAR(t.in_date, 'yyyy-mm-dd') AS in_date_nm, t.in_date, t.book_room_num, t.guest_names, t.contact_name,
+    t.contact_tel, t.book_type, TO_CHAR(t.create_time, 'yyyy-mm-dd hh24:mi:ss') AS create_time, t.user_id,
+  
+    case when t.price_code = 'LMBAR' then (  CASE when t.BOOK_STATUS = '5' then '新单(特价订单已付款)' else '取消单' end ) end as book_status_nm,
+  
+    t.BOOK_STATUS,
+    CASE WHEN t.pay_status = '0' THEN '未支付' when t.pay_status = '1' then '支付成功' when t.pay_status = '2' then '等待支付' when t.pay_status = '3' then '支付中' when t.pay_status = '4' then '支付失败' when t.pay_status = '5' then '支付确认中' when t.pay_status = '6' then '异常取消' ELSE '' END AS pay_status_nm,t.pay_status,
+    t.hold_time, t.fog_order_num,TO_CHAR(t.out_date, 'yyyy-mm-dd') AS out_date_nm, t.out_date,t.ORDER_CHANNEL,t.LOGIN_MOBILE,t.ARRIVE_TIME,t.BOOK_REMARK,
+    t.book_remark, t.book_source, t.book_price, t.room_type_code,t.price_code,t.BOOK_REMARK,
+    CASE WHEN t.price_code = 'LMBAR' THEN 'LMBAR(预付)' when t.price_code = 'LMBAR2' then 'LMBAR2(现付)' when t.price_code = 'BAR' then 'BAR(常规现付)' when t.price_code = 'BARB' then 'BARB(常规现付)' ELSE '' END AS price_code_nm,
+    t.order_cancle_reason, TO_CHAR(t.order_cancel_time, 'yyyy-mm-dd hh24:mi:ss') AS ordercanceltime, t.ORDER_CANCLE_REASON,t.book_total_price,
+    t.login_mobile, t.overtime, t.memo1, t.pro_desc, t.pro_content, t.is_network, t.breakfast_num, t.ticket_usercode, t.ticket_amount,
+    t.ticket_count, t.room_type_name,
+    t.MEMO1,
+    case when price_code = 'LMBAR2' then (case when book_status_other = '0'  then '新单(需前台现付)'  when book_status_other = '1' then '新单(需前台现付)' when book_status_other = '2' then '新单(需前台现付)'  when book_status_other = '3' then '客户取消单' when book_status_other = '9' then '取消单' else '' end ) end as book_status_other_nm,
+    t.book_status_other,
+    t.book_person_tel,
+    CASE WHEN t.IS_GUA = '0' THEN '非担保单' when t.IS_GUA = '1' then '担保单' ELSE '' END AS is_gua_nm,
+    CASE WHEN t.pay_method = '0' THEN '到店付款' when t.pay_method = '1' then '支付宝' when t.pay_method = '2' then '快钱' when t.pay_method = '3' then '银联' when t.pay_method = '4' then '抵扣券' ELSE '' END AS pay_method,
+    CASE WHEN t.is_reserve = '0' THEN '即时订单' when t.is_reserve = '1' then '非即时订单' ELSE '' END AS is_reserve,t.fog_resvtype,
+    CASE WHEN t.fog_resvtype = 'n' THEN '新单' when t.fog_resvtype = 'e' then '修改单' when t.fog_resvtype = 'c' then '取消单' ELSE '' END AS fog_resvtype_nm,
+    CASE WHEN t.fog_resvstatus = '0' THEN '待酒店确认' when t.fog_resvstatus = '1' then '酒店已确认' ELSE '' END AS fog_resvstatus_nm,t.fog_resvstatus,t.fog_auditstatus,
+    CASE WHEN t.fog_auditstatus = '5' THEN 'NoShow' when t.fog_auditstatus = '7' then '入住中' when t.fog_auditstatus = '8' then '离店' ELSE '' END AS fog_auditstatus_nm,
+    CASE WHEN t.lmbar_status = '6' THEN '已完成' ELSE '' END AS lmbar_status, t.pay_methoddesc, t.update_time,t.app_platform,t.PROMOTION_AMOUNT
+    ,p.linktel,p.fax,p.linkfax,tp.packagename,tog.RESV_GUA_DESC,tog.RESV_CXL_DESC,tog.RESV_GUA_HOLD_TIME,tog.USER_HOLD_TIME,toc.FOLLOW_UP,toc.FAX_FDTIME
+    from t_lm_order t
+    left join t_lm_b_prop p on t.hotel_id=p.prop
+    left join t_lm_ticket_user tu on t.ticket_usercode = tu.ticketusercode
+    left join t_lm_ticket_package tp on tu.packagecode = tp.packagecode
+    left join T_LM_ORDER_GUA tog on t.fog_order_num=tog.FOG_ORDER_NUM
+    left join T_LM_ORDER_COF toc on t.fog_order_num=toc.FOG_ORDER_NUM
+    where t.fog_order_num=:ORDERID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_comfirm_byprint">
+    <![CDATA[
+    select t.id as order_id, t.order_num, t.city_id, t.hotel_id, t.hotel_name, TO_CHAR(t.in_date, 'yyyy-mm-dd') AS in_date_nm, t.in_date, t.book_room_num, t.guest_names, t.contact_name,
+    t.contact_tel, t.book_type, TO_CHAR(t.create_time, 'yyyy-mm-dd hh24:mi:ss') AS create_time, t.user_id,
+  
+    case when t.price_code = 'LMBAR' then (  CASE when t.BOOK_STATUS = '5' then '新单(特价订单已付款)' else '取消单' end ) end as book_status_nm,
+  
+    t.BOOK_STATUS,
+    CASE WHEN t.pay_status = '0' THEN '未支付' when t.pay_status = '1' then '支付成功' when t.pay_status = '2' then '等待支付' when t.pay_status = '3' then '支付中' when t.pay_status = '4' then '支付失败' when t.pay_status = '5' then '支付确认中' when t.pay_status = '6' then '异常取消' ELSE '' END AS pay_status_nm,t.pay_status,
+    t.hold_time, t.fog_order_num,TO_CHAR(t.out_date, 'yyyy-mm-dd') AS out_date_nm, t.out_date,t.ORDER_CHANNEL,t.LOGIN_MOBILE,t.ARRIVE_TIME,t.BOOK_REMARK,
+    t.book_remark, t.book_source, t.book_price, t.room_type_code,t.price_code,t.BOOK_REMARK,
+    CASE WHEN t.price_code = 'LMBAR' THEN 'LMBAR(预付)' when t.price_code = 'LMBAR2' then 'LMBAR2(现付)' when t.price_code = 'BAR' then 'BAR(常规现付)' when t.price_code = 'BARB' then 'BARB(常规现付)' ELSE '' END AS price_code_nm,
+    t.order_cancle_reason, TO_CHAR(t.order_cancel_time, 'yyyy-mm-dd hh24:mi:ss') AS ordercanceltime, t.ORDER_CANCLE_REASON,t.book_total_price,
+    t.login_mobile, t.overtime, t.memo1, t.pro_desc, t.pro_content, t.is_network, t.breakfast_num, t.ticket_usercode, t.ticket_amount,
+    t.ticket_count, t.room_type_name,
+    t.MEMO1,
+    case when price_code = 'LMBAR2' then (case when book_status_other = '0'  then '新单(需前台现付)'  when book_status_other = '1' then '新单(需前台现付)' when book_status_other = '2' then '新单(需前台现付)'  when book_status_other = '3' then '客户取消单' when book_status_other = '9' then '取消单' else '' end ) end as book_status_other_nm,
+    t.book_status_other,
+    t.book_person_tel,t.IS_GUA,
+    CASE WHEN t.IS_GUA = '0' THEN '非担保单' when t.IS_GUA = '1' then '担保单' ELSE '' END AS is_gua_nm,
+    CASE WHEN t.pay_method = '0' THEN '到店付款' when t.pay_method = '1' then '支付宝' when t.pay_method = '2' then '快钱' when t.pay_method = '3' then '银联' when t.pay_method = '4' then '抵扣券' ELSE '' END AS pay_method,
+    CASE WHEN t.is_reserve = '0' THEN '即时订单' when t.is_reserve = '1' then '非即时订单' ELSE '' END AS is_reserve,t.fog_resvtype,
+    CASE WHEN t.fog_resvtype = 'n' THEN '新单' when t.fog_resvtype = 'e' then '修改单' when t.fog_resvtype = 'c' then '取消单' ELSE '' END AS fog_resvtype_nm,
+    CASE WHEN t.fog_resvstatus = '0' THEN '待酒店确认' when t.fog_resvstatus = '1' then '酒店已确认' ELSE '' END AS fog_resvstatus_nm,t.fog_resvstatus,t.fog_auditstatus,
+    CASE WHEN t.fog_auditstatus = '5' THEN 'NoShow' when t.fog_auditstatus = '7' then '入住中' when t.fog_auditstatus = '8' then '离店' ELSE '' END AS fog_auditstatus_nm,
+    CASE WHEN t.lmbar_status = '6' THEN '已完成' ELSE '' END AS lmbar_status, t.pay_methoddesc, t.update_time,t.app_platform,t.PROMOTION_AMOUNT
+    ,p.linktel,p.fax,p.linkfax,tp.packagename,tog.RESV_GUA_DESC,tog.RESV_CXL_DESC,tog.RESV_GUA_HOLD_TIME,tog.USER_HOLD_TIME,toc.FOLLOW_UP,toc.FAX_FDTIME,
+    hex.linktel AS ODLINKTEL,hex.linkfax AS ODLINKFAX
+    from t_lm_order t
+    left join t_lm_b_prop p on t.hotel_id=p.prop
+    left join t_lm_ticket_user tu on t.ticket_usercode = tu.ticketusercode
+    left join t_lm_ticket_package tp on tu.packagecode = tp.packagecode
+    left join T_LM_ORDER_GUA tog on t.fog_order_num=tog.FOG_ORDER_NUM
+    left join T_LM_ORDER_COF toc on t.fog_order_num=toc.FOG_ORDER_NUM
+    left join t_lm_hotel_ex hex on t.hotel_id=hex.hotel_id and hex.type='2'
+    where t.fog_order_num=:ORDERID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_comfirm_plan_byprint">
+    <![CDATA[
+    select t.room_type_name AS ROOMNM,t.two_price AS TWOPRICE from t_lm_plan t 
+    inner join t_lm_b_prop bp on t.hotel_id = bp.prop and bp.online_status='1' and bp.status='active'
+    where t.effect_date = trunc(sysdate,'dd') and t.status='1' and t.room_num > 0 
+    and t.hotel_id=:HOTELID and t.rate_code=:PRICECODE
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_detial_select">
+    <![CDATA[
+    select TO_CHAR(in_date, 'yyyy-mm-dd') AS INDATE , book_price AS TWOPRICE, price_code, create_time, breakfast_num AS BREAKFAST, is_network, lm_order_num from t_order_price_info
+  where order_num=:ORDERID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_detial_select_lm">
+    <![CDATA[
+    select TO_CHAR(in_date, 'yyyy-mm-dd') AS INDATE , 
+    t.book_total_price AS TWOPRICE, price_code, create_time, breakfast_num AS BREAKFAST, is_network, t.order_num as lm_order_num 
+    from t_lm_order t
+    where t.fog_order_num=:ORDERID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_save">
+    <![CDATA[
+    merge into T_LM_ORDER_OPE t1
+      using (select :ORDERID AS FOG_ORDER_NUM,:BOOKSTATUS AS BOOK_STATUS,:PAYSTATUS AS PAY_STATUS,:BOOKSTATUSOTHER AS BOOK_STATUS_OTHER,:FOGRESVTYPE AS FOG_RESVTYPE,:FOGRESVSTATUS AS FOG_RESVSTATUS,:FOGAUDITSTATUS AS FOG_AUDITSTATUS,:ORDERCANCLEREASON AS ORDER_CANCLE_REASON,:BOOKREMARK AS BOOK_REMARK,:CREATEUSER AS CREATE_USER, :CONFIRMNUM AS CONFIRM_NUM from dual) t2 
+      on (t1.FOG_ORDER_NUM = t2.FOG_ORDER_NUM)
+      when matched then
+         update set 
+         t1.BOOK_STATUS=t2.BOOK_STATUS,
+         t1.PAY_STATUS=t2.PAY_STATUS,
+         t1.BOOK_REMARK=t2.BOOK_REMARK,
+         t1.ORDER_CANCLE_REASON=t2.ORDER_CANCLE_REASON,
+         t1.BOOK_STATUS_OTHER=t2.BOOK_STATUS_OTHER,
+         t1.FOG_RESVTYPE=t2.FOG_RESVTYPE,
+         t1.FOG_RESVSTATUS=t2.FOG_RESVSTATUS,
+         t1.FOG_AUDITSTATUS=t2.FOG_AUDITSTATUS,
+         t1.STATUS = '1',
+         t1.UPDATE_USER=t2.CREATE_USER,
+         t1.update_time=sysdate,
+         t1.CONFIRM_NUM = t2.CONFIRM_NUM
+         where t1.FOG_ORDER_NUM = t2.FOG_ORDER_NUM
+      when not matched then
+         insert values (T_LM_ORDER_OPE_SEQ.nextval, t2.FOG_ORDER_NUM,t2.BOOK_STATUS, t2.PAY_STATUS,t2.BOOK_REMARK,t2.ORDER_CANCLE_REASON,t2.BOOK_STATUS_OTHER,t2.FOG_RESVTYPE,t2.FOG_RESVSTATUS,t2.FOG_AUDITSTATUS,'1',sysdate,t2.CREATE_USER,sysdate,t2.CREATE_USER,t2.CONFIRM_NUM)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_operation_appsave">
+    <![CDATA[
+    merge into T_LM_ORDER_OPE t1
+      using (select :ORDERID AS FOG_ORDER_NUM,:BOOKSTATUS AS BOOK_STATUS,:PAYSTATUS AS PAY_STATUS,:BOOKSTATUSOTHER AS BOOK_STATUS_OTHER,:FOGRESVTYPE AS FOG_RESVTYPE,:FOGRESVSTATUS AS FOG_RESVSTATUS,:FOGAUDITSTATUS AS FOG_AUDITSTATUS,:ORDERCANCLEREASON AS ORDER_CANCLE_REASON,:BOOKREMARK AS BOOK_REMARK,:CREATEUSER AS CREATE_USER, :CONFIRMNUM AS CONFIRM_NUM, :APPROVENUM AS APPROVE_NUM, :INROOMNUM AS INROOM_NUM, :ORDERNSREASON AS ORDER_NS_REASON, :VENDOR AS VENDOR from dual) t2 
+      on (t1.FOG_ORDER_NUM = t2.FOG_ORDER_NUM)
+      when matched then
+         update set 
+         t1.BOOK_STATUS=t2.BOOK_STATUS,
+         t1.PAY_STATUS=t2.PAY_STATUS,
+         t1.BOOK_REMARK=t2.BOOK_REMARK,
+         t1.ORDER_CANCLE_REASON=t2.ORDER_CANCLE_REASON,
+         t1.BOOK_STATUS_OTHER=t2.BOOK_STATUS_OTHER,
+         t1.FOG_RESVTYPE=t2.FOG_RESVTYPE,
+         t1.FOG_RESVSTATUS=t2.FOG_RESVSTATUS,
+         t1.FOG_AUDITSTATUS=t2.FOG_AUDITSTATUS,
+         t1.STATUS = '1',
+         t1.UPDATE_USER=t2.CREATE_USER,
+         t1.update_time=sysdate,
+         t1.CONFIRM_NUM = t2.CONFIRM_NUM,
+         t1.APPROVE_NUM = t2.APPROVE_NUM,
+         t1.INROOM_NUM = t2.INROOM_NUM,
+         t1.ORDER_NS_REASON = t2.ORDER_NS_REASON,
+         t1.VENDOR = t2.VENDOR
+         where t1.FOG_ORDER_NUM = t2.FOG_ORDER_NUM
+      when not matched then
+         insert values (T_LM_ORDER_OPE_SEQ.nextval, t2.FOG_ORDER_NUM,t2.BOOK_STATUS, t2.PAY_STATUS,t2.BOOK_REMARK,t2.ORDER_CANCLE_REASON,t2.BOOK_STATUS_OTHER,t2.FOG_RESVTYPE,t2.FOG_RESVSTATUS,t2.FOG_AUDITSTATUS,'1',sysdate,t2.CREATE_USER,sysdate,t2.CREATE_USER,t2.CONFIRM_NUM,t2.APPROVE_NUM,t2.INROOM_NUM,t2.ORDER_NS_REASON,t2.VENDOR)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_cof_save">
+    <![CDATA[
+        update t_lm_order_cof
+    set update_time = sysdate,
+       update_user = :CREATEUSER,
+       follow_up = :FOLLOWUP
+    where fog_order_num = :ORDERID
+   ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_cof_faxdetial_update">
+    <![CDATA[
+    update t_lm_order_cof  
+    set fax_system=:FAX_SYSTEM,
+    fax_no=:FAX_NO,
+    fax_image_url=:FAX_IMAGE_URL,
+    fax_status=:FAX_STATUS,
+    fax_dtime= to_date(:FAX_DTIME, 'yyyy.mm.dd hh24:mi:ss'),
+    fax_number = TO_NUMBER(nvl(fax_number,0))+1,
+    fax_fdtime=to_date(:FAX_FDTIME, 'yyyy.mm.dd hh24:mi:ss'),
+    client_task_id=：CLIENT_TASK_ID,
+    fax_type = :FAX_TYPE 
+    where order_id = :ORDERID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_cof_faxdetial_repeat_update">
+    <![CDATA[
+    update t_lm_order_cof  
+    set fax_system=:FAX_SYSTEM,
+    fax_no=:FAX_NO,
+    fax_image_url=:FAX_IMAGE_URL,
+    fax_status=:FAX_STATUS,
+    fax_dtime=to_date(:FAX_DTIME, 'yyyy.mm.dd hh24:mi:ss'),
+    fax_number = TO_NUMBER(nvl(fax_number,0))+1,
+    client_task_id=：CLIENT_TASK_ID,
+    fax_type = :FAX_TYPE
+    where order_id = :ORDERID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_ex_remark_check">
+    <![CDATA[
+    select hotel_id, type, linkman, linktel, linkmail, linkfax, remark, ex_time, ex_mode
+    from t_lm_hotel_ex where hotel_id=:HOTELID and type='2'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_ex_remark_save">
+    <![CDATA[
+    Update t_lm_hotel_ex set remark=:REMARK, UPDATE_TIME=sysdate, UPDATE_USER=:CREATEUSER
+    where hotel_id=:HOTELID and type='2'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_by_operatestatus">
+    <![CDATA[
+  select id, order_num, city_id, hotel_id, hotel_name, in_date, book_room_num, guest_names, contact_name, contact_tel, book_type, 
+  create_time, user_id, book_status, pay_status, hold_time, fog_order_num, out_date, book_remark, book_source, book_price, room_type_code, 
+  price_code, order_cancle_reason, book_total_price, login_mobile, overtime, memo1, pro_desc, pro_content, is_network, breakfast_num, 
+  ticket_usercode, ticket_amount, ticket_count, room_type_name, book_status_other, book_person_tel, is_reserve, fog_resvtype, 
+  fog_resvstatus, fog_auditstatus, lmbar_status, pay_methoddesc, update_time, invoice_code, promotion_amount, app_version, is_delete, 
+  order_channel, vendor, vendor_status, 
+  is_visitor from t_lm_order where fog_order_num=:FOGORDERNUM
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderappromginfo_chkOrderLock">
+    <![CDATA[
+    select t.fog_order_num from t_lm_order_cof t where t.fog_order_num=:ORDERID and t.status='2'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_comfirm_hcorder_list">
+    <![CDATA[
+    select 
+    t.fog_order_num AS ORDERID,'['||t.hotel_id||']' AS hotelid, t.hotel_name, '' AS HOTELNM,t.guest_names||' '||t.contact_tel AS PERSON,t.in_date,t.out_date,
+    TO_CHAR(t.in_date, 'mm-dd') AS in_date_nm,TO_CHAR(t.out_date, 'mm-dd') AS out_date_nm ,
+    t.book_room_num,t.book_total_price,'' AS PRICES, '' AS INODATE, '0' AS CHTYPE,
+    '' AS BOOKNUMS, '['||t.hotel_id||'] - ['||t.hotel_name||'] - '|| t.fog_order_num || ' - 订单确认问题' AS ISSNM
+    from t_lm_order t 
+    inner join T_LM_ORDER_cof toc on t.FOG_ORDER_NUM = toc.fog_order_num 
+    where t.fog_order_num <> :ORDERID and t.contact_tel=:CONTTEL 
+    AND (t.fog_resvstatus='0' or t.fog_resvstatus is null)
+    AND t.BOOK_STATUS_OTHER = '1'
+    AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+    union all
+    select 
+    t.fog_order_num AS ORDERID,'['||t.hotel_id||']' AS hotelid, t.hotel_name, '' AS HOTELNM,t.guest_names||' '||t.contact_tel AS PERSON,t.in_date,t.out_date,
+    TO_CHAR(t.in_date, 'mm-dd') AS in_date_nm,TO_CHAR(t.out_date, 'mm-dd') AS out_date_nm ,
+    t.book_room_num,t.book_total_price,'' AS PRICES, '' AS INODATE, '1' AS CHTYPE,
+    t.room_type_name || '  ' ||t.book_room_num || '间' AS BOOKNUMS, '['||t.hotel_id||'] - ['||t.hotel_name||'] - '|| t.fog_order_num || ' - 订单确认问题' AS ISSNM
+    from t_lm_order t 
+    inner join T_LM_ORDER_cof toc on t.FOG_ORDER_NUM = toc.fog_order_num AND (toc.STATUS IN ('0','1') OR (toc.STATUS = 2 AND lower(toc.OPE_USER)=lower(:OPEUSER)))
+    where t.fog_order_num <> :ORDERID and t.hotel_id=:HOTELID 
+    AND (t.fog_resvstatus='0' or t.fog_resvstatus is null)
+    AND t.BOOK_STATUS_OTHER = '1'    
+    AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_comfirm_hcorder_list_view">
+    <![CDATA[
+    select 
+    t.fog_order_num AS ORDERID,'['||t.hotel_id||']' AS hotelid, t.hotel_name, '' AS HOTELNM,t.guest_names||' '||t.contact_tel AS PERSON,t.in_date,t.out_date,
+    TO_CHAR(t.in_date, 'mm-dd') AS in_date_nm,TO_CHAR(t.out_date, 'mm-dd') AS out_date_nm ,
+    t.book_room_num,t.book_total_price,'' AS PRICES, '' AS INODATE, '0' AS CHTYPE,
+    '' AS BOOKNUMS
+    from t_lm_order t 
+    inner join T_LM_ORDER_cof toc on t.FOG_ORDER_NUM = toc.fog_order_num 
+    where t.fog_order_num <> :ORDERID and t.contact_tel=:CONTTEL 
+    AND (t.fog_resvstatus='0' or t.fog_resvstatus is null)
+    AND t.BOOK_STATUS_OTHER = '1'
+    AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+    union all
+    select 
+    t.fog_order_num AS ORDERID,'['||t.hotel_id||']' AS hotelid, t.hotel_name, '' AS HOTELNM,t.guest_names||' '||t.contact_tel AS PERSON,t.in_date,t.out_date,
+    TO_CHAR(t.in_date, 'mm-dd') AS in_date_nm,TO_CHAR(t.out_date, 'mm-dd') AS out_date_nm ,
+    t.book_room_num,t.book_total_price,'' AS PRICES, '' AS INODATE, '1' AS CHTYPE,
+    t.room_type_name || '  ' ||t.book_room_num || '间' AS BOOKNUMS
+    from t_lm_order t 
+    inner join T_LM_ORDER_cof toc on t.FOG_ORDER_NUM = toc.fog_order_num
+    where t.fog_order_num <> :ORDERID and t.hotel_id=:HOTELID 
+    AND (t.fog_resvstatus='0' or t.fog_resvstatus is null)
+    AND t.BOOK_STATUS_OTHER = '1'    
+    AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_cof_hotel_lock">
+    <![CDATA[
+    update t_lm_order_cof set status='2',ope_user=:OPEUSER , update_time=sysdate, 
+    update_user= :OPEUSER where STATUS IN ('0','1') and FOG_ORDER_NUM IN
+    (
+    select t.FOG_ORDER_NUM
+    from t_lm_order t 
+    inner join T_LM_ORDER_cof toc on t.FOG_ORDER_NUM = toc.fog_order_num AND toc.STATUS IN ('0','1')
+    where t.fog_order_num <> :ORDERID and t.hotel_id=:HOTELID
+    AND (t.fog_resvstatus='0' or t.fog_resvstatus is null)
+    AND t.BOOK_STATUS_OTHER = '1'
+    AND (toc.VENDOR IS NOT NULL AND toc.VENDOR IN ('HOMEINNS','MOTEL168','HVP'))
+    )
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_order_approved_report">
+    <![CDATA[
+    select id,hotel_id,order_num,city_id,hotel_name,in_date,create_time,book_status,book_room_num,fog_order_num,out_date,price_code,BOOK_STATUS_OTHER,
+    CASE WHEN BOOK_STATUS_OTHER= '0' OR BOOK_STATUS_OTHER= '1' THEN '新建' 
+    WHEN BOOK_STATUS_OTHER= '3' THEN '用户取消' 
+    WHEN BOOK_STATUS_OTHER= '5' THEN 'NO-SHOW' 
+    WHEN BOOK_STATUS_OTHER= '6' THEN '已完成' 
+    WHEN BOOK_STATUS_OTHER= '7' THEN '已入住' 
+    WHEN BOOK_STATUS_OTHER= '8' THEN '离店' 
+    WHEN BOOK_STATUS_OTHER= '9' THEN 'CC取消' 
+    ELSE '' END AS ORSTATUS
+    from t_lm_order
+    where BOOK_STATUS_OTHER in ('4','5','6','7','8')
+    AND ((:StartDate IS NULL) OR (OUT_DATE>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+    AND ((:EndDate IS NULL) OR (OUT_DATE<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+    AND ((:CITYID IS NULL) OR (CITY_ID=:CITYID))
+    AND (VENDOR IS NOT NULL AND VENDOR IN ('HOMEINNS','MOTEL168','HVP')) AND price_code='LMBAR2'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_by_order">
+    <![CDATA[
+    select distinct hotel_id
+    from t_lm_order
+    where (:FOGORDERNUM IS NULL OR (fog_order_num in (SELECT REGEXP_SUBSTR (:FOGORDERNUM, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:FOGORDERNUM) - LENGTH (REPLACE (:FOGORDERNUM, ',', '')))))
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_order_by_order_details">
+    <![CDATA[
+    select *
+    from t_lm_order
+    where (:FOGORDERNUM IS NULL OR (fog_order_num in (SELECT REGEXP_SUBSTR (:FOGORDERNUM, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:FOGORDERNUM) - LENGTH (REPLACE (:FOGORDERNUM, ',', '')))))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_by_order_refund">
+    <![CDATA[
+    select tlo.fog_order_num,tlo.vendor,tlo.hotel_name,tlc.name_cn,tlo.create_time,tlo.in_date,tlo.book_status,tlo.pay_method,tlo.pay_status from  t_lm_order tlo 
+    left join t_lm_b_city tlc on tlo.city_id=tlc.city_id
+    left join t_lm_sales_history tls on tlo.hotel_id =tls.hotel_id and tls.status='1'
+    where tlo.price_code='LMBAR' AND tlo.book_status='7' and tlo.pay_status='10'
+    AND ((:HOTELID IS NULL) OR (tlo.hotel_id=:HOTELID))
+    AND ((:SALES IS NULL) OR (tls.Sales_Account=:SALES))
+    AND ((:FOGORDERNUM IS NULL) OR (tlo.Fog_Order_Num=:FOGORDERNUM))
+    AND ((:StartDate IS NULL) OR (OUT_DATE>= to_date(:StartDate,'yyyy-MM-dd hh24:mi:ss')))
+    AND ((:EndDate IS NULL) OR (OUT_DATE<= to_date(:EndDate,'yyyy-MM-dd hh24:mi:ss')))
+    AND (:PAYSTATUS IS NULL OR (fog_order_num in (SELECT REGEXP_SUBSTR (:PAYSTATUS, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:PAYSTATUS) - LENGTH (REPLACE (:PAYSTATUS, ',', '')))))
+    ]]>
+  </sql>
+
+</sqlList>

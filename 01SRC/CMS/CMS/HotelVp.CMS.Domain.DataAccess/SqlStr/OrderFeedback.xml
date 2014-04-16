@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_order_feedback_list">
+    <![CDATA[ 
+    select lf.order_num,lf.content,lf.create_time,
+    case lf.update_time 
+    when lf.create_time then '' else to_char(lf.update_time,'yyyy-mm-dd hh24:mi:ss') end as update_time, 
+    lf.type,lf.operator,
+    case lf.is_process when '1' then '已处理' else '未处理' end as is_process,
+    '['||lo.hotel_id||']'||lo.hotel_name as HotelName,lo.price_code as PriceCode from T_LM_order_feedback lf 
+    left join t_lm_order lo on lo.fog_order_num = lf.order_num 
+    where TYPE='1'
+    
+    
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_by_nsusercomplain">
+    <![CDATA[ 
+    select ls.sales_account,le.linktel as OrderAffirmLinkTel,lex.linktel as OrderVerifyLinkTel,lo.* from t_lm_order lo
+    left join t_lm_sales_history ls on ls.hotel_id = lo.hotel_id and ls.status=1
+    left join t_lm_hotel_ex le on le.hotel_id = lo.hotel_id and le.type='2'
+    left join t_lm_hotel_ex lex on lex.hotel_id = lo.hotel_id and lex.type='3'
+    where fog_order_num=:FOGORDERNUM
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="update_t_lm_order_feedback">
+    <![CDATA[ 
+    update T_LM_order_feedback set is_process=:ISPROCESS,operator=:OPERATOR,update_time=sysdate where order_NUM=:ORDERNUM
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="update_t_lm_order_bookstatusother">
+    <![CDATA[ 
+    update t_lm_order set book_status_other=:BOOKSTATUSOTHER where fog_order_NUM=:ORDERNUM
+  ]]>
+  </sql>
+  
+</sqlList>

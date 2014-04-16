@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_order">
+    <![CDATA[  
+     select id from t_lm_order t where t.fog_order_num=:TID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_hotel">
+    <![CDATA[  
+     select prop from t_lm_b_prop t where t.prop=:TID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_invoice">
+    <![CDATA[  
+     select invoice_num from t_lm_invoice t where t.invoice_num=:TID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_user">
+    <![CDATA[  
+     select login_mobile from t_lm_user t where t.login_mobile=:TID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_cash">
+    <![CDATA[  
+     select id from t_lm_cash t where t.id=:TID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_advice">
+    <![CDATA[  
+     select id from t_lm_advice t where t.ID=:TID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_order_user_tel">
+    <![CDATA[  
+     select LOGIN_MOBILE AS  from t_lm_order t where t.fog_order_num=:TID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_prop_reval_order">
+    <![CDATA[  
+     select t.hotel_id AS HOTELID,t.hotel_name AS HOTELNM from t_lm_order t where t.fog_order_num = :REKEY
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_prop_reval_hotel">
+    <![CDATA[  
+     select t.prop AS HOTELID, t.prop_name_zh AS HOTELNM from t_lm_b_prop t where t.prop = :REKEY
+  ]]>
+  </sql>
+
+</sqlList>

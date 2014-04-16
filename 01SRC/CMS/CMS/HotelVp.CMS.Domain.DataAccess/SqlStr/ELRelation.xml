@@ -1,0 +1,363 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_fx_hvp_hotel_select">
+    <![CDATA[  
+      select lp.prop AS HVPID, fh.SUP_HOTEL_ID AS ELID, fh.source AS SORC, fh.in_use ,lp.prop_name_zh AS HOTELNM,fh.source AS SUPID,
+      case when fh.source IS NOT NULL AND fh.source='ELONG' then '艺龙' 
+      when fh.source IS NOT NULL AND fh.source='PODINNS' then '布丁' 
+      when fh.source IS NOT NULL AND fh.source='CTRIP' then '携程' 
+      when fh.source IS NOT NULL AND fh.source='MOTEL168' then '莫泰168' 
+      when fh.source IS NOT NULL AND fh.source='HOMEINNS' then '如家' 
+      when fh.source IS NOT NULL AND fh.source='HUBS1' then 'HUBS1' 
+      else '天海路' end AS SUPNM
+      from t_lm_b_prop lp 
+      left join t_sup_map_hotel fh on fh.APP_hotel_id=lp.prop 
+      where (:HVPID IS NULL OR lp.prop=:HVPID)
+      AND (:HVPLP IS NULL OR 
+      (:HVPLP='0' AND (fh.APP_hotel_id IS NULL OR fh.APP_hotel_id='')) OR (:HVPLP='1' AND (fh.APP_hotel_id IS NOT NULL OR fh.APP_hotel_id <> '')))
+      order by lp.prop desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_sup_hvp_hotel_select">
+    <![CDATA[  
+    select
+    st.HVPID,
+    st.HOTELNM,
+    Case when st.SHC > 0 then '../../Styles/images/tick.png' else '../../Styles/images/cross.png' end AS HBIMG,
+    Case when st.RCC > 0 and st.RCC=st.ARI then '../../Styles/images/star.png' else '../../Styles/images/hstar.png' end AS RBIMG,
+    Case when st.SHC > 0 then '该酒店已绑定供应商' else '该酒店未绑定供应商' end AS HBMSG,
+    Case when st.RCC > 0 and st.RCC=st.ARI then '所有房型均已绑定供应商' else '部分房型未绑定供应商' end AS RBMSG
+    from
+    (select lp.prop AS HVPID, lp.prop_name_zh AS HOTELNM, NVL(fh.SHC, 0) AS SHC,count(trm.room_code) AS RCC,count(app_room_id) AS ARI
+    from t_lm_b_prop lp 
+    left join (select APP_hotel_id, count(sup_hotel_id) AS SHC from t_sup_map_hotel where (:HVPID IS NULL OR APP_hotel_id=:HVPID) group by APP_hotel_id) fh 
+    on fh.APP_hotel_id=lp.prop 
+    left join (select distinct trd.room_code, trd.hotel_id, trd.status from t_room trd inner join t_price_code_room pcr on 
+    trd.hotel_id = pcr.hotel_id
+    and pcr.room_code=trd.room_code 
+    and pcr.status='1' and pcr.price_code IN ('LMBAR','LMBAR2')) 
+    trm on trm.hotel_id=lp.prop and trm.status='1'
+    left join (select distinct smr.app_room_id, smr.app_hotel_id from t_sup_map_room smr inner join t_price_code_room pcr on 
+    smr.app_hotel_id = pcr.hotel_id and pcr.room_code=smr.app_room_id and pcr.status='1' and pcr.price_code IN ('LMBAR','LMBAR2') 
+    where smr.SUP_ROOM_ID IS NOT NULL group by smr.app_room_id, smr.app_hotel_id) fr 
+    on fr.app_room_id=trm.room_code and fr.app_hotel_id=trm.hotel_id
+    where 
+    (:HVPID IS NULL OR lp.prop=:HVPID) AND 
+    (:HVPLP IS NULL OR 
+    (:HVPLP='0' AND (fh.APP_hotel_id IS NULL OR fh.APP_hotel_id='')) OR 
+    (:HVPLP='1' AND (fh.APP_hotel_id IS NOT NULL OR fh.APP_hotel_id <> '')))
+    group by lp.prop, lp.prop_name_zh,fh.SHC
+    order by lp.prop desc
+    ) st
+    left join t_lm_sales_history tlsh on st.HVPID=tlsh.hotel_id and tlsh.status='1'
+    where 
+    (:HVPRP IS NULL OR 
+    (:HVPRP='0' AND (st.RCC > 0 and st.ARI > 0 and st.RCC<>st.ARI)) OR 
+    (:HVPRP='1' AND (st.RCC > 0 and st.RCC=st.ARI)) OR 
+    (:HVPRP='2' AND (st.RCC = 0 or st.ARI = 0))) AND
+    ((:SALES IS NULL) OR (NLS_LOWER(tlsh.sales_account) = NLS_LOWER(:SALES)))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_sup_hvp_hotel_select_count">
+    <![CDATA[  
+      select
+    count(st.HVPID)
+    from
+    (select lp.prop AS HVPID, lp.prop_name_zh AS HOTELNM, NVL(fh.SHC, 0) AS SHC,count(trm.room_code) AS RCC,count(app_room_id) AS ARI
+    from t_lm_b_prop lp 
+    left join (select APP_hotel_id, count(sup_hotel_id) AS SHC from t_sup_map_hotel where (:HVPID IS NULL OR APP_hotel_id=:HVPID) group by APP_hotel_id) fh 
+    on fh.APP_hotel_id=lp.prop 
+    left join (select distinct trd.room_code, trd.hotel_id, trd.status from t_room trd inner join t_price_code_room pcr on 
+    trd.hotel_id = pcr.hotel_id
+    and pcr.room_code=trd.room_code 
+    and pcr.status='1' and pcr.price_code IN ('LMBAR','LMBAR2')) 
+    trm on trm.hotel_id=lp.prop and trm.status='1'
+    left join (select distinct smr.app_room_id, smr.app_hotel_id from t_sup_map_room smr inner join t_price_code_room pcr on 
+    smr.app_hotel_id = pcr.hotel_id and pcr.room_code=smr.app_room_id and pcr.status='1' and pcr.price_code IN ('LMBAR','LMBAR2') 
+    where smr.SUP_ROOM_ID IS NOT NULL group by smr.app_room_id, smr.app_hotel_id) fr 
+    on fr.app_room_id=trm.room_code and fr.app_hotel_id=trm.hotel_id
+    where 
+    (:HVPID IS NULL OR lp.prop=:HVPID) AND 
+    (:HVPLP IS NULL OR 
+    (:HVPLP='0' AND (fh.APP_hotel_id IS NULL OR fh.APP_hotel_id='')) OR 
+    (:HVPLP='1' AND (fh.APP_hotel_id IS NOT NULL OR fh.APP_hotel_id <> '')))
+    group by lp.prop, lp.prop_name_zh,fh.SHC
+    order by lp.prop desc
+    ) st
+    left join t_lm_sales_history tlsh on st.HVPID=tlsh.hotel_id and tlsh.status='1'
+    where 
+    (:HVPRP IS NULL OR 
+    (:HVPRP='0' AND (st.RCC > 0 and st.ARI > 0 and st.RCC<>st.ARI)) OR 
+    (:HVPRP='1' AND (st.RCC > 0 and st.RCC=st.ARI)) OR 
+    (:HVPRP='2' AND (st.RCC = 0 or st.ARI = 0))) AND
+    ((:SALES IS NULL) OR (NLS_LOWER(tlsh.sales_account) = NLS_LOWER(:SALES)))
+  ]]>
+  </sql>
+  
+  <sql database="TUANDB" sqlId="t_fx_hvp_hotel_select_count">
+    <![CDATA[  
+      select count(lp.prop)
+      from t_lm_b_prop lp 
+      left join t_sup_map_hotel fh on fh.APP_hotel_id=lp.prop 
+      where (:HVPID IS NULL OR lp.prop=:HVPID)
+      AND (:HVPLP IS NULL OR 
+      (:HVPLP='0' AND (fh.APP_hotel_id IS NULL OR fh.APP_hotel_id='')) OR (:HVPLP='1' AND (fh.APP_hotel_id IS NOT NULL OR fh.APP_hotel_id <> '')))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_hvp_hotel_update">
+    <![CDATA[  
+      merge into t_sup_map_hotel t1
+      using (select :HVPID AS APP_HOTEL_ID,:ELID AS SUP_HOTEL_ID, :SOURCE AS SOURCE, :OSOURCE AS OSOURCE from dual) t2 
+      on (t1.APP_HOTEL_ID = t2.APP_HOTEL_ID AND ((t2.OSOURCE IS NULL AND t1.SOURCE IS NULL) OR (t1.SOURCE = t2.OSOURCE)))
+      when matched then
+         update set t1.SUP_HOTEL_ID=t2.SUP_HOTEL_ID, t1.SOURCE = t2.SOURCE, t1.UPDATE_TIME=sysdate
+         where t1.APP_HOTEL_ID = t2.APP_HOTEL_ID AND t1.SOURCE = t2.OSOURCE
+      when not matched then
+         insert values (t2.APP_HOTEL_ID,t2.SUP_HOTEL_ID,t2.SOURCE, '1', sysdate, sysdate)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_update_for_detail">
+    <![CDATA[  
+      update T_SUP_MAP_ROOM
+      set IN_USE='0', UPDATE_TIME=sysdate
+      where APP_HOTEL_ID=:HVPID and SOURCE=:OSOURCE and SUP_HOTEL_ID=:SUPID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_update">
+    <![CDATA[  
+      merge into t_sup_map_hotel t1
+      using (select :HVPID AS APP_HOTEL_ID,:SUPID AS SUP_HOTEL_ID, :SOURCE AS SOURCE, :OSOURCE AS OSOURCE, :INUSE AS INUSE from dual) t2 
+      on (t1.APP_HOTEL_ID = t2.APP_HOTEL_ID AND ((t2.OSOURCE IS NULL AND t1.SOURCE IS NULL) OR (t1.SOURCE = t2.OSOURCE)))
+      when matched then
+         update set t1.SUP_HOTEL_ID=t2.SUP_HOTEL_ID, t1.SOURCE = t2.SOURCE, t1.UPDATE_TIME=sysdate, t1.IN_USE=t2.INUSE
+         where t1.APP_HOTEL_ID = t2.APP_HOTEL_ID AND t1.SOURCE = t2.OSOURCE 
+      when not matched then
+         insert values (t2.APP_HOTEL_ID,t2.SUP_HOTEL_ID,t2.SOURCE, t2.INUSE, sysdate, sysdate)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_create">
+    <![CDATA[
+    insert into t_sup_map_hotel
+      (app_hotel_id, sup_hotel_id, source, in_use, create_time, update_time)
+    values
+      (:HVPID, :SUPID, :SOURCE, :INUSE, sysdate, sysdate)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_hvp_area_insert">
+    <![CDATA[  
+    insert into t_fx_hvp_area(id,hvp_hotel_id,FX_HOTEL_ID,source,area_id)
+    select t_fx_hvp_area_seq.nextval as ID, :HVPHOTELID AS HVP_HOTEL_ID,SUP_HOTEL_ID,SOURCE,:AREAID AS AREAID from t_sup_map_hotel where app_HOTEL_ID=:HVPHOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_hvp_area_delete">
+    <![CDATA[  
+      delete t_fx_hvp_area where HVP_HOTEL_ID=:HVPHOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_hvp_hotel_select_circle">
+    <![CDATA[  
+      select * from  t_sup_map_hotel where APP_HOTEL_ID=:HVPHOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_hvp_area_select">
+    <![CDATA[  
+  select t.id as AREAID,t.tag_name as TagName  from t_fx_hvp_area a,t_tag_info t where a.area_id=t.id
+  AND ((:HVPHOTELID IS NULL) OR (hvp_hotel_id LIKE '%'||:HVPHOTELID||'%'))
+  AND ((:CITYNAME IS NULL) OR (NLS_LOWER(CITY_ID) LIKE '%'||:CITYNAME||'%'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_hvp_hotel_insertbase">
+    <![CDATA[    
+    insert into t_fx_hvp_area(id,hvp_hotel_id,FX_HOTEL_ID,source,area_id) values(t_fx_hvp_area_seq.nextval,:HVPHOTELID,'','HVP',:AREAID)
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_sup_hvp_hotel_detail">
+    <![CDATA[  
+    select '供应商：' AS SORC, '供应商ID：' AS SORCID , '状态：' AS INUSERT, 
+    case when in_use IS NOT NULL AND in_use='1' then '上线' else '下线' end AS INUSERDIS, 
+    in_use AS INUSE,sup_hotel_id AS SUPID,source AS SOURCES,
+    case when source IS NOT NULL AND source='ELONG' then '艺龙' 
+    when source IS NOT NULL AND source='PODINNS' then '布丁' 
+    when source IS NOT NULL AND source='CTRIP' then '携程' 
+    when source IS NOT NULL AND source='MOTEL168' then '莫泰168' 
+    when source IS NOT NULL AND source='HOMEINNS' then '如家' 
+    when source IS NOT NULL AND source='HUBS1' then 'HUBS1' 
+    else '天海路' end AS SUPNM,'0' AS RTYPE,RowID AS OSUPID
+    from t_sup_map_hotel where app_hotel_id=:HVPID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_sup_hvp_hotel_detail_sa">
+    <![CDATA[  
+    select 
+    sup_hotel_id AS SUPID,source AS SOURCES,
+    case when source IS NOT NULL AND source='ELONG' then '艺龙' 
+    when source IS NOT NULL AND source='PODINNS' then '布丁' 
+    when source IS NOT NULL AND source='CTRIP' then '携程' 
+    when source IS NOT NULL AND source='MOTEL168' then '莫泰168' 
+    when source IS NOT NULL AND source='HOMEINNS' then '如家' 
+    when source IS NOT NULL AND source='HUBS1' then 'HUBS1' 
+    else '天海路' end AS SUPNM
+    from t_sup_map_hotel where app_hotel_id=:HVPID
+    order by sup_hotel_id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_sup_hvp_hotel_room_detail">
+    <![CDATA[
+    select distinct '['||trm.room_code||']'||trm.room_name AS ROOMNM,trm.room_code,trm.room_name,nvl(CSRI,0) AS CSR, tt.two_price AS TWOPRICE from
+    (
+    select tr.room_code,tr.room_name,tr.hotel_id from t_room tr 
+    inner join t_price_code_room pcr on 
+    pcr.hotel_id = tr.hotel_id
+    and pcr.room_code=tr.room_code 
+    and pcr.status='1' and pcr.price_code IN ('LMBAR','LMBAR2')
+    where tr.hotel_id=:HVPID and tr.status='1'
+    ) trm
+    left join (select smr.app_room_id, smr.app_hotel_id, count(smr.sup_room_id) CSRI 
+    from t_sup_map_room smr
+    inner join t_price_code_room pcr on 
+    pcr.hotel_id = smr.app_hotel_id
+    and pcr.room_code=smr.app_room_id 
+    and pcr.status='1' and pcr.price_code IN ('LMBAR','LMBAR2')
+    where smr.SUP_ROOM_ID IS NOT NULL and smr.app_hotel_id=:HVPID
+    group by smr.app_room_id, smr.app_hotel_id) fr 
+    on fr.app_room_id=trm.room_code and fr.app_hotel_id=trm.hotel_id
+    left join
+    (
+    select tlp.room_type_code,tlp.two_price
+    from 
+    (select id,room_type_code,two_price from t_lm_plan where hotel_id=:HVPID
+    and effect_date >= trunc(add_months(sysdate, -1), 'dd') 
+    and effect_date <= trunc(sysdate, 'dd') 
+    ) tlp inner join
+    (
+    select max(id) as MID,room_type_code from t_lm_plan  
+    where 
+    hotel_id= :HVPID and effect_date >= trunc(add_months(sysdate, -1), 'dd') and effect_date <= trunc(sysdate, 'dd') 
+    group by room_type_code
+    ) dt on tlp.id = dt.MID
+    ) tt on trm.room_code = tt.room_type_code
+    order by room_code
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_sup_hvp_hotel_mapping_room_detail">
+    <![CDATA[
+    select distinct 
+    fr.sup_room_id AS SUPID, 
+    fr.source AS SOURCES,
+    case when fr.source IS NOT NULL AND fr.source='ELONG' then '艺龙' 
+    when fr.source IS NOT NULL AND fr.source='PODINNS' then '布丁' 
+    when fr.source IS NOT NULL AND fr.source='CTRIP' then '携程' 
+    when fr.source IS NOT NULL AND fr.source='MOTEL168' then '莫泰168' 
+    when fr.source IS NOT NULL AND fr.source='HOMEINNS' then '如家' 
+    when fr.source IS NOT NULL AND fr.source='HUBS1' then 'HUBS1' 
+    else '天海路' end AS SUPNM,
+    case when fr.in_use IS NOT NULL AND fr.in_use='1' then '上线' else '下线' end AS INUSERDIS,
+    fr.in_use AS INUSE, 
+    fr.sup_hotel_id||'_'||fr.sup_room_id||'_'||smr.sup_plan_id AS SUPHID,
+    fr.source AS OSOURCES,
+    '0' AS RTYPE,
+    fr.rowid AS OROWID
+    from t_sup_map_room fr
+    left join t_sup_map_roomplan smr on fr.app_room_id=smr.app_room_id and fr.sup_room_id=smr.sup_room_id 
+    and fr.source = smr.source and fr.app_hotel_id = smr.app_hotel_id and fr.sup_hotel_id=smr.sup_hotel_id and smr.IN_USE='1'
+    inner join t_price_code_room pcr on 
+    fr.app_hotel_id = pcr.hotel_id
+    and pcr.room_code=fr.app_room_id 
+    and pcr.status='1' and pcr.price_code IN ('LMBAR','LMBAR2')
+    where fr.app_hotel_id=:HVPID and fr.app_room_id=:RoomCD
+    order by fr.sup_room_id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_room_create">
+    <![CDATA[
+    insert into t_sup_map_room
+  (app_room_id, sup_room_id, source, in_use, create_time, update_time, app_hotel_id, sup_hotel_id)
+  values
+  (:APPROOM, :SUPROOM, :SOURCE, :INUSE, sysdate, sysdate, :APPHOTELID, :SUPHOTELID)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_room_plan_create">
+    <![CDATA[
+    insert into t_sup_map_roomplan
+  (app_room_id, sup_room_id, source, in_use, create_time, update_time, app_hotel_id, sup_hotel_id,sup_plan_id)
+  values
+  (:APPROOM, :SUPROOM, :SOURCE, :INUSE, sysdate, sysdate, :APPHOTELID, :SUPHOTELID, :SUPPLANID)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_room_update">
+    <![CDATA[
+    update t_sup_map_room
+    set sup_room_id = :SUPROOM,source=:SOURCE,in_use=:INUSE,update_time=sysdate,sup_hotel_id=:SUPHOTELID
+    where
+    app_hotel_id=:APPHOTELID and app_room_id=:APPROOM and source=:OSOURCE and sup_room_id = :OSUPROOM AND sup_hotel_id=:OSUPHOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_room_plan_update">
+    <![CDATA[
+    update t_sup_map_roomplan
+    set sup_room_id = :SUPROOM,source=:SOURCE,in_use=:INUSE,update_time=sysdate,sup_hotel_id=:SUPHOTELID,sup_plan_id=:SUPPLANID
+    where
+    app_hotel_id=:APPHOTELID and app_room_id=:APPROOM and source=:OSOURCE and sup_room_id = :OSUPROOM AND sup_hotel_id=:OSUPHOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_create_insert_chk">
+    <![CDATA[
+    select t.app_hotel_id,t.sup_hotel_id from t_sup_map_hotel t where t.app_hotel_id=:HVPID and t.source=:SOURCE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_update_chk">
+    <![CDATA[
+    select t.app_hotel_id,t.sup_hotel_id from t_sup_map_hotel t 
+    where 
+    t.app_hotel_id=:HVPID and 
+    t.source=:SOURCE and 
+    t.Rowid<>:OSUPID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_room_create_chk">
+    <![CDATA[
+    select app_room_id, sup_room_id, source, app_hotel_id, sup_hotel_id 
+    from t_sup_map_room
+    where 
+    app_room_id=:APPROOM and
+    source=:SOURCE and
+    app_hotel_id=:APPHOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fx_sup_hotel_room_update_chk">
+    <![CDATA[
+    select app_room_id, sup_room_id, source, app_hotel_id, sup_hotel_id 
+    from t_sup_map_room
+    where 
+    app_room_id=:APPROOM and
+    source=:SOURCE and
+    app_hotel_id=:APPHOTELID AND
+    Rowid<>:OROWID
+  ]]>
+  </sql>
+
+</sqlList>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_b_hotelplan_search_list">
+    <![CDATA[  
+        select count(t.fog_order_num) as ordercount,p.cityid,bc.name_cn,p.prop,p.prop_name_zh,p.tradearea_id,p.linkman,p.linktel,p.linkemail,p.sales_account,ex.linkman as EXLinkMan,ex.linktel as EXlinkTel,ex.remark as EXRemark,ex.ex_mode as EXMODE,p.prop_name_zh as BackPropName,'0' as HasBeenToHotels,'' as Color,p.area_id  from(
+    select distinct cityid,prop,prop_name_zh,tradearea_id,linkman,linktel,linkemail,sales_account,area_id  from(
+      select 
+       bp.cityid,bp.prop,bp.prop_name_zh,bp.tradearea_id,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account,fha.area_id
+      from t_lm_b_prop bp
+      left join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop
+      left join t_tag_info tif on tif.id = fha.area_id 
+      left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+      )where ((:HOTELID IS NULL) OR (prop=:HOTELID)) AND ((:CITYID IS NULL) OR (cityid=:CITYID)) AND ((:TRADEAREAID IS NULL) OR (area_id=:TRADEAREAID) AND (:SALES IS NULL) OR (sales_account=:SALES))
+     ) p
+    left join t_lm_order t on p.prop = t.hotel_id 
+    and t.PRICE_CODE='LMBAR2' and t.FOG_RESVSTATUS='1' and t.create_time between (sysdate-30) and sysdate
+    left join t_lm_hotel_ex ex on  p.prop = ex.hotel_id and type=1  
+    left join t_lm_b_city bc on bc.city_id = p.cityid
+    group by p.cityid,bc.name_cn,p.prop,p.prop_name_zh,p.tradearea_id,p.linkman,p.linktel,p.linkemail,p.sales_account,ex.linkman,ex.linktel,ex.remark,ex.ex_mode,p.area_id
+    ]]>
+  </sql>
+</sqlList>

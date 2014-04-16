@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_b_platform">
+    <![CDATA[  
+        SELECT lm.ID, lm.ID AS platformID,lm.platform_code AS platformcode,lm.platform_name AS platformnm, lm.status AS ONLINESTATUS, 
+        (CASE lm.status WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS,
+        lm.create_time AS CDTIME, lm.update_time AS UDTIME from  t_lm_b_platform lm
+        where ((:PLATFORMNAME IS NULL) OR (lm.platform_name LIKE '%'||:PLATFORMNAME||'%'))
+        AND ((:ONLINESTATUS IS NULL) OR (lm.status=:ONLINESTATUS))
+        AND ((:StartDTime IS NULL) OR (to_date(:StartDTime, 'yyyy.mm.dd hh24:mi:ss') <= lm.create_time))
+        AND ((:EndDTime IS NULL) OR (lm.create_time <= to_date(:EndDTime, 'yyyy.mm.dd hh24:mi:ss'))) ORDER BY lm.ID DESC
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_platform_updatesigle">
+    <![CDATA[  
+       select lm.platform_code AS platformCODE,lm.platform_name AS platformNM from t_lm_b_platform lm 
+        where (lm.platform_code <> :PLATFORMCODE)
+        AND (lm.platform_name = :PLATFORMNM)
+  ]]>
+  </sql>
+  <sql database="TUANDB" sqlId="t_lm_b_platform_sigle">
+    <![CDATA[  
+       select lm.platform_code AS platformCODE,lm.platform_name AS platformNM from t_lm_b_platform lm 
+        where (lm.platform_code = :PLATFORMCODE)
+        OR (lm.platform_name = :PLATFORMNM)
+  ]]>
+  </sql>
+  <sql database ="TUANDB" sqlId="t_lm_b_platform_insert">
+    <![CDATA[
+       INSERT INTO t_lm_b_platform(ID,  platform_code,  platform_name,  status, create_time, update_time) VALUES 
+       (:ID,  :PLATFORMCODE,  :PLATFORMNM, '0' ,SYSDATE, SYSDATE)
+    ]]>
+  </sql>
+  <sql database ="TUANDB" sqlId="t_lm_b_platform_update">
+    <![CDATA[
+       UPDATE t_lm_b_platform SET platform_name=:PLATFORMNM,status=:ONLINESTATUS, update_time=SYSDATE WHERE platform_code=:ID
+    ]]>
+  </sql> 
+</sqlList>

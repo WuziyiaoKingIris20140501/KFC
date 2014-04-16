@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mapiList>
+  <mapi lmApiID="SearchCityUrl">
+    <commandText>
+      <![CDATA[/show/getSupCity.json?clientCode=&useCode=IOS]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchCityUrlV2">
+    <commandText>
+      <![CDATA[/content/cityList.json?useCode={0}&useCodeVersion=0&clientCode=HOTELVP]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelListUrl">
+    <commandText>
+      <![CDATA[/show/hotel-list-v2.json?sysSource={0}&imgSize=200&cityId={1}&version=0&isTest=true&isToday={2}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="getSearchHotelListUrlV2">
+    <commandText>
+      <![CDATA[/content/hotelList.json?useCode={0}&useCodeVersion=0&clientCode=HOTELVP&imgSize=200&cityId={1}&hotelListVersion=0&isTest=true&isToday={2}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelsByIDUrl">
+    <commandText>
+      <![CDATA[/show/hotel-list-v3.json?sysSource={0}&imgSize=200&cityId={1}&version=0&isTest=true&isToday={2}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelsByIDUrlV2">
+    <commandText>
+      <![CDATA[/content/hotelList.json?useCode={0}&useCodeVersion=0&clientCode=HOTELVP&imgSize=200&cityId={1}&hotelListVersion=0&isTest=true&isToday={2}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelsBySUPIDUrlV2">
+    <commandText>
+      <![CDATA[/content/hotelDetails.json?useCode=IOS&useCodeVersion=2.0&clientCode=HOTELVP&hotelId={0}&imgSize=100&apiVersion=2.7&inDate={1}&outDate={2}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelAmenityUrl">
+    <commandText>
+      <![CDATA[/show/propAmenityV2.html?prop={0}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelAmenityUrlV2">
+    <commandText>
+      <![CDATA[/content/hotelAmenityList.json?useCode={0}&useCodeVersion=0&clientCode=HOTELVP&hotelId={1}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelImagesUrl">
+    <commandText>
+      <![CDATA[/rest/hotel/image/{0}/{1}.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelImagesUrlV2">
+    <commandText>
+      <![CDATA[/content/hotelImagesList.json?useCode=IOS&useCodeVersion=0&clientCode=HOTELVP&hotelId={0}&imgSize={1}]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchServiceTelUrl">
+    <commandText>
+      <![CDATA[/sysinfoCity.html?clientCode=HOTELVP&useCode=IOS]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchServiceTelUrlV2">
+    <commandText>
+      <![CDATA[/content/sysCityList.json?useCode={0}&useCodeVersion=0&clientCode=HOTELVP]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="ApplyHotelFullRoomV2">
+    <commandText>
+      <![CDATA[/management/sc/plan.json?method=saveOrUpdate&data=]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="RenewPlanFullRoomByUpdatePlan">
+    <commandText>
+      <![CDATA[/management/cms/updatePlan.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="BatchUpdatePlan">
+    <commandText>
+      <![CDATA[/management/sc/planByHotel.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="queryHotelFullRoomV2">
+    <commandText>
+      <![CDATA[/management/sc/plan.json?method=query&data=]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="queryHotelBalRoomV2">
+    <commandText>
+      <![CDATA[/management/fog/roomCodeList.json?hotelId=]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="applyHotelBalRoomV2">
+    <commandText>
+      <![CDATA[/management/accounting/saveAccounting.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SaveCashBackRequestV2">
+    <commandText>
+      <![CDATA[/deal/cashApply.json?useCode=CMS&useCodeVersion=1.0&clientCode=HOTELVP&apiVersion=2.1&signKey=]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="autoPayV2">
+  <commandText>
+    <![CDATA[/management/cms/autoPay.json]]>
+  </commandText>
+</mapi>
+  <mapi lmApiID="getSignByPhoneForCCV2">
+    <commandText>
+      <![CDATA[/management/cms/getUserCaptcha.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="saveOrderOperationV2">
+    <commandText>
+      <![CDATA[/management/fog/synOrderStatus.action?opeSource=CMS]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="saveAuditOrderOperationV2">
+    <commandText>
+      <![CDATA[/management/fog/synAuditOrderStatus.action?opeSource=CMS]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="sendFaxSeviceV2">
+    <commandText>
+      <![CDATA[/management/cms/sendFax.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="sendBindFaxSeviceV2">
+    <commandText>
+      <![CDATA[/management/cms/bindingBarCode.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="applyHotelRoomPlanV2">
+    <commandText>
+      <![CDATA[/management/cms/updateRoomStatus.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="applyHotelPrRoomPlanV2">
+    <commandText>
+      <![CDATA[/management/cms/updatePriceRoomStatus.json]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchCityUrlV3">
+    <commandText>
+      <![CDATA[/content/cityList.json?useCode={0}&clientCode=HOTELVP&useCodeVersion=3.3]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="getSearchHotelListUrlV3">
+    <commandText>
+      <![CDATA[/search/hotelList.json?useCode={0}&useCodeVersion=1.4&clientCode=HOTELVP&apiVersion=1.2&isTest=true&isToday=true]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="SearchHotelsByIDUrlV3">
+    <commandText>
+      <![CDATA[/content/hotelDetails.json?useCode={0}&useCodeVersion=2.0&clientCode=HOTELVP&imgSize=100&apiVersion=2.7&hotelId={1}&isTest=true&isToday=true]]>
+    </commandText>
+  </mapi>
+  <mapi lmApiID="saveRefund">
+    <commandText>
+      <![CDATA[/management/cms/saveRefund.json?useCode=IOS&useCodeVersion=2.2&clientCode=HOTELVP]]>
+    </commandText>
+  </mapi>
+</mapiList>

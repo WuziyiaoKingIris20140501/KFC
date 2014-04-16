@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="get_oracle_hotels_byconsultprople">
+    <![CDATA[
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, 1 AS HTSUM
+    from
+    (
+    select distinct t.id AS ID, case  t.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE, 
+    '['||t.hotel_id||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from 
+    t_lm_consult_room t 
+    left join t_lm_b_prop bp on t.hotel_id=bp.prop and bp.ismyhotel=1
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+    left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=to_date('2013-05-28','yyyy-MM-dd')) lp on bp.prop= lp.hotel_id
+    and t.rtype='2' and t.status='1' and t.OTYPE='0' 
+    where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:CHECKUSERNAME)
+    ) dt
+    where dt.HEXID IS NULL
+    
+    union all
+    
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(prop) AS HTSUM
+    from
+    (
+    select distinct
+    crt.id AS ID, case crt.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE, 
+    '['||crt.city_id||']'||lbc.name_cn AS CONSULTVAL, bp.prop,hex.id AS HEXID,bp.prop_name_zh
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:CHECKUSERNAME)
+    ) crt
+    inner join t_lm_b_prop bp on bp.cityid=crt.city_id  and bp.ismyhotel=1
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    left join t_lm_b_city lbc on bp.cityid= lbc.city_id    
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=to_date('2013-05-28','yyyy-MM-dd')) lp on bp.prop= lp.hotel_id
+    
+    where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1' 
+    ) dt
+    where dt.HEXID IS NULL
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+
+    union all
+    
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(hvp_hotel_id) AS HTSUM
+    from    (
+    select 
+    ctd.id AS ID, case ctd.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE,
+    '['||ctd.tag_id||']'||lbc.name_cn||'-'||tif.tag_name||'商圈' AS CONSULTVAL, fha.hvp_hotel_id ,hex.id AS HEXID
+    from
+    (
+    select  t.id, t.rtype, t.city_id, t.tag_id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:CHECKUSERNAME)
+    ) ctd
+    left join t_hvp_tag_info tif on tif.id = ctd.tag_id
+    left join t_fx_hvp_area fha on tif.id = fha.area_id
+    inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop  and bp.ismyhotel=1
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = fha.hvp_hotel_id and hex.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=to_date('2013-05-28','yyyy-MM-dd')) lp on bp.prop= lp.hotel_id
+    left join t_lm_b_city lbc on tif.city_id= lbc.city_id
+    where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+    ) dt
+    where dt.HEXID IS NULL   
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+    union all
+    select bt.ID, bt.CONSULTTYPE, bt.CONSULTVAL,count(bt.prop) AS HTSUM
+    from
+    (
+    select
+    crt.id AS ID, case crt.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE, crt.SALES_ID AS CONSULTVAL, bp.prop,hex.id AS HEXID
+    from
+    (
+    select t.id, t.rtype, t.SALES_ID
+    from 
+    t_lm_consult_room t where t.rtype='3' and t.status='1' and t.OTYPE='0'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:CHECKUSERNAME)
+    ) crt
+    inner join T_LM_SALES_HISTORY tsh on NLS_LOWER(tsh.SALES_ACCOUNT)=NLS_LOWER(crt.SALES_ID) and tsh.STATUS='1'
+    inner join t_lm_b_prop bp on bp.prop=tsh.HOTEL_ID and bp.type=0 AND bp.ismyhotel='1' and bp.online_status='1' and bp.status='active'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=to_date('2013-05-28','yyyy-MM-dd')) lp on bp.prop= lp.hotel_id
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    ) bt
+    where bt.HEXID IS NULL
+    group by bt.ID, bt.CONSULTTYPE, bt.CONSULTVAL
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="get_oracle_hotelsdetail_bykeys">
+    <![CDATA[
+    select bp.prop as prop,'['||bp.prop||']'||bp.prop_name_zh AS prop_name_zh,bp.cityid, hex.id AS HEXID,lp.status,lp.MODIFIER
+    from 
+    t_lm_consult_room t 
+    left join t_lm_b_prop bp on t.hotel_id=bp.prop and bp.ismyhotel=1 and bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1' 
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop= lp.hotel_id
+    where t.rtype='2' and t.status='1' and t.OTYPE='0'
+    and t.id = :KEYID
+    union all
+    select 
+    bp.prop as prop,'['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL,bp.cityid,hex.id AS HEXID,lp.status,lp.MODIFIER
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+    and t.id = :KEYID
+    ) crt
+    left join t_lm_b_prop bp on bp.cityid=crt.city_id and bp.ismyhotel=1 and bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1' 
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop= lp.hotel_id
+    union all
+    select 
+    bp.prop as prop,'['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL,bp.cityid, hex.id AS HEXID,lp.status,lp.MODIFIER
+    from
+    (
+    select  t.id, t.rtype, t.city_id, t.tag_id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+    and t.id = :KEYID
+    ) ctd
+    left join t_hvp_tag_info tif on tif.id = ctd.tag_id
+    left join t_fx_hvp_area fha on tif.id = fha.area_id
+    inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop and bp.ismyhotel=1 and bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1' 
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = bp.prop and hex.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop= lp.hotel_id
+    union all
+    select
+    bp.prop as prop,'['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL,bp.cityid, hex.id AS HEXID,lp.status,lp.MODIFIER
+    from
+    (
+    select t.id, t.rtype, t.SALES_ID
+    from 
+    t_lm_consult_room t where t.rtype='3' and t.status='1' and t.OTYPE='0'
+    and t.id = :KEYID
+    ) crt
+    inner join T_LM_SALES_HISTORY tsh on NLS_LOWER(tsh.SALES_ACCOUNT)=NLS_LOWER(crt.SALES_ID) and tsh.STATUS='1'
+    inner join t_lm_b_prop bp on bp.prop=tsh.HOTEL_ID and bp.type=0 AND bp.ismyhotel='1' and bp.online_status='1' and bp.status='active'
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=to_date('2013-05-28','yyyy-MM-dd')) lp on bp.prop= lp.hotel_id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="get_oracle_consultallcitys_bymanager">
+    <![CDATA[
+    select ct.name_cn,bp.cityid,bp.prop,bp.prop_name_zh,lp.status,lp.modifier,lp.room_type_code from t_lm_b_city ct 
+    inner join t_lm_b_prop bp on ct.city_id=bp.cityid
+    left join t_lm_plan lp  on bp.prop = lp.hotel_id
+    where substr(ct.type,0,1) = '1'  and ct.status=1  
+    and bp.status='active' and bp.online_status='1' and bp.ismyhotel=1
+    and lp.effect_date=trunc(sysdate) 
+  ]]>
+  </sql>
+
+</sqlList>

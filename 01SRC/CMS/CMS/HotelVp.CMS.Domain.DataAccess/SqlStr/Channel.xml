@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_b_chanel">
+    <![CDATA[  
+      select ID, CHANEL_CODE AS CHANELCODE, CHANEL_NAME AS CHANELNM, CHANEL_NAME||'('||CHANEL_CODE||')' AS DISPLAYNM from T_LM_B_CHANEL  
+  ]]>   
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_chanel_list">
+    <![CDATA[  
+    SELECT lm.ID,lm.chanel_code AS chanelcode,lm.chanel_name AS chanelnm, lm.status AS ONLINESTATUS, 
+(CASE lm.status  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS， 
+lm.create_time AS CDTIME, lm.update_time AS UDTIME from t_lm_b_chanel lm
+where ((:CHANELNAME IS NULL) OR (lm.chanel_name LIKE '%'||:CHANELNAME||'%'))
+AND ((:ONLINESTATUS IS NULL) OR (lm.status=:ONLINESTATUS))
+AND ((:StartDTime IS NULL) OR (to_date(:StartDTime, 'yyyy.mm.dd hh24:mi:ss') <= lm.create_time))
+AND ((:EndDTime IS NULL) OR (lm.create_time <= to_date(:EndDTime, 'yyyy.mm.dd hh24:mi:ss'))) ORDER BY lm.ID DESC
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_chanel_sigle">
+    <![CDATA[  
+       select lm.chanel_code AS chanelcode,lm.chanel_name AS chanelnm from t_lm_b_chanel lm
+        where (lm.chanel_code = :CHANELCODE)
+        OR (lm.chanel_name = :CHANELNM)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_chanel_updatesigle">
+    <![CDATA[  
+      select lm.chanel_code AS chanelcode,lm.chanel_name AS chanelnm from t_lm_b_chanel lm
+        where (lm.chanel_code <> :CHANELCODE)
+        AND (lm.chanel_name = :CHANELNM)
+  ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_chanel_insert">
+    <![CDATA[
+       INSERT INTO t_lm_b_chanel(ID,  chanel_code,  chanel_name, status,create_time, update_time) VALUES 
+       (:ID,  :CHANELCODE,  :CHANELNM,  '0',SYSDATE, SYSDATE)
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_chanel_update">
+    <![CDATA[
+       UPDATE t_lm_b_chanel SET chanel_name=:CHANELNM, status=:ONLINESTATUS,update_time=SYSDATE WHERE chanel_code=:CHANELCODE
+    ]]>
+  </sql>
+</sqlList>

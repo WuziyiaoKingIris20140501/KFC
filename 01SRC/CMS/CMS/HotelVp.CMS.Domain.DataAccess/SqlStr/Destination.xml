@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_type">
+    <![CDATA[  
+      select 0 AS ID, '作为顶级分类' AS TYPENM  from dual
+      union all
+      select lp.ID, lp.NAME_CN AS TYPENM from t_lm_b_destination_type lp order by ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_type_union">
+    <![CDATA[  
+      select lp.ID, lp.NAME_CN AS TYPENM from t_lm_b_destination_type lp where SHOW_FlAG='1' order by lp.ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_type_common">
+    <![CDATA[  
+      select 0 AS ID, '作为顶级分类' AS TYPENM  from dual
+      union all
+      select lp.ID, lp.NAME_CN AS TYPENM from t_lm_b_destination_type lp where lp.ID <> :ID order by ID
+  ]]>
+  </sql>
+  
+  <sql database="TUANDB" sqlId="t_lm_b_destination_type_all">
+    <![CDATA[  
+      select lp.ID, lp.PARENTS_ID, lm.name_cn AS PARENTSNM,lp.NAME_CN AS TYPENM,
+      (CASE lp.status  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS, 
+      lp.CREATE_TIME AS CDTIME,lp.UPDATE_TIME AS UDTIME 
+      from t_lm_b_destination_type lp left join t_lm_b_destination_type lm
+      on lp.parents_id=lm.id ORDER BY lp.ID DESC 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_type_detail">
+    <![CDATA[  
+      select lp.ID, lp.PARENTS_ID AS PARENTSID, lp.NAME_CN AS TYPENM,lp.status AS ONLINESTATUS,
+      lp.CREATE_TIME AS CDTIME,lp.UPDATE_TIME AS UDTIME from t_lm_b_destination_type lp where ID=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_type_sigle">
+    <![CDATA[  
+       select lm.ID, lm.NAME_CN from t_lm_b_destination_type lm
+        where  (lm.NAME_CN = :TYPENM)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_sigle">
+    <![CDATA[  
+       select lm.ID, lm.NAME_CN from t_lm_b_destination lm
+        where  (lm.NAME_CN = :DESNM)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_city_check">
+    <![CDATA[  
+       select id,city_id,name_cn from t_lm_b_city t where t.city_id=:CITYID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_insert">
+    <![CDATA[  
+       insert into t_lm_b_destination
+  (id, city_id, type_id, name_cn, address_cn, tel_st, tel_lg, latitude, longitude, status, create_time, update_time)
+values
+  (:ID, :CITYID, :TYPEID, :NAMECN, :ADDRESSCN, :TELST, :TELLG, :LATITUDE, :LONGITUDE, '0', SYSDATE, SYSDATE)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_type_insert">
+    <![CDATA[  
+       INSERT INTO t_lm_b_destination_type(ID,  PARENTS_ID, NAME_CN, SHOW_FlAG, STATUS, create_time, update_time) VALUES 
+       (:ID,  :PARENTSID,  :NAMECN, '1',  '0', SYSDATE, SYSDATE)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_type_updatesigle">
+    <![CDATA[  
+       select lm.ID from t_lm_b_destination_type lm 
+        where (lm.ID <> :ID)
+        AND (lm.NAME_CN = :NAMECN)
+  ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_destination_type_update">
+    <![CDATA[
+       UPDATE  t_lm_b_destination_type SET PARENTS_ID=:PARENTSID, NAME_CN=:NAMECN,STATUS=:ONLINESTATUS,update_time=SYSDATE WHERE ID=:ID
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_destination_type_update_flag">
+    <![CDATA[
+       UPDATE  t_lm_b_destination_type SET SHOW_FlAG=:SHOWFlAG,update_time=SYSDATE WHERE ID=:ID AND SHOW_FlAG<>:SHOWFlAG
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fc_city">
+    <![CDATA[  
+      select city_id AS cityid, area_id AS areaid, name_cn AS name_zh, name_en, name_cn||'('||pinyin_short||') '||pinyin AS cityNM from t_lm_b_city order by pinyin
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_all">
+    <![CDATA[  
+      select dt.id, 
+      dt.CITY_ID, 
+      tct.name_cn AS CITYNM,
+      dt.TYPE_ID,
+      dtt.name_cn AS TYPENM, 
+      dt.name_cn DESTINATIONNM, 
+      dt.address_cn AS ADDRESSNM,
+      dt.TEL_ST,
+      dt.TEL_LG,
+      dt.LATITUDE, 
+      dt.LONGITUDE, 
+      dt.status AS ONLINESTATUS,
+      (CASE dt.status  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS, 
+      (CASE WHEN dt.tel_st IS NOT NULL and dt.tel_lg IS NOT NULL THEN  dt.tel_st||'-'||dt.tel_lg  ELSE dt.tel_st||dt.tel_lg END ) as TELEPHONE, 
+      dt.update_time AS UDTIME,
+      '['||dt.CITY_ID||']'||tct.name_cn AS CITYNAME
+      from 
+      t_lm_b_destination dt 
+      left join t_lm_b_city tct on dt.city_id = tct.city_id
+      left join t_lm_b_destination_type dtt on dt.type_id = dtt.id
+      where 
+      ((:ID IS NULL) OR (dt.id =:ID)) AND
+      ((:CITYID IS NULL) OR (dt.city_id =:CITYID)) AND
+      ((:TYPEID IS NULL) OR (dt.type_id =:TYPEID)) AND
+      ((:ONLINESTATUS IS NULL) OR (dt.status =:ONLINESTATUS))
+      ORDER BY dt.ID DESC 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_update_sigle">
+    <![CDATA[  
+       select lm.ID, lm.NAME_CN from t_lm_b_destination lm
+        where  (lm.ID <> :ID) and (lm.NAME_CN = :DESNM)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_update">
+    <![CDATA[  
+       UPDATE t_lm_b_destination SET CITY_ID=:CITYID,TYPE_ID=:TYPEID,
+       name_cn=:NAMECN,address_cn=:ADDRESSCN,TEL_ST=:TELST,TEL_LG=:TELLG,
+       LATITUDE=:LATITUDE,LONGITUDE=:LONGITUDE,status=:ONLINESTATUS
+        where ID =:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_type_parents">
+    <![CDATA[  
+      select tp.PARENTS_ID AS PARENTSID, td.ICOUNT from t_lm_b_destination_type tp
+      left join (select count(id) AS icount,parents_id from t_lm_b_destination_type
+      where ID <>:ID group by parents_id) td on td.parents_id = tp.parents_id
+      where tp.ID =:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_hotel_batchlist">
+    <![CDATA[  
+      select t.prop AS HOTELID, t.CITYID,bdt.id as DESTINATIONID,bdt.TYPE_ID AS TYPEID,
+      t.latitude as HLLATITUDE,t.longitude as HLLONGITUDE,
+      bdt.latitude as DTLATITUDE,bdt.longitude as DTLONGITUDE,
+      bdh.distance AS OLDDISTANCE,'' as DISTANCE
+      from t_lm_b_prop t
+      inner join t_lm_b_destination bdt on t.cityid=bdt.city_id
+      left join t_lm_b_destination_hotel bdh 
+      on bdh.city_id=t.CITYID and bdh.destination_id=bdt.id and bdh.hotel_id=t.prop and bdh.type_id=bdt.TYPE_ID
+      where (:CITYID IS NULL OR t.CITYID=:CITYID) AND (:DESTINATIONID IS NULL OR bdt.id=:DESTINATIONID)
+      order by t.cityid,t.prop,bdt.id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_destination_hotel_save">
+    <![CDATA[  
+       merge into T_LM_B_DESTINATION_HOTEL t1
+      using (select :CITYID AS CITY_ID,:HOTELID AS HOTEL_ID,:DESTINATIONID AS DESTINATION_ID, :TYPEID AS TYPE_ID, :DISTANCE AS DISTANCE from dual) t2 
+      on (t1.CITY_ID = t2.CITY_ID and t1.HOTEL_ID = t2.HOTEL_ID AND t1.DESTINATION_ID=t2.DESTINATION_ID and t1.TYPE_ID=t2.TYPE_ID)
+      when matched then
+         update set t1.DISTANCE=t2.DISTANCE,t1.UPDATE_TIME=sysdate
+         where t1.CITY_ID = t2.CITY_ID and t1.HOTEL_ID = t2.HOTEL_ID AND t1.DESTINATION_ID=t2.DESTINATION_ID and t1.TYPE_ID=t2.TYPE_ID and t1.DISTANCE<>t2.DISTANCE
+      when not matched then
+         insert values (T_LM_B_DESTINATION_HOTEL_SEQ.nextval, t2.CITY_ID,t2.HOTEL_ID,t2.DESTINATION_ID,t2.TYPE_ID,t2.DISTANCE,sysdate,sysdate)
+  ]]>
+  </sql>
+  
+</sqlList>

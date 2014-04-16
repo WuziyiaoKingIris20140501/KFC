@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_hotel_blacklist_search_bycount">
+    <![CDATA[  
+     select count(*) from t_lm_hotel_blacklist b
+     left join t_lm_b_Prop p on b.hotel_id = p.prop
+     where ((:HOTELID IS NULL) OR (b.hotel_id=:HOTELID)) and ((:SOURCE IS NULL) OR (source=:SOURCE)) and ((:ISBLACK IS NULL) OR (is_black=:ISBLACK)) and is_black=1
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_blacklist_search">
+    <![CDATA[  
+     select b.id, b.hotel_id, b.source,
+     (case b.is_black when '1' then '黑名单' else '白名单' end ) as is_black,
+     b.create_time, b.update_time, b.create_user, b.update_user,p.prop_name_zh from t_lm_hotel_blacklist b
+     left join t_lm_b_Prop p on b.hotel_id = p.prop
+     where ((:HOTELID IS NULL) OR (b.hotel_id=:HOTELID)) and ((:SOURCE IS NULL) OR (source=:SOURCE)) and ((:ISBLACK IS NULL) OR (is_black=:ISBLACK)) and is_black=1 order by id desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_blacklist_insert">
+    <![CDATA[  
+      insert into t_lm_hotel_blacklist(id, hotel_id, is_black, source, create_time,create_user) 
+      values(:ID,:HOTELID,:ISBLACK,:SOURCE,sysdate,:CREATEUSER)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_blacklist_delete">
+    <![CDATA[  
+      delete from t_lm_hotel_blacklist where id=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_blacklist_update">
+    <![CDATA[  
+      update t_lm_hotel_blacklist set is_black=:ISBLACK where id=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_blacklist_update_exist">
+    <![CDATA[  
+      update t_lm_hotel_blacklist set is_black=:ISBLACK,UPDATE_TIME=sysdate,UPDATE_USER=:UPDATEUSER where hotel_id=:HOTELID and SOURCE=:SOURCE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_blacklist_repeat">
+    <![CDATA[  
+      select * from t_lm_hotel_blacklist where hotel_id=:HOTELID and SOURCE=:SOURCE
+  ]]>
+  </sql>
+
+</sqlList>

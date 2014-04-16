@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_orderchannel_days_info">
+    <![CDATA[
+         select o.*,b.StartDate,b.EndDate from t_lm_order o,(select :StartDate AS StartDate,:EndDate as EndDate from dual) b  where 
+        create_time >= TO_DATE(:StartDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+        and create_time <TO_DATE(:EndDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+        AND contact_name not like '%测试%' 
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_orderchannel_yesterday_info">
+    <![CDATA[
+       select o.*,b.* from t_lm_order o,(select to_char(sysdate-1, 'yyyy-MM-dd') AS YESTERDATE2 from dual) b where
+      create_time >= TO_DATE((to_char(sysdate-1 , 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') 
+        and create_time < TO_DATE((to_char(sysdate  , 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') 
+        AND contact_name not like '%测试%' 
+    ]]>
+  </sql> 
+</sqlList>

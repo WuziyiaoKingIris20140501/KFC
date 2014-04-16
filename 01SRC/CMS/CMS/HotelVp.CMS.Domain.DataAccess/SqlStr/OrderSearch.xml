@@ -1,0 +1,735 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_order_search_list">
+    <![CDATA[  
+        select tlo.id AS LMID,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+    tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,tls.sales_account,
+    floor((CAST(min(tho.ope_time) AS DATE)- CAST(tlo.create_time AS DATE))* 24 * 60) AS confirmTime,
+    tlo.ticket_amount,tlo.order_channel,tlo.app_platform,
+    case
+    when tlo.price_code='LMBAR2' and tlo.book_status_other='1' then '待确认' 
+    when tlo.price_code='LMBAR2' and  tlo.book_status_other='4' then 'CC确认' 
+    when tlo.price_code='LMBAR2' and  tlo.book_status_other='5' then 'CC确认' 
+    when tlo.price_code='LMBAR2' and  tlo.book_status_other='6' then 'CC确认'
+    when tlo.price_code='LMBAR2' and  tlo.book_status_other='7' then 'CC确认' 
+    when tlo.price_code='LMBAR2' and  tlo.book_status_other='8' then 'CC确认' 
+    when tlo.price_code='LMBAR2' and  tlo.book_status_other='9' then 'CC取消'
+    when tlo.price_code='LMBAR' and  tlo.book_status='5' then '待确认'
+    when tlo.price_code='LMBAR' and  tlo.book_status='6' then 'CC确认'
+    when tlo.price_code='LMBAR' and  tlo.book_status='8' then 'CC确认'
+    when tlo.price_code='LMBAR' and  tlo.book_status='9' then 'CC确认'
+    when tlo.price_code='LMBAR' and  tlo.book_status='10' then 'CC确认'
+    when tlo.price_code='LMBAR' and  tlo.book_status='7' then 'CC取消'
+    else '' end as FOGRESVSTATUS,
+    case when tlo.FOG_AUDITSTATUS is null or tlo.FOG_AUDITSTATUS='7'  then '待审核'
+    when tlo.FOG_AUDITSTATUS='8'  then '离店'
+    when tlo.FOG_AUDITSTATUS='5'  then 'NO-SHOW' 
+    else '' end  as FOGAUDITSTATUS,
+    case when tlo.fog_order_num is null then to_char(tlo.id) when tlo.fog_order_num='' then to_char(tlo.id) else tlo.fog_order_num end as FOGORDERNUM
+    from t_lm_order tlo left join t_lm_b_city tlb on tlo.city_id=tlb.city_id 
+    left join t_lm_sales_history tls on tlo.hotel_id=tls.hotel_id and tls.status='1'
+    left join t_his_order tho on tlo.fog_order_num=tho.order_num and (ope_event='cc-confirm' or ope_event='cc-cancle')
+    left join t_lm_b_prop tbp on tlo.hotel_id=tbp.prop
+    left join t_fx_hvp_area tfh on tbp.prop=tfh.hvp_hotel_id
+    left join t_tag_info tag on tfh.area_id=tag.id
+    where (:ORDERID IS NULL OR (tlo.fog_order_num in (SELECT REGEXP_SUBSTR (:ORDERID, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:ORDERID) - LENGTH (REPLACE (:ORDERID, ',', '')))))
+    AND (:STARTDTIME IS NULL OR (tlo.create_time >= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:ENDDTIME IS NULL OR (to_date(:ENDDTIME, 'yyyy.mm.dd  hh24:mi:ss') >= tlo.create_time)) 
+    AND (:GROUPID IS NULL OR tbp.group_code = :GROUPID)
+    AND (:INSTART IS NULL OR (tlo.in_date >= to_date(:INSTART, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:INEND IS NULL OR (to_date(:INEND, 'yyyy.mm.dd hh24:mi:ss') >= tlo.in_date)) 
+    AND (:CITYID IS NULL OR tlo.CITY_ID = :CITYID) 
+    AND (:AREAID IS NULL OR tag.id = :AREAID) 
+    AND (:OUTSTART IS NULL OR (tlo.OUT_DATE >= to_date(:OUTSTART, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:OUTEND IS NULL OR (to_date(:OUTEND, 'yyyy.mm.dd hh24:mi:ss') >= tlo.OUT_DATE)) 
+    AND (:SALESID IS NULL OR tls.Sales_Account = :SALESID) 
+    AND (:HOTELID IS NULL OR tlo.HOTEL_ID = :HOTELID) 
+    AND (:LOGINMOBILE IS NULL OR (tlo.Login_Mobile = :LOGINMOBILE or tlo.contact_tel = :LOGINMOBILE)) 
+    AND (:GUESTNAME IS NULL OR tlo.GUEST_NAMES = :GUESTNAME) 
+    AND (:CREATESTATUS IS NULL OR 
+    (:CREATESTATUS = '0' and ((tlo.price_code='LMBAR2' and (tlo.fog_order_num IS NULL OR tlo.fog_order_num = '')) OR (tlo.price_code='LMBAR' and (tlo.fog_order_num IS NULL OR tlo.fog_order_num = '' or tlo.book_status='3')))) 
+    or 
+    (:CREATESTATUS = '1' and ((tlo.price_code='LMBAR2' and tlo.fog_order_num IS NOT NULL) OR (tlo.price_code='LMBAR' and tlo.fog_order_num IS NOT NULL)))
+    )
+    AND (:USERCANCEL IS NULL OR 
+    (:USERCANCEL = '0' and ((tlo.price_code='LMBAR2' and tlo.book_status_other <> '3') OR (tlo.price_code='LMBAR' and tlo.book_status <> '4'))) 
+    OR 
+    (:USERCANCEL = '1' AND (tlo.price_code='LMBAR2' AND tlo.book_status_other = '3') OR (tlo.price_code='LMBAR' and tlo.book_status = '4'))
+    )
+    AND (:PRICECODE  IS NULL OR (tlo.Price_Code in (SELECT REGEXP_SUBSTR (:PRICECODE , '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:PRICECODE ) - LENGTH (REPLACE (:PRICECODE , ',', ''))))) 
+    AND (:TICKET IS NULL OR (:TICKET = '0' and (tlo.TICKET_USERCODE IS NULL OR tlo.TICKET_USERCODE = '')) OR (:TICKET = '1' AND tlo.TICKET_USERCODE IS NOT NULL))
+    AND 
+    (:PLATFORM IS NULL OR (tlo.app_platform in (SELECT REGEXP_SUBSTR (:PLATFORM, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:PLATFORM) - LENGTH (REPLACE (:PLATFORM, ',', '')))))  
+    AND 
+    (:ORDERCHANNEL IS NULL OR (tlo.ORDER_CHANNEL in (SELECT REGEXP_SUBSTR (:ORDERCHANNEL, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:ORDERCHANNEL) - LENGTH (REPLACE (:ORDERCHANNEL, ',', ''))))) 
+    AND (:APROVE IS NULL OR (:APROVE='7' AND (tlo.FOG_AUDITSTATUS='7' AND tlo.FOG_AUDITSTATUS IS NULL) OR (:APROVE='5' AND tlo.FOG_AUDITSTATUS='5') OR (:APROVE='8' AND tlo.FOG_AUDITSTATUS='8'))) 
+    AND (
+    ((:AFFIRMSTATUSOTHER IS NULL OR (tlo.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:AFFIRMSTATUSOTHER, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:AFFIRMSTATUSOTHER) - LENGTH (REPLACE (:AFFIRMSTATUSOTHER, ',', ''))))) and  (:HOTELCOMFIRM IS NULL OR (tlo.fog_resvstatus=:HOTELCOMFIRM)))
+    OR
+    (
+    :AFFIRMSTATUS IS NULL OR (tlo.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:AFFIRMSTATUS, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:AFFIRMSTATUS) - LENGTH (REPLACE (:AFFIRMSTATUS, ',', ''))))
+    )
+    OR (
+    (:RESTPRICECODE IS NULL AND :RESTBOOKSTATUS IS NULL) OR ( 
+    tlo.PRICE_CODE=:RESTPRICECODE
+    AND 
+    (:RESTBOOKSTATUS  IS NULL OR (tlo.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:RESTBOOKSTATUS , '[^,]+', 1,rownum) FROM DUAL
+    CONNECT BY ROWNUM <= LENGTH (:RESTBOOKSTATUS) - LENGTH (REPLACE (:RESTBOOKSTATUS , ',', ''))))) )
+    ))
+    AND (:PAYMETHOD IS NULL OR (tlo.PAY_METHOD in (SELECT REGEXP_SUBSTR (:PAYMETHOD, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:PAYMETHOD) - LENGTH (REPLACE (:PAYMETHOD, ',', '')))))
+    AND (:PAYSTATUS IS NULL OR (tlo.PAY_STATUS in (SELECT REGEXP_SUBSTR (:PAYSTATUS, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:PAYSTATUS) - LENGTH (REPLACE (:PAYSTATUS, ',', '')))))
+    AND ((:OUTTEST IS NULL) OR (tlo.contact_name not like '%测试%' ))
+    
+    group by tlo.id,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+    tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,tls.sales_account,
+    tho.ope_time,tlo.create_time,
+    tlo.ticket_amount,tlo.order_channel,tlo.app_platform, tlo.book_status
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_search_list_bak">
+    <![CDATA[  
+       select tlo.id AS LMID,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+    tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,tls.sales_account,
+    floor((CAST(min(tho.ope_time) AS DATE)- CAST(tlo.create_time AS DATE))* 24 * 60) AS confirmTime,
+    tlo.ticket_amount,tlo.order_channel,tlo.app_platform,
+    case when tlo.book_status_other='1' then '待确认' when tlo.book_status_other='4' then 'CC确认' when tlo.book_status_other='5' then 'CC确认' when tlo.book_status_other='6' then 'CC确认'
+    when tlo.book_status_other='7' then 'CC确认' when tlo.book_status_other='8' then 'CC确认' when tlo.book_status_other='9' then 'CC取消'
+    else '' end as FOGRESVSTATUS,
+    case when tlo.book_status_other='6' then '待审核' when tlo.book_status_other='7' then '待审核'
+    when tlo.book_status_other='8' then '离店' when tlo.book_status_other='5' then 'NO-SHOW' else '' end as FOGAUDITSTATUS,
+    case when tlo.fog_order_num is null then to_char(tlo.id) when tlo.fog_order_num='' then to_char(tlo.id) else tlo.fog_order_num end as FOGORDERNUM
+    from t_lm_order tlo left join t_lm_b_city tlb on tlo.city_id=tlb.city_id 
+    left join t_lm_sales_history tls on tlo.hotel_id=tls.hotel_id and tls.status='1'
+    left join t_his_order tho on tlo.fog_order_num=tho.order_num and (ope_event='cc-confirm' or ope_event='cc-cancle')
+    left join t_lm_b_prop tbp on tlo.hotel_id=tbp.prop
+    left join t_fx_hvp_area tfh on tbp.prop=tfh.hvp_hotel_id
+    left join t_tag_info tag on tfh.area_id=tag.id
+    where (:ORDERID IS NULL OR (tlo.fog_order_num in (SELECT REGEXP_SUBSTR (:ORDERID, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:ORDERID) - LENGTH (REPLACE (:ORDERID, ',', '')))))
+    AND (:STARTDTIME IS NULL OR (tlo.create_time >= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:ENDDTIME IS NULL OR (to_date(:ENDDTIME, 'yyyy.mm.dd  hh24:mi:ss') >= tlo.create_time)) 
+    AND (:GROUPID IS NULL OR tbp.group_code = :GROUPID)
+    AND (:INSTART IS NULL OR (tlo.in_date >= to_date(:INSTART, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:INEND IS NULL OR (to_date(:INEND, 'yyyy.mm.dd hh24:mi:ss') >= tlo.in_date)) 
+    AND (:CITYID IS NULL OR tlo.CITY_ID = :CITYID) 
+    AND (:AREAID IS NULL OR tag.id = :AREAID) 
+    AND (:OUTSTART IS NULL OR (tlo.OUT_DATE >= to_date(:OUTSTART, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:OUTEND IS NULL OR (to_date(:OUTEND, 'yyyy.mm.dd hh24:mi:ss') >= tlo.OUT_DATE)) 
+    AND (:SALESID IS NULL OR tls.Sales_Account = :SALESID) 
+    AND (:HOTELID IS NULL OR tlo.HOTEL_ID = :HOTELID) 
+    AND (:LOGINMOBILE IS NULL OR (tlo.Login_Mobile = :LOGINMOBILE or tlo.contact_tel = :LOGINMOBILE)) 
+    AND (:GUESTNAME IS NULL OR tlo.GUEST_NAMES = :GUESTNAME) 
+    AND (:CREATESTATUS IS NULL OR (:CREATESTATUS = '0' and (tlo.fog_order_num IS NULL OR tlo.fog_order_num = '')) OR (:CREATESTATUS = '1' AND tlo.fog_order_num IS NOT NULL))
+    AND (:USERCANCEL IS NULL OR (:USERCANCEL = '0' and (tlo.book_status_other <> '3')) OR (:USERCANCEL = '1' AND tlo.book_status_other = '3'))
+    AND (:PRICECODE  IS NULL OR (tlo.Price_Code in (SELECT REGEXP_SUBSTR (:PRICECODE , '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:PRICECODE ) - LENGTH (REPLACE (:PRICECODE , ',', ''))))) 
+    AND (:TICKET IS NULL OR (:TICKET = '0' and (tlo.TICKET_USERCODE IS NULL OR tlo.TICKET_USERCODE = '')) OR (:TICKET = '1' AND tlo.TICKET_USERCODE IS NOT NULL)) 
+    AND 
+    (:PLATFORM IS NULL OR (tlo.app_platform in (SELECT REGEXP_SUBSTR (:PLATFORM, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:PLATFORM) - LENGTH (REPLACE (:PLATFORM, ',', '')))))  
+    AND 
+    (:ORDERCHANNEL IS NULL OR (tlo.ORDER_CHANNEL in (SELECT REGEXP_SUBSTR (:ORDERCHANNEL, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:ORDERCHANNEL) - LENGTH (REPLACE (:ORDERCHANNEL, ',', ''))))) 
+    AND (:APROVE IS NULL OR tlo.book_status_other=:APROVE) 
+    AND ((:OUTTEST IS NULL) OR (tlo.contact_name not like '%测试%' ))
+    AND (
+    ((:AFFIRMSTATUS IS NULL OR (tlo.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:AFFIRMSTATUS, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:AFFIRMSTATUS) - LENGTH (REPLACE (:AFFIRMSTATUS, ',', ''))))) and  (:HOTELCOMFIRM IS NULL OR (tlo.fog_resvstatus=:HOTELCOMFIRM)))
+    OR (
+    (:RESTPRICECODE IS NULL AND :RESTBOOKSTATUS IS NULL) or ( 
+    tlo.PRICE_CODE=:RESTPRICECODE
+    AND 
+    (:RESTBOOKSTATUS  IS NULL OR (tlo.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:RESTBOOKSTATUS , '[^,]+', 1,rownum) FROM DUAL
+    CONNECT BY ROWNUM <= LENGTH (:RESTBOOKSTATUS) - LENGTH (REPLACE (:RESTBOOKSTATUS , ',', ''))))) )
+    ))
+    group by tlo.id,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+    tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,tls.sales_account,
+    tho.ope_time,tlo.create_time,
+    tlo.ticket_amount,tlo.order_channel,tlo.app_platform
+    
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_search_list_count">
+    <![CDATA[  
+      select tlo.id AS LMID,floor((CAST(min(tho.ope_time) AS DATE)- CAST(tlo.create_time AS DATE))* 24 * 60) AS confirmTime
+    from t_lm_order tlo left join t_lm_b_city tlb on tlo.city_id=tlb.city_id 
+    left join t_lm_sales_history tls on tlo.hotel_id=tls.hotel_id and tls.status='1'
+    left join t_his_order tho on tlo.fog_order_num=tho.order_num and (ope_event='cc-confirm' or ope_event='cc-cancle')
+    left join t_lm_b_prop tbp on tlo.hotel_id=tbp.prop
+    left join t_fx_hvp_area tfh on tbp.prop=tfh.hvp_hotel_id
+    left join t_tag_info tag on tfh.area_id=tag.id
+     where (:ORDERID IS NULL OR (tlo.fog_order_num in (SELECT REGEXP_SUBSTR (:ORDERID, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:ORDERID) - LENGTH (REPLACE (:ORDERID, ',', '')))))
+    AND (:STARTDTIME IS NULL OR (tlo.create_time >= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:ENDDTIME IS NULL OR (to_date(:ENDDTIME, 'yyyy.mm.dd  hh24:mi:ss') >= tlo.create_time)) 
+    AND (:GROUPID IS NULL OR tbp.group_code = :GROUPID)
+    AND (:INSTART IS NULL OR (tlo.in_date >= to_date(:INSTART, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:INEND IS NULL OR (to_date(:INEND, 'yyyy.mm.dd hh24:mi:ss') >= tlo.in_date)) 
+    AND (:CITYID IS NULL OR tlo.CITY_ID = :CITYID) 
+    AND (:AREAID IS NULL OR tag.id = :AREAID) 
+    AND (:OUTSTART IS NULL OR (tlo.OUT_DATE >= to_date(:OUTSTART, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:OUTEND IS NULL OR (to_date(:OUTEND, 'yyyy.mm.dd hh24:mi:ss') >= tlo.OUT_DATE)) 
+    AND (:SALESID IS NULL OR tls.Sales_Account = :SALESID) 
+    AND (:HOTELID IS NULL OR tlo.HOTEL_ID = :HOTELID) 
+    AND (:LOGINMOBILE IS NULL OR (tlo.Login_Mobile = :LOGINMOBILE or tlo.contact_tel = :LOGINMOBILE)) 
+    AND (:GUESTNAME IS NULL OR tlo.GUEST_NAMES = :GUESTNAME) 
+    AND (:CREATESTATUS IS NULL OR 
+    (:CREATESTATUS = '0' and ((tlo.price_code='LMBAR2' and (tlo.fog_order_num IS NULL OR tlo.fog_order_num = '')) OR (tlo.price_code='LMBAR' and (tlo.fog_order_num IS NULL OR tlo.fog_order_num = '' or tlo.book_status='3')))) 
+    or 
+    (:CREATESTATUS = '1' and ((tlo.price_code='LMBAR2' and tlo.fog_order_num IS NOT NULL) OR (tlo.price_code='LMBAR' and tlo.fog_order_num IS NOT NULL)))
+    )
+    AND (:USERCANCEL IS NULL OR 
+    (:USERCANCEL = '0' and ((tlo.price_code='LMBAR2' and tlo.book_status_other <> '3') OR (tlo.price_code='LMBAR' and tlo.book_status <> '4'))) 
+    OR 
+    (:USERCANCEL = '1' AND (tlo.price_code='LMBAR2' AND tlo.book_status_other = '3') OR (tlo.price_code='LMBAR' and tlo.book_status = '4'))
+    )
+    AND (:PRICECODE  IS NULL OR (tlo.Price_Code in (SELECT REGEXP_SUBSTR (:PRICECODE , '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:PRICECODE ) - LENGTH (REPLACE (:PRICECODE , ',', ''))))) 
+    AND (:TICKET IS NULL OR (:TICKET = '0' and (tlo.TICKET_USERCODE IS NULL OR tlo.TICKET_USERCODE = '')) OR (:TICKET = '1' AND tlo.TICKET_USERCODE IS NOT NULL))
+    AND 
+    (:PLATFORM IS NULL OR (tlo.app_platform in (SELECT REGEXP_SUBSTR (:PLATFORM, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:PLATFORM) - LENGTH (REPLACE (:PLATFORM, ',', '')))))  
+    AND 
+    (:ORDERCHANNEL IS NULL OR (tlo.ORDER_CHANNEL in (SELECT REGEXP_SUBSTR (:ORDERCHANNEL, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:ORDERCHANNEL) - LENGTH (REPLACE (:ORDERCHANNEL, ',', ''))))) 
+    AND (:APROVE IS NULL OR (:APROVE='7' AND (tlo.FOG_AUDITSTATUS='7' AND tlo.FOG_AUDITSTATUS IS NULL) OR (:APROVE='5' AND tlo.FOG_AUDITSTATUS='5') OR (:APROVE='8' AND tlo.FOG_AUDITSTATUS='8'))) 
+    AND (
+    ((:AFFIRMSTATUSOTHER IS NULL OR (tlo.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:AFFIRMSTATUSOTHER, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:AFFIRMSTATUSOTHER) - LENGTH (REPLACE (:AFFIRMSTATUSOTHER, ',', ''))))) and  (:HOTELCOMFIRM IS NULL OR (tlo.fog_resvstatus=:HOTELCOMFIRM)))
+    OR
+    (
+    :AFFIRMSTATUS IS NULL OR (tlo.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:AFFIRMSTATUS, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:AFFIRMSTATUS) - LENGTH (REPLACE (:AFFIRMSTATUS, ',', ''))))
+    )
+    OR (
+    (:RESTPRICECODE IS NULL AND :RESTBOOKSTATUS IS NULL) OR ( 
+    tlo.PRICE_CODE=:RESTPRICECODE
+    AND 
+    (:RESTBOOKSTATUS  IS NULL OR (tlo.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:RESTBOOKSTATUS , '[^,]+', 1,rownum) FROM DUAL
+    CONNECT BY ROWNUM <= LENGTH (:RESTBOOKSTATUS) - LENGTH (REPLACE (:RESTBOOKSTATUS , ',', ''))))) )
+    ))
+    AND (:PAYMETHOD IS NULL OR (tlo.PAY_METHOD in (SELECT REGEXP_SUBSTR (:PAYMETHOD, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:PAYMETHOD) - LENGTH (REPLACE (:PAYMETHOD, ',', '')))))
+    AND (:PAYSTATUS IS NULL OR (tlo.PAY_STATUS in (SELECT REGEXP_SUBSTR (:PAYSTATUS, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:PAYSTATUS) - LENGTH (REPLACE (:PAYSTATUS, ',', '')))))
+    AND ((:OUTTEST IS NULL) OR (tlo.contact_name not like '%测试%' ))
+    group by tlo.id,tho.ope_time,tlo.create_time
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_search_list_count_bak">
+    <![CDATA[  
+      select tlo.id AS LMID,floor((CAST(min(tho.ope_time) AS DATE)- CAST(tlo.create_time AS DATE))* 24 * 60) AS confirmTime
+    from t_lm_order tlo left join t_lm_b_city tlb on tlo.city_id=tlb.city_id 
+    left join t_lm_sales_history tls on tlo.hotel_id=tls.hotel_id and tls.status='1'
+    left join t_his_order tho on tlo.fog_order_num=tho.order_num and (ope_event='cc-confirm' or ope_event='cc-cancle')
+    left join t_lm_b_prop tbp on tlo.hotel_id=tbp.prop
+    left join t_fx_hvp_area tfh on tbp.prop=tfh.hvp_hotel_id
+    left join t_tag_info tag on tfh.area_id=tag.id
+    where (:ORDERID IS NULL OR (tlo.fog_order_num in (SELECT REGEXP_SUBSTR (:ORDERID, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:ORDERID) - LENGTH (REPLACE (:ORDERID, ',', '')))))
+    AND (:STARTDTIME IS NULL OR (tlo.create_time >= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:ENDDTIME IS NULL OR (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') >= tlo.create_time)) 
+    AND (:GROUPID IS NULL OR tbp.group_code = :GROUPID)
+    AND (:INSTART IS NULL OR (tlo.in_date >= to_date(:INSTART, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:INEND IS NULL OR (to_date(:INEND, 'yyyy.mm.dd hh24:mi:ss') >= tlo.in_date)) 
+    AND (:CITYID IS NULL OR tlo.CITY_ID = :CITYID) 
+    AND (:AREAID IS NULL OR tag.id = :AREAID) 
+    AND (:OUTSTART IS NULL OR (tlo.OUT_DATE >= to_date(:OUTSTART, 'yyyy.mm.dd hh24:mi:ss'))) 
+    AND (:OUTEND IS NULL OR (to_date(:OUTEND, 'yyyy.mm.dd hh24:mi:ss') >= tlo.OUT_DATE)) 
+    AND (:SALESID IS NULL OR tls.Sales_Account = :SALESID) 
+    AND (:HOTELID IS NULL OR tlo.HOTEL_ID = :HOTELID) 
+    AND (:LOGINMOBILE IS NULL OR (tlo.Login_Mobile = :LOGINMOBILE or tlo.contact_tel = :LOGINMOBILE)) 
+    AND (:GUESTNAME IS NULL OR tlo.GUEST_NAMES = :GUESTNAME) 
+    AND (:CREATESTATUS IS NULL OR (:CREATESTATUS = '0' and (tlo.fog_order_num IS NULL OR tlo.fog_order_num = '')) OR (:CREATESTATUS = '1' AND tlo.fog_order_num IS NOT NULL))
+    AND (:USERCANCEL IS NULL OR (:USERCANCEL = '0' and (tlo.book_status_other <> '3')) OR (:USERCANCEL = '1' AND tlo.book_status_other = '3'))
+    AND (:PRICECODE  IS NULL OR (tlo.Price_Code in (SELECT REGEXP_SUBSTR (:PRICECODE , '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:PRICECODE ) - LENGTH (REPLACE (:PRICECODE , ',', ''))))) 
+    AND (:TICKET IS NULL OR (:TICKET = '0' and (tlo.TICKET_USERCODE IS NULL OR tlo.TICKET_USERCODE = '')) OR (:TICKET = '1' AND tlo.TICKET_USERCODE IS NOT NULL)) 
+    AND 
+    (:PLATFORM IS NULL OR (tlo.app_platform in (SELECT REGEXP_SUBSTR (:PLATFORM, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:PLATFORM) - LENGTH (REPLACE (:PLATFORM, ',', '')))))  
+    AND 
+    (:ORDERCHANNEL IS NULL OR (tlo.ORDER_CHANNEL in (SELECT REGEXP_SUBSTR (:ORDERCHANNEL, '[^,]+', 1,rownum)
+    FROM DUAL
+    CONNECT BY ROWNUM <=
+    LENGTH (:ORDERCHANNEL) - LENGTH (REPLACE (:ORDERCHANNEL, ',', ''))))) 
+    AND (:APROVE IS NULL OR tlo.book_status_other=:APROVE)  
+    AND ((:OUTTEST IS NULL) OR (tlo.contact_name not like '%测试%' ))
+   AND (
+    ((:AFFIRMSTATUS IS NULL OR (tlo.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:AFFIRMSTATUS, '[^,]+', 1,rownum)
+    FROM DUAL CONNECT BY ROWNUM <= LENGTH (:AFFIRMSTATUS) - LENGTH (REPLACE (:AFFIRMSTATUS, ',', ''))))) and  (:HOTELCOMFIRM IS NULL OR (tlo.fog_resvstatus=:HOTELCOMFIRM)))
+    OR (
+    (:RESTPRICECODE IS NULL AND :RESTBOOKSTATUS IS NULL) or ( 
+    tlo.PRICE_CODE=:RESTPRICECODE
+    AND 
+    (:RESTBOOKSTATUS  IS NULL OR (tlo.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:RESTBOOKSTATUS , '[^,]+', 1,rownum) FROM DUAL
+    CONNECT BY ROWNUM <= LENGTH (:RESTBOOKSTATUS) - LENGTH (REPLACE (:RESTBOOKSTATUS , ',', ''))))) )
+    )) 
+    group by tlo.id,tho.ope_time,tlo.create_time
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogTicketOrdDataBack">
+    <![CDATA[
+      select * from (select tlo.id AS LMID, tlo.FOG_ORDER_NUM AS FOGORDERID, '' AS USERID,tlo.login_mobile AS LOGINMOBILE, 
+      tlo.price_code AS PRICECODE, tlo.hotel_name AS HOTELNM,tlo.create_time AS CREATETIME, TO_CHAR(tlo.in_date,'yyyy-mm-dd') AS INDATE, TO_CHAR(tlo.out_date,'yyyy-mm-dd') AS OUTDATE,
+      NVL(tlo.BOOK_TOTAL_PRICE, 0) AS BTPRICE,
+      CASE when tlo.FOG_RESVTYPE = 'n' then '新单' when tlo.FOG_RESVTYPE = 'e' then '修改单' when tlo.FOG_RESVTYPE = 'c' then '取消单'  ELSE ''  END AS FOGRESVTYPE,
+      CASE when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '0' then '新单' when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '1' then '新建入FOG成功单' when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '2' then '新建入fog失败单' when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '3' then '超时单' when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '4' then '用户取消单'  when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '5' then '成功单'  when tlo.FOG_RESVTYPE = 'e' then 'CC修改单'  ELSE ''   END AS ORDERSTATUS, 
+      case when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '0' then '新单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '1' then '预订成功等待确认单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '2' then '新建入fog失败单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '3' then '用户取消单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '4' then '可入住已确认单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '5' then ' NO-SHOW单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '6' then '已完成单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '7' then '审核单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '8' then '离店单'  WHEN tlo.price_code <> 'LMBAR' and BOOK_STATUS_OTHER='9' THEN 'CC取消单'  when tlo.FOG_RESVTYPE = 'e' then 'CC修改单'  ELSE ''   END AS ORDERSTATUSOTHER,
+      CASE WHEN tlo.fog_resvstatus= '0' THEN '待酒店确认' when tlo.fog_resvstatus = '1' then '酒店已确认' ELSE '' END AS FOGRESVSTATUS,
+      CASE WHEN tlo.fog_auditstatus= '5' THEN 'No-Show' when tlo.fog_auditstatus = '7' then '入住中' when tlo.fog_auditstatus = '8' then '已离店' ELSE '未审核' END AS FOGAUDITSTATUS,
+      CASE WHEN tlo.PAY_STATUS = '1' THEN '已支付成功'  ELSE '未支付成功' END AS PAYSTATUS,
+      CASE WHEN tlo.TICKET_USERCODE IS NULL OR tlo.TICKET_USERCODE = '' THEN '0' ELSE '1' END AS TICKET,tlo.guest_names AS GUESTNAMES,
+      NVL(tlo.TICKET_AMOUNT, '0.0') AS TICKETAMOUNT,
+      tlo.id, tlo.order_num, tlo.city_id, tlo.hotel_id, tlo.hotel_name, tlo.in_date, 
+      tlo.book_room_num, tlo.guest_names, tlo.contact_name, tlo.contact_tel, tlo.book_type, 
+      tlo.create_time, tlo.user_id, tlo.book_status, tlo.pay_status, tlo.hold_time, tlo.fog_order_num, 
+      tlo.out_date, tlo.book_remark, tlo.book_source, tlo.book_price, tlo.room_type_code, tlo.price_code, 
+      tlo.order_cancle_reason, tlo.book_total_price, tlo.login_mobile, tlo.overtime, tlo.memo1, tlo.pro_desc, 
+      tlo.pro_content, tlo.is_network, tlo.breakfast_num, tlo.ticket_usercode, tlo.ticket_amount, tlo.ticket_count, 
+      tlo.room_type_name, tlo.book_status_other, tlo.book_person_tel, tlo.pay_method, tlo.is_reserve, tlo.fog_resvtype, 
+      tlo.fog_resvstatus, tlo.fog_auditstatus, tlo.lmbar_status, tlo.pay_methoddesc, tlo.update_time, tlo.invoice_flg, 
+      tlo.invoice_code, tlo.promotion_amount, tlo.app_version, tlo.is_delete, tlo.app_platform, tlo.order_channel, tlo.charge_desc ,sh.sales_account AS SALESMG,
+      case when tlo.fog_order_num is null then to_char(tlo.id) when tlo.fog_order_num='' then to_char(tlo.id) else tlo.fog_order_num end as FOGORDERNUM
+      from t_lm_order tlo
+      inner join (select tlol.fog_order_num
+      from t_lm_ticket_package tltp
+      inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+      inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode AND tltb.STATUS='0'
+      inner join t_lm_order tlol on tltb.cnfnum=tlol.fog_order_num 
+      AND ((tlol.price_code = 'LMBAR' AND tlol.book_status = '5') OR 
+      ((tlol.price_code = 'LMBAR2' OR tlol.price_code = 'BAR' OR tlol.price_code = 'BARB') AND (tlol.FOG_AUDITSTATUS = '8')))
+      where 
+      ((:PAYCODE IS NULL) OR (tlol.price_code in (SELECT REGEXP_SUBSTR (:PAYCODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PAYCODE) - LENGTH (REPLACE (:PAYCODE, ',', '')))))
+      and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE))
+      AND ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+      and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+      and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+      and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+      and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+      AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+      ) tll
+      on tlo.fog_order_num = tll.fog_order_num
+      left join t_lm_sales_history sh on tlo.hotel_id=sh.hotel_id and sh.start_date<= tlo.create_time and tlo.create_time < sh.end_date
+      ) dt
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogTicketAllDataBack">
+    <![CDATA[
+      select * from (select tlo.id AS LMID, tlo.FOG_ORDER_NUM AS FOGORDERID, '' AS USERID,tlo.login_mobile AS LOGINMOBILE, 
+      tlo.price_code AS PRICECODE, tlo.hotel_name AS HOTELNM,tlo.create_time AS CREATETIME, TO_CHAR(tlo.in_date,'yyyy-mm-dd') AS INDATE, TO_CHAR(tlo.out_date,'yyyy-mm-dd') AS OUTDATE,
+      NVL(tlo.BOOK_TOTAL_PRICE, 0) AS BTPRICE,
+      CASE when tlo.FOG_RESVTYPE = 'n' then '新单' when tlo.FOG_RESVTYPE = 'e' then '修改单' when tlo.FOG_RESVTYPE = 'c' then '取消单'  ELSE ''  END AS FOGRESVTYPE,
+      CASE when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '0' then '新单' when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '1' then '新建入FOG成功单' when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '2' then '新建入fog失败单' when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '3' then '超时单' when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '4' then '用户取消单'  when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '5' then '成功单'  when tlo.FOG_RESVTYPE = 'e' then 'CC修改单'  ELSE ''   END AS ORDERSTATUS, 
+      case when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '0' then '新单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '1' then '预订成功等待确认单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '2' then '新建入fog失败单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '3' then '用户取消单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '4' then '可入住已确认单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '5' then ' NO-SHOW单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '6' then '已完成单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '7' then '审核单'  when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '8' then '离店单'  WHEN tlo.price_code <> 'LMBAR' and BOOK_STATUS_OTHER='9' THEN 'CC取消单'  when tlo.FOG_RESVTYPE = 'e' then 'CC修改单'  ELSE ''   END AS ORDERSTATUSOTHER,
+      CASE WHEN tlo.fog_resvstatus= '0' THEN '待酒店确认' when tlo.fog_resvstatus = '1' then '酒店已确认' ELSE '' END AS FOGRESVSTATUS,
+      CASE WHEN tlo.fog_auditstatus= '5' THEN 'No-Show' when tlo.fog_auditstatus = '7' then '入住中' when tlo.fog_auditstatus = '8' then '已离店' ELSE '未审核' END AS FOGAUDITSTATUS,
+      CASE WHEN tlo.PAY_STATUS = '1' THEN '已支付成功'  ELSE '未支付成功' END AS PAYSTATUS,
+      CASE WHEN tlo.TICKET_USERCODE IS NULL OR tlo.TICKET_USERCODE = '' THEN '0' ELSE '1' END AS TICKET,tlo.guest_names AS GUESTNAMES,
+      NVL(tlo.TICKET_AMOUNT, '0.0') AS TICKETAMOUNT,
+      tlo.id, tlo.order_num, tlo.city_id, tlo.hotel_id, tlo.hotel_name, tlo.in_date, 
+      tlo.book_room_num, tlo.guest_names, tlo.contact_name, tlo.contact_tel, tlo.book_type, 
+      tlo.create_time, tlo.user_id, tlo.book_status, tlo.pay_status, tlo.hold_time, tlo.fog_order_num, 
+      tlo.out_date, tlo.book_remark, tlo.book_source, tlo.book_price, tlo.room_type_code, tlo.price_code, 
+      tlo.order_cancle_reason, tlo.book_total_price, tlo.login_mobile, tlo.overtime, tlo.memo1, tlo.pro_desc, 
+      tlo.pro_content, tlo.is_network, tlo.breakfast_num, tlo.ticket_usercode, tlo.ticket_amount, tlo.ticket_count, 
+      tlo.room_type_name, tlo.book_status_other, tlo.book_person_tel, tlo.pay_method, tlo.is_reserve, tlo.fog_resvtype, 
+      tlo.fog_resvstatus, tlo.fog_auditstatus, tlo.lmbar_status, tlo.pay_methoddesc, tlo.update_time, tlo.invoice_flg, 
+      tlo.invoice_code, tlo.promotion_amount, tlo.app_version, tlo.is_delete, tlo.app_platform, tlo.order_channel, tlo.charge_desc , sh.sales_account AS SALESMG,
+      case when tlo.fog_order_num is null then to_char(tlo.id) when tlo.fog_order_num='' then to_char(tlo.id) else tlo.fog_order_num end as FOGORDERNUM
+      from t_lm_order tlo
+      inner join (select tltb.cnfnum from t_lm_ticket_package tltp
+      inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+      inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode
+      inner join t_lm_order tlo on tltb.cnfnum=tlo.fog_order_num
+      where 
+      ((:PAYCODE IS NULL) OR (tlo.price_code in (SELECT REGEXP_SUBSTR (:PAYCODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PAYCODE) - LENGTH (REPLACE (:PAYCODE, ',', '')))))
+      and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE))
+       AND ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+      and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+      and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+      and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+      and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+      AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+      ) tll
+      on tlo.fog_order_num = tll.cnfnum
+      left join t_lm_sales_history sh on tlo.hotel_id=sh.hotel_id and sh.start_date<= tlo.create_time and tlo.create_time < sh.end_date
+      ) dt
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogTicketAllCountBack">
+    <![CDATA[
+      select count(tltb.cnfnum) from t_lm_ticket_package tltp
+      inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+      inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode
+      inner join t_lm_order tlo on tltb.cnfnum=tlo.fog_order_num
+      left join t_lm_b_prop bp on tlo.hotel_id = bp.prop 
+      where 
+      ((:PAYCODE IS NULL) OR (tlo.price_code in (SELECT REGEXP_SUBSTR (:PAYCODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PAYCODE) - LENGTH (REPLACE (:PAYCODE, ',', '')))))
+      and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE))
+      AND ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+      and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+      and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+      and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+      and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+      AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+      AND (:GROUPID IS NULL OR (bp.GROUP_CODE=:GROUPID)) 
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogTicketOrdCountBack">
+    <![CDATA[
+      select count(tlol.fog_order_num)
+      from t_lm_ticket_package tltp
+      inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+      inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode AND tltb.STATUS='0'
+      inner join t_lm_order tlol on tltb.cnfnum=tlol.fog_order_num 
+      left join t_lm_b_prop bp on tlo.hotel_id = bp.prop 
+      AND ((tlol.price_code = 'LMBAR' AND tlol.book_status = '5') OR 
+      ((tlol.price_code = 'LMBAR2' OR tlol.price_code = 'BAR' OR tlol.price_code = 'BARB') AND (tlol.FOG_AUDITSTATUS = '8')))
+      where 
+      ((:PAYCODE IS NULL) OR (tlol.price_code in (SELECT REGEXP_SUBSTR (:PAYCODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PAYCODE) - LENGTH (REPLACE (:PAYCODE, ',', '')))))
+      and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE))
+      AND ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+      and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+      and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+      and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+      and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+      AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+      AND (:GROUPID IS NULL OR (bp.GROUP_CODE=:GROUPID)) 
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogTicketOrdData">
+    <![CDATA[
+      select * from (select tlo.id AS LMID,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+      tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,sh.sales_account,
+      floor((CAST(min(tho.ope_time) AS DATE)- CAST(tlo.create_time AS DATE))* 24 * 60) AS confirmTime,
+      tlo.ticket_amount,tlo.order_channel,tlo.app_platform,
+      case when tlo.book_status_other='4' then 'CC确认' when tlo.book_status_other='5' then 'CC确认' when tlo.book_status_other='6' then 'CC确认'
+      when tlo.book_status_other='7' then 'CC确认' when tlo.book_status_other='8' then 'CC确认' when tlo.book_status_other='9' then 'CC取消'
+      else '' end as FOGRESVSTATUS,
+      case when tlo.book_status_other='8' then '离店' when tlo.book_status_other='5' then 'NO-SHOW' else '' end as FOGAUDITSTATUS,
+      case when tlo.fog_order_num is null then to_char(tlo.id) when tlo.fog_order_num='' then to_char(tlo.id) else tlo.fog_order_num end as FOGORDERNUM
+      from t_lm_order tlo
+      inner join (select tlol.fog_order_num
+      from t_lm_ticket_package tltp
+      inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+      inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode AND tltb.STATUS='0'
+      inner join t_lm_order tlol on tltb.cnfnum=tlol.fog_order_num 
+      AND ((tlol.price_code = 'LMBAR' AND tlol.book_status = '5') OR 
+      ((tlol.price_code = 'LMBAR2' OR tlol.price_code = 'BAR' OR tlol.price_code = 'BARB') AND (tlol.FOG_AUDITSTATUS = '8')))
+      where 
+      ((:PAYCODE IS NULL) OR (tlol.price_code in (SELECT REGEXP_SUBSTR (:PAYCODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PAYCODE) - LENGTH (REPLACE (:PAYCODE, ',', '')))))
+      and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE))
+      AND ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+      and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+      and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+      and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+      and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+      AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+      ) tll
+      on tlo.fog_order_num = tll.fog_order_num
+      left join t_lm_b_city tlb on tlo.city_id=tlb.city_id 
+      left join t_lm_sales_history sh on tlo.hotel_id=sh.hotel_id and sh.start_date<= tlo.create_time and tlo.create_time < sh.end_date
+      left join t_his_order tho on tlo.fog_order_num=tho.order_num and (ope_event='cc-confirm' or ope_event='cc-cancle')
+      group by tlo.id,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+      tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,sh.sales_account,
+      tho.ope_time,tlo.create_time,
+      tlo.ticket_amount,tlo.order_channel,tlo.app_platform
+      ) dt
+    ]]>
+  </sql>
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogTicketAllData">
+    <![CDATA[
+      select * from (select tlo.id AS LMID,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+      tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,sh.sales_account,
+      floor((CAST(min(tho.ope_time) AS DATE)- CAST(tlo.create_time AS DATE))* 24 * 60) AS confirmTime,
+      tlo.ticket_amount,tlo.order_channel,tlo.app_platform,
+      case when tlo.book_status_other='4' then 'CC确认' when tlo.book_status_other='5' then 'CC确认' when tlo.book_status_other='6' then 'CC确认'
+      when tlo.book_status_other='7' then 'CC确认' when tlo.book_status_other='8' then 'CC确认' when tlo.book_status_other='9' then 'CC取消'
+      else '' end as FOGRESVSTATUS,
+      case when tlo.book_status_other='8' then '离店' when tlo.book_status_other='5' then 'NO-SHOW' else '' end as FOGAUDITSTATUS ,
+      case when tlo.fog_order_num is null then to_char(tlo.id) when tlo.fog_order_num='' then to_char(tlo.id) else tlo.fog_order_num end as FOGORDERNUM
+      from t_lm_order tlo
+      inner join (select tltb.cnfnum from t_lm_ticket_package tltp
+      inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+      inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode
+      inner join t_lm_order tlo on tltb.cnfnum=tlo.fog_order_num
+      where 
+      ((:PAYCODE IS NULL) OR (tlo.price_code in (SELECT REGEXP_SUBSTR (:PAYCODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PAYCODE) - LENGTH (REPLACE (:PAYCODE, ',', '')))))
+      and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE))
+       AND ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+      and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+      and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+      and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+      and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+      AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+      ) tll
+      on tlo.fog_order_num = tll.cnfnum
+      left join t_lm_b_city tlb on tlo.city_id=tlb.city_id 
+      left join t_lm_sales_history sh on tlo.hotel_id=sh.hotel_id and sh.start_date<= tlo.create_time and tlo.create_time < sh.end_date
+      left join t_his_order tho on tlo.fog_order_num=tho.order_num and (ope_event='cc-confirm' or ope_event='cc-cancle')
+      group by tlo.id,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+      tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,sh.sales_account,
+      tho.ope_time,tlo.create_time,
+      tlo.ticket_amount,tlo.order_channel,tlo.app_platform 
+      ) dt
+    ]]>
+  </sql>
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogTicketAllCount">
+    <![CDATA[
+      select count(tltb.cnfnum) from t_lm_ticket_package tltp
+      inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+      inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode
+      inner join t_lm_order tlo on tltb.cnfnum=tlo.fog_order_num
+      left join t_lm_b_prop bp on tlo.hotel_id = bp.prop 
+      where 
+      ((:PAYCODE IS NULL) OR (tlo.price_code in (SELECT REGEXP_SUBSTR (:PAYCODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PAYCODE) - LENGTH (REPLACE (:PAYCODE, ',', '')))))
+      and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE))
+      AND ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+      and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+      and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+      and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+      and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+      AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+      AND (:GROUPID IS NULL OR (bp.GROUP_CODE=:GROUPID)) 
+    ]]>
+  </sql>
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogTicketOrdCount">
+    <![CDATA[
+      select count(tlol.fog_order_num)
+      from t_lm_ticket_package tltp
+      inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+      inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode AND tltb.STATUS='0'
+      inner join t_lm_order tlol on tltb.cnfnum=tlol.fog_order_num 
+      left join t_lm_b_prop bp on tlol.hotel_id = bp.prop 
+      AND ((tlol.price_code = 'LMBAR' AND tlol.book_status = '5') OR 
+      ((tlol.price_code = 'LMBAR2' OR tlol.price_code = 'BAR' OR tlol.price_code = 'BARB') AND (tlol.FOG_AUDITSTATUS = '8')))
+      where 
+      ((:PAYCODE IS NULL) OR (tlol.price_code in (SELECT REGEXP_SUBSTR (:PAYCODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PAYCODE) - LENGTH (REPLACE (:PAYCODE, ',', '')))))
+      and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE))
+      AND ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+      and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+      and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+      and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+      and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+      AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+      AND (:GROUPID IS NULL OR (bp.GROUP_CODE=:GROUPID)) 
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogSelectByRests">
+    <![CDATA[
+       select tlo.id AS LMID,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+      tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,tls.sales_account,
+      floor((CAST(min(tho.ope_time) AS DATE)- CAST(tlo.create_time AS DATE))* 24 * 60) AS confirmTime,
+      tlo.ticket_amount,tlo.order_channel,tlo.app_platform,
+      case when tlo.book_status_other='1' then '待确认' when tlo.book_status_other='4' then 'CC确认' when tlo.book_status_other='5' then 'CC确认' when tlo.book_status_other='6' then 'CC确认'
+      when tlo.book_status_other='7' then 'CC确认' when tlo.book_status_other='8' then 'CC确认' when tlo.book_status_other='9' then 'CC取消'
+      else '' end as FOGRESVSTATUS,
+      case when tlo.book_status_other='6' then '待审核' when tlo.book_status_other='7' then '待审核'
+      when tlo.book_status_other='8' then '离店' when tlo.book_status_other='5' then 'NO-SHOW' else '' end as FOGAUDITSTATUS,
+      case when tlo.fog_order_num is null then to_char(tlo.id) when tlo.fog_order_num='' then to_char(tlo.id) else tlo.fog_order_num end as FOGORDERNUM
+      from t_lm_order tlo left join t_lm_b_city tlb on tlo.city_id=tlb.city_id 
+      left join t_lm_sales_history tls on tlo.hotel_id=tls.hotel_id and tls.status='1'
+      left join t_his_order tho on tlo.fog_order_num=tho.order_num and (ope_event='cc-confirm' or ope_event='cc-cancle')
+      left join t_lm_b_prop tbp on tlo.hotel_id=tbp.prop
+      left join t_fx_hvp_area tfh on tbp.prop=tfh.hvp_hotel_id
+      left join t_tag_info tag on tfh.area_id=tag.id
+      where 1=1
+      AND (:STARTDTIME IS NULL OR (tlo.create_time >= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      AND (:ENDDTIME IS NULL OR (to_date(:ENDDTIME, 'yyyy.mm.dd  hh24:mi:ss') >= tlo.create_time)) 
+      AND 
+      (:ORDERCHANNEL IS NULL OR (tlo.ORDER_CHANNEL not in (SELECT REGEXP_SUBSTR (:ORDERCHANNEL, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:ORDERCHANNEL) - LENGTH (REPLACE (:ORDERCHANNEL, ',', ''))))) 
+         
+      AND (:PRICECODE  IS NULL OR (tlo.Price_Code in (SELECT REGEXP_SUBSTR (:PRICECODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PRICECODE) - LENGTH (REPLACE (:PRICECODE , ',', ''))))) 
+    
+      AND (
+     ((:AFFIRMSTATUS IS NULL OR (tlo.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:AFFIRMSTATUS, '[^,]+', 1,rownum)
+     FROM DUAL CONNECT BY ROWNUM <= LENGTH (:AFFIRMSTATUS) - LENGTH (REPLACE (:AFFIRMSTATUS, ',', ''))))) and  (:HOTELCOMFIRM IS NULL OR (tlo.fog_resvstatus=:HOTELCOMFIRM)))
+      OR (
+      (:RESTPRICECODE IS NULL AND :RESTBOOKSTATUS IS NULL) or ( 
+      tlo.PRICE_CODE=:RESTPRICECODE
+      AND 
+      (:RESTBOOKSTATUS  IS NULL OR (tlo.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:RESTBOOKSTATUS , '[^,]+', 1,rownum) FROM DUAL
+      CONNECT BY ROWNUM <= LENGTH (:RESTBOOKSTATUS) - LENGTH (REPLACE (:RESTBOOKSTATUS , ',', ''))))) )
+      ))
+      AND (:TICKET IS NULL OR (:TICKET = '0' and (tlo.TICKET_USERCODE IS NULL OR tlo.TICKET_USERCODE = '')) OR (:TICKET = '1' AND tlo.TICKET_USERCODE IS NOT NULL)) 
+      group by tlo.id,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+      tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,tls.sales_account,
+      tho.ope_time,tlo.create_time,
+      tlo.ticket_amount,tlo.order_channel,tlo.app_platform
+      ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="ReviewLmOrderLogSelectCountByRests">
+    <![CDATA[
+       select  tlo.id AS LMID,floor((CAST(min(tho.ope_time) AS DATE)- CAST(tlo.create_time AS DATE))* 24 * 60) AS confirmTime
+      from t_lm_order tlo left join t_lm_b_city tlb on tlo.city_id=tlb.city_id 
+      left join t_lm_sales_history tls on tlo.hotel_id=tls.hotel_id and tls.status='1'
+      left join t_his_order tho on tlo.fog_order_num=tho.order_num and (ope_event='cc-confirm' or ope_event='cc-cancle')
+      left join t_lm_b_prop tbp on tlo.hotel_id=tbp.prop
+      left join t_fx_hvp_area tfh on tbp.prop=tfh.hvp_hotel_id
+      left join t_tag_info tag on tfh.area_id=tag.id
+      where 1=1
+      AND (:STARTDTIME IS NULL OR (tlo.create_time >= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      AND (:ENDDTIME IS NULL OR (to_date(:ENDDTIME, 'yyyy.mm.dd  hh24:mi:ss') >= tlo.create_time)) 
+      AND 
+      (:ORDERCHANNEL IS NULL OR (tlo.ORDER_CHANNEL not in (SELECT REGEXP_SUBSTR (:ORDERCHANNEL, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:ORDERCHANNEL) - LENGTH (REPLACE (:ORDERCHANNEL, ',', ''))))) 
+         
+      AND (:PRICECODE  IS NULL OR (tlo.Price_Code in (SELECT REGEXP_SUBSTR (:PRICECODE, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PRICECODE) - LENGTH (REPLACE (:PRICECODE , ',', ''))))) 
+    
+      AND (
+     ((:AFFIRMSTATUS IS NULL OR (tlo.BOOK_STATUS_OTHER in (SELECT REGEXP_SUBSTR (:AFFIRMSTATUS, '[^,]+', 1,rownum)
+     FROM DUAL CONNECT BY ROWNUM <= LENGTH (:AFFIRMSTATUS) - LENGTH (REPLACE (:AFFIRMSTATUS, ',', ''))))) and  (:HOTELCOMFIRM IS NULL OR (tlo.fog_resvstatus=:HOTELCOMFIRM)))
+      OR (
+      (:RESTPRICECODE IS NULL AND :RESTBOOKSTATUS IS NULL) or ( 
+      tlo.PRICE_CODE=:RESTPRICECODE
+      AND 
+      (:RESTBOOKSTATUS  IS NULL OR (tlo.BOOK_STATUS in (SELECT REGEXP_SUBSTR (:RESTBOOKSTATUS , '[^,]+', 1,rownum) FROM DUAL
+      CONNECT BY ROWNUM <= LENGTH (:RESTBOOKSTATUS) - LENGTH (REPLACE (:RESTBOOKSTATUS , ',', ''))))) )
+      ))
+      AND (:TICKET IS NULL OR (:TICKET = '0' and (tlo.TICKET_USERCODE IS NULL OR tlo.TICKET_USERCODE = '')) OR (:TICKET = '1' AND tlo.TICKET_USERCODE IS NOT NULL)) 
+      group by tlo.id,tlo.user_id,tlo.fog_order_num,tlo.login_mobile,tlo.create_time,tlo.hotel_id,tlo.hotel_name,tlo.city_id,tlb.name_cn,tlo.room_type_code,tlo.room_type_name,tlo.book_room_num,tlo.price_code,tlo.book_price,
+      tlo.in_date,tlo.out_date,tlo.guest_names,tlo.book_status_other,tlo.fog_auditstatus,tls.sales_account,
+      tho.ope_time,tlo.create_time,
+      tlo.ticket_amount,tlo.order_channel,tlo.app_platform
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_settle_search_list">
+    <![CDATA[
+        select dt.hotel_id AS HOTELID,bp.prop_name_zh AS HOTELNM, '￥'||TO_CHAR(SUM(dt.COMS)) AS COMMISSION, tsh.sales_account AS SALES, sett.months AS MONTHS
+        from
+        (
+        select tlo.hotel_id,tlo.out_date,to_char(tlo.book_total_price * (to_number(10)/100)) AS COMS
+        from
+        t_lm_order tlo
+        where tlo.book_status_other = '8' and tlo.price_code='LMBAR2' AND
+        ((:HOTELID IS NULL) OR (tlo.hotel_id = :HOTELID)) and NOT EXISTs (select col4 from freek_t_1 ft WHERE tlo.hotel_id=ft.col4 and ft.col2='20131216001') 
+        ) dt
+        left join t_lm_b_prop bp on bp.prop=dt.hotel_id
+        left join t_lm_order_settle sett on sett.hotelid=bp.prop
+        left join t_lm_sales_history tsh on tsh.hotel_id=bp.prop and tsh.status='1'
+        where ((:USERCODE IS NULL) OR (NLS_LOWER(tsh.sales_account)=NLS_LOWER(:USERCODE))) 
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_settle_save">
+    <![CDATA[
+      merge into t_lm_order_settle t1
+      using (SELECT :HOTELID as hotelid, :MONTHS AS months,:OPEUSER AS ope_user from dual) t2 
+      on (t1.hotelid = t2.hotelid)
+      when matched then
+         update set t1.months=t2.months,t1.ope_user = t2.ope_user, t1.UPDATE_TIME=sysdate
+         where t1.hotelid = t2.hotelid
+      when not matched then
+         insert values (t2.hotelid, t2.months,t2.ope_user,sysdate,sysdate)
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_settle_search_export">
+    <![CDATA[
+      select dt.hotel_id AS "酒店ID",dt.hotel_name AS "酒店名称",bp.linktel AS "酒店电话",bp.linkfax AS "酒店传真",
+        "订单号",dt.guest_names AS "入住人",dt.room_type_name AS "房型",to_char(dt.in_date,'yyyy-mm-dd') AS "入住日期",
+      to_char(dt.out_date,'yyyy-mm-dd') AS "离店日期",dt.book_room_num AS "间夜",
+      dt.book_price AS "卖价",case when dt.COMS is not null then dt.book_price-(to_number(dt.COMS)/dt.book_room_num) else dt.book_price end AS "底价",to_number(dt.COMS) AS "佣金",dt.inroom_num AS "房号"
+      from
+      (
+      select tlo.city_id ,tlo.hotel_id,tlo.fog_order_num AS "订单号",tlo.hotel_name,tlo.room_type_code,tlo.room_type_name,tlo.guest_names,tlo.in_date,tlo.out_date,tlo.book_room_num,
+      tlo.book_price,
+       to_char(tlo.book_total_price * (to_number(10)/100)) AS COMS,ope.inroom_num
+      from
+      t_lm_order tlo
+      left join t_lm_order_ope ope on tlo.fog_order_num=ope.fog_order_num
+      where tlo.book_status_other = '8' and tlo.price_code='LMBAR2' AND
+      tlo.hotel_id = :HOTELID 
+      ) dt
+      left join t_lm_b_prop bp on bp.prop=dt.hotel_id
+      where 1=1 
+      ]]>
+  </sql>
+
+</sqlList>

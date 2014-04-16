@@ -1,0 +1,1701 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_hotelgrouplist">
+    <![CDATA[  
+     select '' as GROUPCODE,'无' as NAMEZH from dual
+      union
+      select group_code as GROUPCODE,name_zh as NAMEZH from t_lm_b_hotelgroup order by GROUPCODE desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_roomlist">
+    <![CDATA[  
+    (select * from (select ROOM_NAME AS NAME_ZH,ROOM_CODE AS ROOMID from T_ROOM group by ROOM_NAME,ROOM_CODE order by COUNT(ROOMID) desc) tt where rownum <21)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_citylist">
+    <![CDATA[  
+     select CITY_ID AS CITYID,NAME_CN AS NAMEZH from t_lm_b_city order by CITY_ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_common_provinciallist">
+    <![CDATA[  
+     
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_prop_chk">
+    <![CDATA[  
+      select '['||prop||']'||prop_name_zh AS REVALUE_ALL from T_LM_B_PROP
+      where PROP=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_prop_exam_chk">
+    <![CDATA[  
+      select PROP, PROP_NAME_ZH from T_LM_B_PROP
+      where PROP=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_bind">
+    <![CDATA[  
+     select 
+      PROP AS HOTELID
+      ,tp.PROP_NAME_ZH AS HOTELNM
+      ,tp.GROUP_CODE AS GROUPID
+      ,bg.NAME_ZH AS NAMEZH
+      ,tp.STAR_RATING AS STARRATING
+      ,tp.DIAMOND_RATING AS DIAMONDRATING
+      ,tp.CITYID AS CITYID
+      ,to_char(tp.OPENING_DATE,'yyyy-mm-dd') AS OPENDATE
+      ,to_char(tp.RENOVATED_DATE,'yyyy-mm-dd') AS REPAIRDATE
+      ,tp.ADDRESS1_ZH AS ADDRESS
+      ,tp.WEBSITE AS WEBSITE
+      ,tp.linkTEL AS PHONE
+      ,tp.linkfax AS FAX
+      ,tp.LINKMAN AS CONTACTPER
+      ,tp.linkEMAIL AS CONTACTEMAIL
+      ,tp.SIMPLE_DESC_ZH AS SIMPLEDESCZH
+      ,tp.HOTEL_DESCRIPTION_ZH AS DESCZH
+      ,tp.SIMPLE_APPR_ZH AS EVALUATION
+      ,tp.ONLINE_STATUS AS ONLINESTATUS
+      ,tp.AUTO_TRUST AS AUTOTRUST
+      ,tp.STATUS AS FOGSTATUS
+      ,tp.PROP_NAME_EN AS HotelNMEN
+      ,(CASE tp.STATUS  WHEN 'new' THEN '待上线' WHEN 'active' THEN '上线' WHEN 'inactive' THEN '临时关闭' WHEN 'close' THEN '下线' ELSE ''  END ) AS FOGSTATUSDIS
+      ,tp.create_time
+      ,tp.update_time
+      ,tp.LONGITUDE
+      ,tp.LATITUDE 
+      ,tp.TOTAL_ROOMS
+      ,tp.PINYIN_LONG
+      ,tp.PINYIN_SHORT
+      ,tp.LOW_LIMIT
+      ,tp.REMARK
+      ,tp.ZIP   
+      ,tp.CONTACT_PHONE
+      ,tp.CONTACT_NAME_ZH
+      ,tp.CONTACT_EMAIL
+      ,tp.FAX AS UFAX
+      ,tp.PHONE AS UPHONE
+      ,'['||tp.CITYID||']'||tc.name_cn AS CITYNM
+      ,tp.LONGITUDE_BAIDU AS BDLONGITUDE
+      ,tp.LATITUDE_BAIDU AS BDLATITUDE
+      ,tp.KEYWORDS
+      ,tp.ISMYHOTEL
+      from T_LM_B_PROP tp left join t_lm_b_city tc on tp.CITYID = tc.city_id
+      left join t_lm_b_hotelgroup bg on tp.GROUP_CODE = bg.group_code
+     where tp.PROP=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_fog">
+    <![CDATA[  
+     select ftp.PROP AS HOTELID,ftp.PROP_NAME_ZH AS HOTELNM, ftp.STAR_RATING AS STARRATING,ftp.DIAMOND_RATING AS DIAMONDRATING, ftp.CITYID AS CITYID,
+     to_char(ftp.OPENING_DATE, 'yyyy-mm-dd') AS OPENDATE,to_char(ftp.RENOVATED_DATE, 'yyyy-mm-dd') AS REPAIRDATE,ftp.ADDRESS1_ZH AS ADDRESS,ftp.WEBSITE AS WEBSITE,tlh.TEL AS PHONE,
+     tlh.fax AS FAX, tlh.LINKMAN AS CONTACTPER,tlh.MAIL AS CONTACTEMAIL, ftp.SIMPLE_DESC_ZH AS SIMPLEDESCZH,ftp.STATUS AS FOGSTATUS,PROP_NAME_EN AS HotelNMEN,
+     (CASE ftp.STATUS  WHEN 'new' THEN '待上线' WHEN 'active' THEN '上线' WHEN 'inactive' THEN '临时关闭' WHEN 'close' THEN '下线' ELSE ''  END ) AS FOGSTATUSDIS,
+     ftpd.property_zh AS DESCZH,ftpg.orgid AS GROUPID,ftp.LONGITUDE, ftp.LATITUDE,'['||ftp.CITYID||']'||tc.name_cn AS CITYNM
+     from FOG_T_PROP ftp 
+     left join T_LM_HOTEL tlh on ftp.PROP=tlh.HOTEL_ID
+     left join fog_t_prop_desc ftpd on ftpd.PROP=ftp.PROP
+     left join fog_t_proporg ftpg on ftpg.orgid=ftp.orgid
+     left join t_lm_b_city tc on ftp.CITYID = tc.city_id
+     where ftp.PROP=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_insertcheck">
+    <![CDATA[  
+     select ftp.PROP AS HOTELID
+     from t_lm_b_prop ftp
+     where ftp.PROP=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_update">
+    <![CDATA[  
+     update t_lm_b_prop set 
+      PROP_NAME_ZH=:HOTELNM , 
+      GROUP_CODE=:GROUPID, 
+      STAR_RATING=:STARRATING, 
+      DIAMOND_RATING=:DIAMONDRATING, 
+      CITYID=:CITYID, 
+      OPENING_DATE=to_date(:OPENDATE, 'yyyy.mm.dd'),
+      RENOVATED_DATE=to_date(:REPAIRDATE, 'yyyy.mm.dd'), 
+      ADDRESS1_ZH=:ADDRESS, 
+      WEBSITE=:WEBSITE, 
+      SIMPLE_DESC_ZH=:SIMPLEDESCZH, 
+      SIMPLE_APPR_ZH=:EVALUATION, 
+      ONLINE_STATUS=:ONLINESTATUS, 
+      STATUS=:FOGSTATUS, 
+      AUTO_TRUST=:AUTOTRUST, 
+      PROP_NAME_EN=:HOTELNMEN, 
+      update_time=sysdate,
+       HOTEL_DESCRIPTION_ZH=:DESCZH,
+       LONGITUDE=:LONGITUDE,
+       LATITUDE=:LATITUDE
+      where PROP = :HOTELID 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_sales_update">
+    <![CDATA[  
+     update t_lm_b_prop set 
+      linkTEL=:PHONE, 
+      linkfax=:FAX, 
+      LINKMAN=:CONTACTPER, 
+      linkEMAIL=:CONTACTEMAIL, 
+      update_time=sysdate
+      where PROP = :HOTELID 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_sales_update">
+    <![CDATA[  
+     update t_lm_b_prop set 
+      SALES_ACCOUNT=:USERCODE, 
+      update_time=sysdate
+      where PROP = :HOTELID 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_sales_history_save">
+    <![CDATA[  
+     insert into t_lm_sales_history
+  (id, hotel_id, sales_account, status, start_date, end_date)
+values
+  (t_lm_sales_history_SEQ.Nextval, :HOTELID, :SALESID, '1', sysdate, sysdate + numtoyminterval(10,'year'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_sales_history_select">
+    <![CDATA[  
+     select hotel_id from t_lm_sales_history where hotel_id=:HOTELID AND :SALESID=:SALESID AND status='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_sales_history_delete">
+    <![CDATA[  
+     update t_lm_sales_history set end_date=sysdate,status='0' where hotel_id=:HOTELID AND :SALESID=:SALESID AND status='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_insert_back">
+    <![CDATA[  
+      insert into t_lm_b_prop
+      (prop, orgid, prop_name_jp, prop_name_en, prop_name_zh, address1_zh, address1_en, address1_jp, address2_zh, address2_en, address2_jp, areaid, 
+      countryid, cityid, prop_typeid, zip, status, phone, fax, timezone, checkin, late_checkin, checkout, holdtime, opening_date, renovated_date, 
+      description_zh, description_en, description_jp, latitude, longitude, need_pay, star_rating, diamond_rating, price_high, price_low, total_rooms, 
+      total_floors, contact_name_zh, contact_name_en, contact_name_jp, contact_title_zh, contact_title_en, contact_title_jp, contact_phone, contact_email, 
+      activated_date, modify_date, modify_user, total_elevators, double_rooms, handi_rooms, king_rooms, meet_room_cap, max_prop_bednum, meeting_rooms, 
+      meet_room_area, nosmoking_rooms, twin_rooms, queen_rooms, add_extra_bed, big_rooms, website, is_model, fee_low, gdscode1, gdscode2, gdscode3, 
+      gdscode4, gdscode5, gdscode6, gdscode7, gdscode8, gdscode9, gdscode10, gdscode11, gdscode12, gdscode13, gdscode14, gdscode15, low_limit, 
+      high_limit, propcat, districtid, is_welcome_foreign, is_faith, censor, is_pms, keywords, simple_desc_zh, simple_desc_en, simple_desc_jp, is_expo, 
+      currencycode, air, est_online_date, use_logo, rq_book, overbooklimit, tradearea_zh, tradearea_en, tradearea_id, is_lm, contractdate, tp_fax, 
+      tp_contact_man, tp_contact_phone, simple_appr_zh,linkemail, linkman, group_code, linktel, linkfax, hotel_description_zh, 
+      create_time, update_time, auto_trust, ONLINE_STATUS)
+      select prop, orgid, prop_name_jp, prop_name_en, :HOTELNM, :ADDRESS, address1_en, address1_jp, 
+      address2_zh, address2_en, address2_jp, areaid, countryid, :CITYID, prop_typeid, zip, :ONLINESTATUS, phone, fax, timezone, checkin, late_checkin, 
+      checkout, holdtime, to_date(:OPENDATE, 'yyyy.mm.dd'), to_date(:REPAIRDATE, 'yyyy.mm.dd'), description_zh, description_en, description_jp, latitude, longitude, need_pay, :STARRATING, 
+      :DIAMONDRATING, price_high, price_low, total_rooms, total_floors, contact_name_zh, contact_name_en, contact_name_jp, contact_title_zh, contact_title_en, 
+      contact_title_jp, contact_phone, contact_email, activated_date, modify_date, modify_user, total_elevators, double_rooms, handi_rooms, king_rooms, meet_room_cap, 
+      max_prop_bednum, meeting_rooms, meet_room_area, nosmoking_rooms, twin_rooms, queen_rooms, add_extra_bed, big_rooms, :WEBSITE, is_model, fee_low, gdscode1, gdscode2, 
+      gdscode3, gdscode4, gdscode5, gdscode6, gdscode7, gdscode8, gdscode9, gdscode10, gdscode11, gdscode12, gdscode13, gdscode14, gdscode15, low_limit, high_limit, propcat, 
+      districtid, is_welcome_foreign, is_faith, censor, is_pms, keywords, :SIMPLEDESCZH, simple_desc_en, simple_desc_jp, is_expo, currencycode, air, est_online_date, use_logo, 
+      rq_book, overbooklimit, tradearea_zh, tradearea_en, tradearea_id, is_lm, contractdate, tp_fax, tp_contact_man, tp_contact_phone, :EVALUATION,  
+      :CONTACTEMAIL, :CONTACTPER, :GROUPID, :PHONE, :FAX, :DESCZH, sysdate, sysdate, :AUTOTRUST, '1' from fog_T_PROP where PROP=:HOTELID
+     ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_insert">
+    <![CDATA[  
+      insert into t_lm_b_prop
+      (prop, cityid, tradearea_id, areaid, group_code, orgid, districtid, tradearea_zh, pinyin_long, pinyin_short, prop_name_zh, keywords, website, use_logo,
+      diamond_rating, longitude, latitude, address1_zh, star_rating, description_zh, hotel_description_zh, simple_desc_zh, total_rooms, total_floors, opening_date,
+      checkout, checkin, renovated_date, low_limit, high_limit, late_checkin, simple_appr_zh, zip, fax, phone, contact_phone,
+      contact_name_zh, contact_email, linkman, linkemail, linktel, linkfax, create_time, update_time, status, type, auto_trust, ONLINE_STATUS, PROP_NAME_EN)
+      select prop, :CITYID, tradearea_id, areaid, :GROUPID, orgid, districtid, tradearea_zh, pinyin_long, pinyin_short, :HOTELNM, keywords, :WEBSITE, use_logo,
+      :DIAMONDRATING, :LONGITUDE, :LATITUDE, :ADDRESS, :STARRATING, description_zh, :DESCZH, :SIMPLEDESCZH, total_rooms, total_floors, to_date(:OPENDATE, 'yyyy.mm.dd'),
+      checkout, checkin,  to_date(:REPAIRDATE, 'yyyy.mm.dd'), low_limit, high_limit, late_checkin, :EVALUATION, zip, fax, phone, contact_phone,
+      contact_name_zh, contact_email, '', '', '', '', sysdate, sysdate, :FOGSTATUS, type, :AUTOTRUST, :ONLINESTATUS, :HOTELNMEN
+      from fog_T_PROP where PROP=:HOTELID
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_balancerom_roomlist">
+    <![CDATA[  
+      select distinct rate_code, room_type_code
+      from t_lm_accounting
+      where hotel_id=:HOTELID
+      AND ((:ROOMCD IS NULL) OR (room_type_code=:ROOMCD))
+      AND ((:STARTDT IS NULL) OR (TO_DATE(:STARTDT, 'yyyy-mm-dd') <= effect_date))
+      AND ((:ENDDT IS NULL) OR (TO_DATE(:ENDDT, 'yyyy-mm-dd') >= effect_date))
+      order by RATE_CODE asc, room_type_code asc
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_balancerom_select">
+    <![CDATA[  
+      select id, TO_CHAR(effect_date, 'yyyy-mm-dd') AS EFFECTDATE, hotel_id, room_type_code, rate_code, commision_mode, commision 
+      from t_lm_accounting
+      where hotel_id=:HOTELID
+      AND ((:ROOMCD IS NULL) OR (room_type_code=:ROOMCD))
+       AND ((:STARTDT IS NULL) OR (TO_DATE(:STARTDT, 'yyyy-mm-dd') <= effect_date))
+      AND ((:ENDDT IS NULL) OR (TO_DATE(:ENDDT, 'yyyy-mm-dd') >= effect_date))
+      order by effect_date asc, RATE_CODE asc, room_type_code asc
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_balanceroom_roomnm">
+    <![CDATA[  
+      select t.ROOM_NAME AS name_zh from t_room t
+      where t.HOTEL_ID = :HOTELID
+      AND t.ROOM_CODE = :ROOMCD
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_his_plan_list">
+    <![CDATA[  
+      select t.id,ht.operator,to_char(ht.ope_time,'yyyy-mm-dd hh24:mi:ss') AS opetime, 
+      case when ht.order_num is not null or ht.order_num <> '' then ht.ope_memo || '-' || ht.order_num else ht.ope_memo end opememo,
+      ht.ope_msg
+      from t_lm_plan t 
+      inner join t_his_plan ht on t.id = ht.plan_id
+      and t.effect_date=to_date(:EffectDate,'yyyy-mm-dd')
+      and t.hotel_id=:HotelID 
+      and t.room_type_code=:RoomCode 
+      and t.rate_code=:PriceCode
+      order by ht.ope_time desc
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hvp_area_select">
+    <![CDATA[  
+      select '['||t_tag_info.id||']'||t_tag_info.tag_name AS REVALUE_ALL  from t_fx_hvp_area,t_tag_info 
+      where t_tag_info.id = t_fx_hvp_area.area_id
+      and t_fx_hvp_area.hvp_hotel_id=:HVPHOTELID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_fog_low_limit_select">
+    <![CDATA[  
+      select LOW_LIMIT from fog_t_prop t where t.prop=:HOTELID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_supinsertcheck">
+    <![CDATA[  
+       select t.prop,t.prop_name_zh,t.address1_zh,t.linktel,t.linkfax,t.longitude,t.latitude 
+        from t_lm_b_prop t
+        where
+        t.prop_name_zh = :HOTELNM OR
+        t.address1_zh = :ADDRESS OR
+        :TEL <> :TEL OR
+        :FAX <> :FAX OR
+        (t.longitude = :LONGITUDE AND t.latitude = :LATITUDE)
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelinfo_supcitycheck">
+    <![CDATA[  
+       select city_id,name_cn from t_lm_b_city t where t.city_id=:CITYID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_suphotelinfo_insert">
+    <![CDATA[
+       insert into t_lm_b_prop
+        (prop, cityid, pinyin_long, pinyin_short, 
+        prop_name_zh, use_logo, diamond_rating, longitude, latitude, address1_zh, star_rating, 
+        simple_desc_zh, total_rooms, opening_date, renovated_date, low_limit, 
+        zip, fax, phone, contact_phone, contact_name_zh, contact_email, create_time, update_time, 
+        status, type, auto_trust, online_status, prop_name_en, HOTEL_DESCRIPTION_ZH
+        )
+      values
+        (:HOTELID, :CITYID, :HOTELPN, 
+        :HOTELJP, :HOTELNM, 0, :DIAMONDRATING, :LONGITUDE, :LATITUDE, 
+        :ADDRESS, :STARRATING, :SIMPLEDESCZH, TO_NUMBER(:TOTALROOMS), to_date(:OPENDATE,'yyyy-mm-dd'), 
+        to_date(:REPAIRDATE,'yyyy-mm-dd'), TO_NUMBER(:PRICELOW), :ZIP, :FAX, 
+        :PHONE, :CONTACTPHONE, :CONTACTPER, :CONTACTEMAIL, sysdate, 
+        sysdate, 'new', 0, '1', :STATUSID, :HOTELEN, :DESCZH)
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_createhotelinfo_update">
+    <![CDATA[
+      update t_lm_b_prop set
+       cityid = :CITYID ,
+       pinyin_long = :HOTELPN ,
+       pinyin_short =  :HOTELJP,
+       prop_name_zh =  :HOTELNM,
+       diamond_rating = :DIAMONDRATING ,
+       longitude = :LONGITUDE ,
+       latitude = :LATITUDE ,
+       address1_zh = :ADDRESS ,
+       star_rating = :STARRATING ,
+       simple_desc_zh = :SIMPLEDESCZH ,
+       total_rooms =  TO_NUMBER(:TOTALROOMS),
+       opening_date = to_date(:OPENDATE,'yyyy-mm-dd') ,
+       renovated_date = to_date(:REPAIRDATE, 'yyyy-mm-dd') ,
+       low_limit = TO_NUMBER(:PRICELOW) ,
+       zip = :ZIP,
+       fax = :FAX,
+       phone = :PHONE,
+       contact_phone = :CONTACTPHONE ,
+       contact_name_zh = :CONTACTPER ,
+       contact_email = :CONTACTEMAIL ,
+       update_time = sysdate ,
+       status = :FOGSTATUS,
+       online_status = :STATUSID ,
+       prop_name_en = :HOTELEN,
+       HOTEL_DESCRIPTION_ZH = :DESCZH,
+       SIMPLE_APPR_ZH = :EVALUATION,
+       REMARK = :HOTELREMARK,
+       WEBSITE = :WEBSITE,
+       LONGITUDE_BAIDU = :BDLONGITUDE,
+       LATITUDE_BAIDU = :BDLATITUDE,
+       GROUP_CODE=:GROUPCODE,
+       KEYWORDS=:KEYWORDS,
+       ISMYHOTEL=:ISMYHOTEL
+      where prop = :HOTELID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_createhotelinfo_insert">
+    <![CDATA[
+       insert into t_lm_b_prop
+        (prop, cityid, group_code, pinyin_long, pinyin_short, 
+        prop_name_zh, use_logo, diamond_rating, longitude, latitude, address1_zh, star_rating, 
+        simple_desc_zh, total_rooms, opening_date, renovated_date, low_limit, 
+        zip, fax, phone, contact_phone, contact_name_zh, contact_email, create_time, update_time, 
+        status, type, auto_trust, online_status, prop_name_en, HOTEL_DESCRIPTION_ZH, SIMPLE_APPR_ZH,REMARK,WEBSITE, ISMYHOTEL,LONGITUDE_BAIDU,LATITUDE_BAIDU,KEYWORDS
+        )
+      values
+        (:HOTELID, :CITYID, :HOTELGROUP, :HOTELPN, 
+        :HOTELJP, :HOTELNM, 0, :DIAMONDRATING, :LONGITUDE, :LATITUDE, 
+        :ADDRESS, :STARRATING, :SIMPLEDESCZH, TO_NUMBER(:TOTALROOMS), to_date(:OPENDATE,'yyyy-mm-dd'), 
+        to_date(:REPAIRDATE,'yyyy-mm-dd'), TO_NUMBER(:PRICELOW), :ZIP, :FAX, 
+        :PHONE, :CONTACTPHONE, :CONTACTPER, :CONTACTEMAIL, sysdate, 
+        sysdate, 'active', 0, '1', :STATUSID, :HOTELEN, :DESCZH, :EVALUATION,:HOTELREMARK, :WEBSITE, :ISMYHOTEL, :BDLONGITUDE, :BDLATITUDE, :KEYWORDS)
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_suphotelareainfo_insert">
+    <![CDATA[
+      insert into t_fx_hvp_area
+      (id, hvp_hotel_id, FX_HOTEL_ID, source, area_id)
+      values
+      (t_fx_hvp_area_seq.nextval, :HOTELID, :HOTELID, 'HVP', :AREAID)
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_list_select">
+    <![CDATA[
+      select hotel_id, room_code AS ROOMCD, '[' || room_code || ']' || room_name AS ROOMNM, room_desc, bed_type, 
+      max_guest, is_window, guest_type, floor, network,
+      (CASE network  WHEN '无' THEN '无宽带' WHEN '有线' THEN '有线' WHEN 'wifi' THEN 'WIFI' ELSE '' END) AS WLAN, room_area, is_nosmoke, status,
+      (CASE status  WHEN '0' THEN '下线' WHEN '1' THEN '上线' ELSE '' END) AS ROOMDIS, create_time, update_time,
+      TO_CHAR(update_time,'yyyy-mm-dd hh24:mi:ss') AS UPDATETIME, create_user, update_user AS UPDATEUSER from t_room
+      where hotel_id=:HOTELID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_inser_check">
+    <![CDATA[
+      select hotel_id, tr.room_code AS ROOMCD, tr.room_name AS ROOMNM, tr.room_desc, tr.bed_type, tr.
+      max_guest, tr.is_window, tr.guest_type, tr.floor, tr.network,
+      (CASE tr.network  WHEN '无' THEN '无宽带' WHEN '有线' THEN '有线' WHEN 'wifi' THEN 'WIFI' ELSE '' END) AS WLAN, tr.room_area, tr.is_nosmoke, tr.status,
+      (CASE tr.status  WHEN '0' THEN '下线' WHEN '1' THEN '上线' ELSE '' END) AS ROOMDIS, tr.create_time, tr.update_time,
+      TO_CHAR(tr.update_time,'yyyy-mm-dd hh24:mi:ss') AS UPDATETIME, tr.create_user, tr.update_user AS UPDATEUSER,
+      '['||trb.bed_code||']'||trb.bed_name AS BEDTYPE
+      from t_room tr
+      left join t_room_bed trb on tr.bed_type=trb.bed_code
+      where tr.hotel_id=:HOTELID AND tr.room_code=:ROOMCD
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_bed_save_check">
+    <![CDATA[
+      select trb.bed_code, trb.bed_name
+      from t_room_bed trb
+      where trb.bed_code=:BEDCD
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_list_insert">
+    <![CDATA[
+      insert into t_room
+        (hotel_id, room_code, room_name, bed_type, max_guest, is_window, guest_type, network, room_area, is_nosmoke, status, create_time, update_time, create_user, update_user)
+      values
+        (:HOTELID, :ROOMCODE, :ROOMNAME, :BEDTYPE, :MAXGUEST, :ISWINDOW, :GUESTTYPE, :RNETWORK, :ROOMAREA, :ISNOSMOKE, :RSTATUS, sysdate, sysdate, :CREATEUSER, :CREATEUSER)
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_list_update">
+    <![CDATA[
+    update t_room
+    set room_name=:ROOMNAME,
+        bed_type=:BEDTYPE,
+        max_guest=:MAXGUEST,
+        is_window=:ISWINDOW,
+        guest_type=:GUESTTYPE,
+        network=:RNETWORK,
+        room_area=:ROOMAREA,
+        is_nosmoke=:ISNOSMOKE,
+        status=:RSTATUS,
+        update_time=sysdate,
+        update_user = :CREATEUSER
+    where hotel_id=:HOTELID and room_code=:ROOMCODE
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_room_bed_select">
+    <![CDATA[
+      select bed_code AS BEDCD, bed_name AS BEDNM, bed_tag, '' AS BEDTG, status, create_time, update_time, creator, modifier 
+      from t_room_bed
+      where 
+      (:KEYWORD IS NULL) OR (bed_code LIKE '%'||:KEYWORD||'%') OR (bed_name LIKE '%'||:KEYWORD||'%')
+      order by create_time desc
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_room_bed_detail">
+    <![CDATA[
+      select bed_code AS BEDCD, bed_name AS BEDNM, bed_tag AS BEDTG, status, create_time, update_time, creator, modifier 
+      from t_room_bed
+      where 
+      bed_code = :BEDCD
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_bed_isert">
+    <![CDATA[
+     insert into t_room_bed
+      (id, bed_code, bed_name, bed_tag, status, create_time, update_time, creator, modifier)
+    values
+      (t_room_bed_seq.nextval, :BEDCD, :BEDNM, :BEDTG, '1', sysdate, sysdate, :CREATEUSER, :CREATEUSER)
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_bed_update">
+    <![CDATA[
+     update t_room_bed
+   set 
+       bed_name = :BEDNM, 
+       bed_tag = :BEDTG,
+       update_time = sysdate,
+       modifier = :CREATEUSER
+  where 
+  bed_code = :BEDCD
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_bed_inser_check">
+    <![CDATA[
+      select bed_code AS BEDCD, bed_name AS BEDNM, bed_tag AS BEDTG, status, create_time, update_time, creator, modifier 
+      from t_room_bed
+      where 
+      bed_code = :BEDCD OR bed_name = :BEDNM
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_price_code_list_select">
+    <![CDATA[
+      select hotel_id, 
+      price_code AS PRCD, 
+      price_name, 
+      create_time, 
+      TO_CHAR(update_time,'yyyy-mm-dd hh24:mi:ss') AS UPDATETIME, 
+      creator, 
+      status AS STAT, 
+      (CASE status  WHEN '0' THEN '下线' WHEN '1' THEN '上线' ELSE '' END) AS PRROOMDIS,
+      modifier AS UPDATEUSER
+      from t_price_code
+      where hotel_id=:HOTELID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_price_room_list">
+    <![CDATA[
+      select hotel_id, price_code, room_code, 
+      status, create_time, 
+      update_time, creator, modifier 
+      from t_price_code_room
+      where 
+      hotel_id=:HOTELID and price_code=:PRICECD and status='1'
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_fvphotelbussinfo_insert">
+    <![CDATA[
+      insert into t_sup_map_hotel
+        (APP_HOTEL_ID, SUP_HOTEL_ID, source, in_use, CREATE_TIME, UPDATE_TIME)
+      values
+        (:HOTELID, :HOTELID, 'HVP', '1', sysdate, sysdate)
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_balancerom_priceroomlist">
+    <![CDATA[
+      select pcr.room_code AS ROOMCODE, tr.room_name AS ROOMNM from t_price_code_room pcr 
+      left join t_room tr on pcr.hotel_id = tr.hotel_id and pcr.room_code = tr.room_code and tr.status='1'
+      where pcr.hotel_id = :HOTELID AND pcr.price_code = :PRICECD and pcr.status='1'
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_balancerom_priceroomlist_all">
+    <![CDATA[
+      select pcr.room_code AS ROOMCODE, '['||pcr.room_code||']'||tr.room_name AS ROOMNM from t_price_code_room pcr 
+      left join t_room tr on pcr.hotel_id = tr.hotel_id and pcr.room_code = tr.room_code and tr.status='1'
+      where pcr.hotel_id = :HOTELID AND pcr.price_code = :PRICECD and pcr.status='1'
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_balancerom_priceroomlist_byhotelid">
+    <![CDATA[
+      select pcr.room_code AS ROOMCODE, tr.room_name AS ROOMNM, pcr.price_code as PRICECODE from t_price_code_room pcr 
+      left join t_room tr on pcr.hotel_id = tr.hotel_id and pcr.room_code = tr.room_code 
+      where pcr.hotel_id = :HOTELID and pcr.status='1' and tr.status='1'
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_balancerom_byhotelandpricecode">
+    <![CDATA[
+      select pcr.room_code AS ROOMCODE, tr.room_name AS ROOMNM, pcr.price_code as PRICECODE from t_price_code_room pcr 
+      left join t_room tr on pcr.hotel_id = tr.hotel_id and pcr.room_code = tr.room_code 
+      where pcr.hotel_id = :HOTELID and pcr.status='1' and tr.status='1' and pcr.price_code=:PRICECODE
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_balanceroom_proomlist">
+    <![CDATA[
+      select room_code AS ROOMCODE, room_name AS ROOMNM
+      from t_room
+      where hotel_id = :HOTELID and status='1'
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable_back">
+    <![CDATA[
+      select distinct cityid,prop,prop_name_zh,linkman,linktel,linkemail,sales_account from(
+        select  bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from 
+        t_lm_consult_room t 
+        left join t_lm_b_prop bp on t.hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        where t.rtype='2' and t.status='1' and t.OTYPE='0'
+        and t.sales_account =:SALES
+        union all
+        select
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select t.id, t.rtype, t.city_id
+        from 
+        t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+        and t.sales_account = :SALES
+        ) crt
+        left join t_lm_b_prop bp on bp.cityid=crt.city_id
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1'
+        union all
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select  t.id, t.rtype, t.city_id, t.tag_id
+        from 
+        t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+        and t.sales_account = :SALES
+        ) ctd
+        left join t_tag_info tif on tif.id = ctd.tag_id
+        left join t_fx_hvp_area fha on tif.id = fha.area_id
+        inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1'
+    ) 
+    ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable_back_1">
+    <![CDATA[
+      select count(t.fog_order_num) as ordercount,p.cityid,p.prop,p.prop_name_zh,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan from(
+      select distinct cityid,prop,prop_name_zh,linkman,linktel,linkemail,sales_account,(case when hotel_id is null  then '无' when hotel_id='' then '无' else '有' end ) as isplan from(
+        select  bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from 
+        t_lm_consult_room t 
+        left join t_lm_b_prop bp on t.hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+        and t.rtype='2' and t.status='1' and t.OTYPE='0'
+        and t.sales_account =:SALES
+        union all
+        select
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select t.id, t.rtype, t.city_id
+        from 
+        t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+        and t.sales_account =:SALES
+        ) crt
+        left join t_lm_b_prop bp on bp.cityid=crt.city_id
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+        and hex.hotel_id = bp.prop and hex.status='1'
+        union all
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select  t.id, t.rtype, t.city_id, t.tag_id
+        from 
+        t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+        and t.sales_account = :SALES
+        ) ctd
+        left join t_tag_info tif on tif.id = ctd.tag_id
+        left join t_fx_hvp_area fha on tif.id = fha.area_id
+        inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+        and bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+        and hex.hotel_id = bp.prop and hex.status='1'
+    ) dt
+    left join (select distinct hotel_id from t_lm_plan where effect_date=trunc(sysdate)) lp on dt.prop = lp.hotel_id
+    where lp.hotel_id is not null 
+    ) p
+    left join t_lm_order t on p.prop = t.hotel_id 
+    and t.PRICE_CODE='LMBAR2' and t.FOG_RESVSTATUS='1' and t.create_time between (sysdate-30) and sysdate
+    group by cityid,prop,prop_name_zh,linkman,linktel,linkemail,sales_account,isplan
+    ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable_back_2">
+    <![CDATA[
+       select count(t.fog_order_num) as ordercount,p.cityid,p.prop,p.prop_name_zh,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,p.status,p.effect_date,p.Room_type_code,p.MODIFIER from(
+      select distinct cityid,prop,prop_name_zh,linkman,linktel,linkemail,sales_account,(case when hotel_id is null  then '无' when hotel_id='' then '无' else '有' end ) as isplan,status,effect_date,Room_type_code,MODIFIER from(
+        select  bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from 
+        t_lm_consult_room t 
+        left join t_lm_b_prop bp on t.hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+        and t.rtype='2' and t.status='1' and t.OTYPE='0'
+        and t.sales_account =:SALES
+        union all
+        select
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select t.id, t.rtype, t.city_id
+        from 
+        t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+        and t.sales_account =:SALES
+        ) crt
+        left join t_lm_b_prop bp on bp.cityid=crt.city_id
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+        and hex.hotel_id = bp.prop and hex.status='1'
+        union all
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select  t.id, t.rtype, t.city_id, t.tag_id
+        from 
+        t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+        and t.sales_account = :SALES
+        ) ctd
+        left join t_tag_info tif on tif.id = ctd.tag_id
+        left join t_fx_hvp_area fha on tif.id = fha.area_id
+        inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+        and bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+        and hex.hotel_id = bp.prop and hex.status='1' 
+    ) dt
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=trunc(sysdate)) lp on dt.prop = lp.hotel_id
+    ) p
+    left join t_lm_order t on p.prop = t.hotel_id 
+    and t.PRICE_CODE='LMBAR2' and t.FOG_RESVSTATUS='1' and t.create_time between (sysdate-30) and sysdate 
+    group by cityid,prop,prop_name_zh,linkman,linktel,linkemail,sales_account,isplan,status,effect_date,p.Room_type_code,MODIFIER
+    order by prop desc
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable">
+    <![CDATA[
+    select count(t.fog_order_num) as ordercount,p.cityid,bc.name_cn,p.prop,p.prop_name_zh,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,p.status,p.effect_date,p.Room_type_code,p.MODIFIER,ex.linkman as EXLinkMan,ex.linktel as EXlinkTel,ex.remark as EXRemark,ex.ex_mode as EXMODE,'0' as HasBeenToHotels,'' as Color from(
+      select distinct cityid,prop,prop_name_zh,linkman,linktel,linkemail,sales_account,(case when hotel_id is null  then '无' when hotel_id='' then '无' else '有' end ) as isplan,status,effect_date,Room_type_code,MODIFIER from(
+        select  bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from 
+        t_lm_consult_room t 
+        inner join t_lm_b_prop bp on t.hotel_id=bp.prop and bp.ismyhotel=1 and t.rtype='2' and t.status='1' and t.OTYPE='0'
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+        and lower(t.sales_account) =lower(:SALES)
+        union all
+        select
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select t.id, t.rtype, t.city_id
+        from 
+        t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+        and lower(t.sales_account) =lower(:SALES)
+        ) crt
+        inner join t_lm_b_prop bp on bp.cityid=crt.city_id and bp.ismyhotel=1
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id  and hex.hotel_id = bp.prop and hex.status='1' 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'        
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+        union all
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select  t.id, t.rtype, t.city_id, t.tag_id
+        from 
+        t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+        and lower(t.sales_account) =lower(:SALES)
+        ) ctd
+        left join t_tag_info tif on tif.id = ctd.tag_id
+        left join t_fx_hvp_area fha on tif.id = fha.area_id
+        inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop and bp.ismyhotel=1
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = bp.prop and hex.status='1' 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'
+        union all
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select  t.id, t.rtype, t.city_id, t.SALES_ID
+        from 
+        t_lm_consult_room t where t.rtype='3' and t.status='1' and t.OTYPE='0'
+        and lower(t.sales_account) =lower(:SALES)
+        ) ctd
+        inner join t_lm_sales_history sh on sh.sales_account=ctd.SALES_ID and sh.status='1'
+        left join t_lm_b_prop bp on bp.prop=sh.hotel_id and bp.ismyhotel=1
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = bp.prop and hex.status='1' 
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'       
+    ) dt
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=trunc(sysdate)) lp on dt.prop = lp.hotel_id
+    ) p
+    left join t_lm_order t on p.prop = t.hotel_id 
+    and t.PRICE_CODE='LMBAR2' and t.FOG_RESVSTATUS='1' and t.create_time between (sysdate-30) and sysdate 
+    left join t_lm_hotel_ex ex on  p.prop = ex.hotel_id and type=1  
+    left join t_lm_b_city bc on bc.city_id = p.cityid
+    where ((:EXTIME IS NULL) OR (EX_time=:EXTIME)) 
+    group by p.cityid,p.prop,bc.name_cn,p.prop_name_zh,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,p.status,p.effect_date,p.Room_type_code,p.MODIFIER,ex.linkman,ex.linktel,ex.remark,ex.ex_mode
+    order by p.prop desc
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable_byall">
+    <![CDATA[
+    select count(t.fog_order_num) as ordercount,p.cityid,p.prop,p.prop_name_zh,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,p.status,p.effect_date,p.Room_type_code,p.MODIFIER from(
+      select distinct cityid,prop,prop_name_zh,linkman,linktel,linkemail,sales_account,(case when hotel_id is null  then '无' when hotel_id='' then '无' else '有' end ) as isplan,status,effect_date,Room_type_code,MODIFIER from(
+        select  bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from 
+        t_lm_consult_room t 
+        inner join t_lm_b_prop bp on t.hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and t.rtype='2' and t.status='1' and t.OTYPE='0'
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'
+        union all
+        select
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select t.id, t.rtype, t.city_id
+        from 
+        t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+        ) crt
+        inner join t_lm_b_prop bp on bp.cityid=crt.city_id
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1' 
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+        union all
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from
+        (
+        select  t.id, t.rtype, t.city_id, t.tag_id
+        from 
+        t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+        ) ctd
+        left join t_hvp_tag_info tif on tif.id = ctd.tag_id
+        left join t_fx_hvp_area fha on tif.id = fha.area_id
+        inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1' 
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+    ) dt
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=trunc(sysdate)) lp on dt.prop = lp.hotel_id
+    ) p
+    left join t_lm_order t on p.prop = t.hotel_id 
+    and t.PRICE_CODE='LMBAR2' and t.FOG_RESVSTATUS='1' and t.create_time between (sysdate-30) and sysdate 
+    group by cityid,prop,prop_name_zh,linkman,linktel,linkemail,sales_account,isplan,status,effect_date,p.Room_type_code,MODIFIER
+    order by prop desc
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable_byhotel_back">
+    <![CDATA[
+       select distinct cityid,prop,prop_name_zh,tradearea_id,linkman,linktel,linkemail,sales_account from(
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.tradearea_id,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account
+        from t_lm_b_prop bp
+        left join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop
+        left join t_tag_info tif on tif.id = fha.area_id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+    ) where  ((:HOTELID IS NULL) OR (prop=:HOTELID)) AND ((:CITYID IS NULL) OR (cityid=:CITYID)) AND ((:TRADEAREAID IS NULL) OR (tradearea_id=:TRADEAREAID))
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable_byhotel_back1">
+    <![CDATA[  
+    select count(t.fog_order_num) as ordercount,p.cityid,p.prop,p.prop_name_zh,p.tradearea_id,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan from(
+    select distinct cityid,prop,prop_name_zh,tradearea_id,linkman,linktel,linkemail,sales_account,(case when hotel_id is null  then '无' when hotel_id='' then '无' else '有' end ) as isplan  from(
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,bp.tradearea_id,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account,lp.hotel_id
+        from t_lm_b_prop bp
+        left join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop
+        left join t_tag_info tif on tif.id = fha.area_id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+        left join (select distinct hotel_id from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop = lp.hotel_id
+        where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  and lp.hotel_id is not null and bp.ismyhotel=1
+    )where ((:HOTELID IS NULL) OR (prop=:HOTELID)) AND ((:CITYID IS NULL) OR (cityid=:CITYID)) AND ((:TRADEAREAID IS NULL) OR (tradearea_id=:TRADEAREAID)) ) p
+    left join t_lm_order t on p.prop = t.hotel_id 
+    and t.PRICE_CODE='LMBAR2' and t.FOG_RESVSTATUS='1' and t.create_time between (sysdate-30) and sysdate
+    group by cityid,prop,prop_name_zh,tradearea_id,linkman,linktel,linkemail,sales_account,isplan
+    
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable_byhotel_back2">
+    <![CDATA[  
+    select count(t.fog_order_num) as ordercount,p.cityid,p.prop,p.prop_name_zh,p.tradearea_id,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,ex.linkman as EXLinkMan,ex.linktel as EXlinkTel,ex.remark as EXRemark,p.prop_name_zh as BackPropName  from(
+    select distinct cityid,prop,prop_name_zh,tradearea_id,linkman,linktel,linkemail,sales_account,(case when hotel_id is null  then '无' when hotel_id='' then '无' else '有' end ) as isplan  from(
+      select 
+       bp.cityid,bp.prop,bp.prop_name_zh,bp.tradearea_id,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account,lp.hotel_id
+      from t_lm_b_prop bp
+      left join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop
+      left join t_tag_info tif on tif.id = fha.area_id 
+      left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+      left join (select distinct hotel_id from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop = lp.hotel_id
+      where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  and lp.hotel_id is not null and bp.ismyhotel=1
+      )where ((:HOTELID IS NULL) OR (prop=:HOTELID)) AND ((:CITYID IS NULL) OR (cityid=:CITYID)) AND ((:TRADEAREAID IS NULL) OR (tradearea_id=:TRADEAREAID))
+       and  (:NOTPROP is null OR (PROP not in (SELECT REGEXP_SUBSTR (:NOTPROP, '[^,]+', 1,rownum)
+          FROM DUAL
+          CONNECT BY ROWNUM <=
+          LENGTH (:NOTPROP) - LENGTH (REPLACE (:NOTPROP, ',', '')))))
+     ) p
+    left join t_lm_order t on p.prop = t.hotel_id 
+    and t.PRICE_CODE='LMBAR2' and t.FOG_RESVSTATUS='1' and t.create_time between (sysdate-30) and sysdate
+    left join t_lm_hotel_ex ex on  p.prop = ex.hotel_id and type=1  
+    where ((:EXTIME IS NULL) OR (EX_time=:EXTIME)) 
+    group by p.cityid,p.prop,p.prop_name_zh,p.tradearea_id,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,ex.linkman,ex.linktel,ex.remark 
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable_byprop">
+    <![CDATA[  
+    select count(t.fog_order_num) as ordercount,p.cityid,bc.name_cn,p.prop,p.prop_name_zh,p.tradearea_id,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,ex.linkman as EXLinkMan,ex.linktel as EXlinkTel,ex.remark as EXRemark,ex.ex_mode as EXMODE,p.prop_name_zh as BackPropName,'0' as HasBeenToHotels,'' as Color  from(
+    select distinct cityid,prop,prop_name_zh,tradearea_id,linkman,linktel,linkemail,sales_account,(case when hotel_id is null  then '无' when hotel_id='' then '无' else '有' end ) as isplan  from(
+      select 
+       bp.cityid,bp.prop,bp.prop_name_zh,bp.tradearea_id,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account,lp.hotel_id
+      from t_lm_b_prop bp
+      left join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop
+      left join t_tag_info tif on tif.id = fha.area_id 
+      left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+      left join (select distinct hotel_id from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop = lp.hotel_id
+      where lp.hotel_id is not null 
+      )where ((:HOTELID IS NULL) OR (prop=:HOTELID))
+     ) p
+    left join t_lm_order t on p.prop = t.hotel_id 
+    and t.PRICE_CODE='LMBAR2' and t.FOG_RESVSTATUS='1' and t.create_time between (sysdate-30) and sysdate
+    left join t_lm_hotel_ex ex on  p.prop = ex.hotel_id and type=1  
+    left join t_lm_b_city bc on bc.city_id = p.cityid
+    where ((:EXTIME IS NULL) OR (EX_time=:EXTIME)) 
+    group by p.cityid,bc.name_cn,p.prop,p.prop_name_zh,p.tradearea_id,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,ex.linkman,ex.linktel,ex.remark,ex.ex_mode
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelconsulting_roomtable_byhotel">
+    <![CDATA[  
+    select count(t.fog_order_num) as ordercount,p.cityid,bc.name_cn,p.prop,p.prop_name_zh,p.tradearea_id,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,ex.linkman as EXLinkMan,ex.linktel as EXlinkTel,ex.remark as EXRemark,ex.ex_mode as EXMODE,p.prop_name_zh as BackPropName,'0' as HasBeenToHotels,'' as Color  from(
+    select distinct cityid,prop,prop_name_zh,tradearea_id,linkman,linktel,linkemail,sales_account,(case when hotel_id is null  then '无' when hotel_id='' then '无' else '有' end ) as isplan  from(
+      select 
+       bp.cityid,bp.prop,bp.prop_name_zh,bp.tradearea_id,bp.linkman,bp.linktel,bp.linkemail,sh.sales_account,lp.hotel_id
+      from t_lm_b_prop bp
+      left join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop
+      left join t_tag_info tif on tif.id = fha.area_id 
+      left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+      left join (select distinct hotel_id from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop = lp.hotel_id
+      where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  and lp.hotel_id is not null
+      )where ((:HOTELID IS NULL) OR (prop=:HOTELID)) AND ((:CITYID IS NULL) OR (cityid=:CITYID)) AND ((:TRADEAREAID IS NULL) OR (tradearea_id=:TRADEAREAID))
+     ) p
+    left join t_lm_order t on p.prop = t.hotel_id 
+    and t.PRICE_CODE='LMBAR2' and t.FOG_RESVSTATUS='1' and t.create_time between (sysdate-30) and sysdate
+    left join t_lm_hotel_ex ex on  p.prop = ex.hotel_id and type=1  
+     left join t_lm_b_city bc on bc.city_id = p.cityid
+    where ((:EXTIME IS NULL) OR (EX_time=:EXTIME)) 
+    group by p.cityid,bc.name_cn,p.prop,p.prop_name_zh,p.tradearea_id,p.linkman,p.linktel,p.linkemail,p.sales_account,p.isplan,ex.linkman,ex.linktel,ex.remark,ex.ex_mode
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="GetHotelPlanInfoList">
+    <![CDATA[
+      select bp.prop AS HOTELID,'['||bp.prop||']'||bp.prop_name_zh AS HOTELNM,'' AS STAR,
+      bp.star_rating,bp.diamond_rating,'['||lp.room_type_code||']'||lp.room_type_name AS ROOMNM,
+      ti.tag_name AS AREANM,lp.effect_hour,'' AS EFFDT,lp.two_price AS PRICE,lp.room_num AS ROOMNU,
+      bp.linkman||' - '||bp.linktel AS LINK,sh.sales_account AS SALES,'' AS ROOMCL,'' AS REMARK
+      from 
+      t_lm_b_prop bp
+      inner join t_lm_plan lp on bp.prop=lp.hotel_id
+      left join t_fx_hvp_area ha on bp.prop = ha.hvp_hotel_id
+      left join t_tag_info ti on ha.area_id=ti.id
+      left join t_lm_sales_history sh on bp.prop = sh.hotel_id and sh.status='1'
+      where 
+      bp.status='active' and 
+      bp.online_status='1' and 
+      lp.status='1' and 
+      lp.room_num > 0 and
+      lp.effect_date=to_date(:EffectDate, 'yyyy-mm-dd') AND
+      (:CityID IS NULL OR bp.cityid = :CityID) AND
+      (:AreaID IS NULL OR ti.id = :AreaID) AND
+      (:HotelID IS NULL OR bp.prop = :HotelID)
+      order by bp.cityid asc
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="GetHotelPlanInfoCount">
+    <![CDATA[
+       select count(bp.prop)
+      from 
+      t_lm_b_prop bp
+      inner join t_lm_plan lp on bp.prop=lp.hotel_id
+      left join t_fx_hvp_area ha on bp.prop = ha.hvp_hotel_id
+      left join t_tag_info ti on ha.area_id=ti.id
+      left join t_lm_sales_history sh on bp.prop = sh.hotel_id and sh.status='1'
+      where 
+      bp.status='active' and 
+      bp.online_status='1' and 
+      lp.status='1' and 
+      lp.room_num > 0 and
+      lp.effect_date=to_date(:EffectDate, 'yyyy-mm-dd') AND
+      (:CityID IS NULL OR bp.cityid = :CityID) AND
+      (:AreaID IS NULL OR ti.id = :AreaID) AND
+      (:HotelID IS NULL OR bp.prop = :HotelID)
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="CountHotelOnlineLb">
+    <![CDATA[
+      select bt.ALBP,dt.OLBP,ct.RFBP
+      from
+      (
+      select Count(bp.prop) AS ALBP from t_lm_b_prop bp
+      left join t_fx_hvp_area ha on bp.prop = ha.hvp_hotel_id
+      left join t_tag_info ti on ha.area_id=ti.id
+      where 
+      (:CityID IS NULL OR bp.cityid = :CityID) AND
+      (:AreaID IS NULL OR ti.id = :AreaID) AND
+      (:HotelID IS NULL OR bp.prop = :HotelID)
+      )
+      bt
+      ,
+      (
+      select count(distinct bp.prop) AS OLBP
+      from 
+      t_lm_b_prop bp
+      inner join t_lm_plan lp on bp.prop=lp.hotel_id
+      left join t_fx_hvp_area ha on bp.prop = ha.hvp_hotel_id
+      left join t_tag_info ti on ha.area_id=ti.id
+      where 
+      bp.status='active' and 
+      bp.online_status='1' and 
+      lp.status='1' AND
+      lp.effect_date=to_date(:EffectDate, 'yyyy-mm-dd') AND
+      (:CityID IS NULL OR bp.cityid = :CityID) AND
+      (:AreaID IS NULL OR ti.id = :AreaID) AND
+      (:HotelID IS NULL OR bp.prop = :HotelID)
+      ) dt
+      ,
+      (
+      select count(distinct bp.prop)  AS RFBP
+      from 
+      t_lm_b_prop bp
+      inner join t_lm_plan lp on bp.prop=lp.hotel_id
+       left join t_fx_hvp_area ha on bp.prop = ha.hvp_hotel_id
+      left join t_tag_info ti on ha.area_id=ti.id
+      where 
+      bp.status='active' and 
+      bp.online_status='1' and 
+      lp.status='1' AND
+      (lp.room_num = 0 or IS_ROOMFUL=1) AND
+      lp.effect_date=to_date(:EffectDate, 'yyyy-mm-dd') AND
+      (:CityID IS NULL OR bp.cityid = :CityID) AND
+      (:AreaID IS NULL OR ti.id = :AreaID) AND
+      (:HotelID IS NULL OR bp.prop = :HotelID)
+      ) ct
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_ex_type_byhotelid">
+    <![CDATA[  
+    select * from t_lm_hotel_ex where hotel_id=:HOTELID and TYPE='3'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelorder_approvetable">
+    <![CDATA[
+    select count(t.fog_order_num) as ordercount,p.cityid,ct.name_cn AS CITYNM,p.prop,p.prop_name_zh,p.sales_account from(
+      select distinct cityid,prop,prop_name_zh,sales_account from(
+        select bp.cityid,bp.prop,bp.prop_name_zh,sh.sales_account
+        from 
+        t_lm_consult_room t 
+        inner join t_lm_b_prop bp on t.hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and t.rtype='2' and t.status='1' and t.OTYPE='1'
+        where NLS_LOWER(t.sales_account) =NLS_LOWER(:SALES)
+        union all
+        select
+         bp.cityid,bp.prop,bp.prop_name_zh,sh.sales_account
+        from
+        (
+        select t.id, t.rtype, t.city_id
+        from 
+        t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='1'
+        and NLS_LOWER(t.sales_account) =NLS_LOWER(:SALES)
+        ) crt
+        inner join t_lm_b_prop bp on bp.cityid=crt.city_id
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1' 
+        union all
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,sh.sales_account
+        from
+        (
+        select  t.id, t.rtype, t.city_id, t.tag_id
+        from 
+        t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='1'
+        and NLS_LOWER(t.sales_account) =NLS_LOWER(:SALES)
+        ) ctd
+        left join t_tag_info tif on tif.id = ctd.tag_id
+        left join t_fx_hvp_area fha on tif.id = fha.area_id
+        inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1' 
+    ) dt
+    ) p
+    inner join t_lm_order t on p.prop = t.hotel_id 
+    left join t_lm_b_city ct on p.cityid = ct.city_id
+    where 
+    ((:InDateFrom IS NULL) OR (t.out_date>= to_date(:InDateFrom,'yyyy-MM-dd'))) and ((:InDateTo IS NULL) OR (t.out_date<= to_date(:InDateTo,'yyyy-MM-dd'))) 
+    and 
+    ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+    AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+    group by cityid,ct.name_cn,prop,prop_name_zh,sales_account
+    order by prop desc
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelorder_fax_approvetable">
+    <![CDATA[
+    select distinct count(distinct t.fog_order_num) as ordercount,p.cityid,ct.name_cn AS CITYNM,p.prop,p.prop_name_zh,
+      '' AS sales_account, otc.ADCUN ,otcd.UADCUN, count(distinct btf.id) AS BCUN from(
+      select distinct cityid,prop,prop_name_zh,sales_account from(
+        select distinct bp.cityid,bp.prop,bp.prop_name_zh,t.sales_account
+        from 
+        t_lm_consult_room t 
+        inner join t_lm_b_prop bp on t.hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and t.rtype='2' and t.status='1' and t.OTYPE='1'
+        where NLS_LOWER(t.sales_account) =NLS_LOWER(:SALES)
+        union all
+        select
+         bp.cityid,bp.prop,bp.prop_name_zh,crt.sales_account
+        from
+        (
+        select distinct t.id, t.rtype, t.city_id,t.sales_account
+        from 
+        t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='1'
+        and NLS_LOWER(t.sales_account) =NLS_LOWER(:SALES)
+        ) crt
+        inner join t_lm_b_prop bp on bp.cityid=crt.city_id
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1' 
+        union all
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,ctd.sales_account
+        from
+        (
+        select distinct t.id, t.rtype, t.city_id, t.tag_id,t.sales_account
+        from 
+        t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='1'
+        and NLS_LOWER(t.sales_account) =NLS_LOWER(:SALES)
+        ) ctd
+        left join t_tag_info tif on tif.id = ctd.tag_id
+        left join t_fx_hvp_area fha on tif.id = fha.area_id
+        inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1' 
+    ) dt
+    ) p
+    inner join t_lm_order t on p.prop = t.hotel_id
+    left join t_lm_b_city ct on p.cityid = ct.city_id
+    left join t_fax_details tfd on tfd.order_num = t.fog_order_num 
+    left join t_fax tf on tfd.fax_id = tf.id and tf.link_type='4' and tf.fax_type='1'
+    left join t_fax btf on btf.link_id=tf.link_id and btf.link_type='4' and btf.fax_type='2' and btf.fax_status='1' and tf.barcode=btf.barcode
+    left join
+    (
+     select t.hotel_id AS HotelID,count(fog_order_num) AS ADCUN
+            from T_LM_ORDER t
+        where 
+        ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+        AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+        AND t.FOG_ORDER_NUM IS NOT NULL
+        AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+        AND ((null IS NULL) OR (t.FOG_ORDER_NUM = null))
+        and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+        AND (t.FOG_AUDITSTATUS IS NOT NULL AND t.FOG_AUDITSTATUS IN ('5','7','8'))
+        group by t.hotel_id
+    ) otc on otc.HotelID = p.prop
+    left join
+    (
+     select t.hotel_id AS HotelID,count(fog_order_num) AS UADCUN
+            from T_LM_ORDER t
+        where 
+        ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+        AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+        AND t.FOG_ORDER_NUM IS NOT NULL
+        AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+        AND ((null IS NULL) OR (t.FOG_ORDER_NUM = null))
+        and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+        group by t.hotel_id
+    ) otcd on otcd.HotelID = p.prop
+    where 
+    ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+    AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+    and ((:FaxStatus IS NULL) OR (:FaxStatus = '1' and btf.id is NOT NULL) OR (:FaxStatus = '0' and btf.id is NULL))
+    and 
+    ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+    AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+    group by cityid,ct.name_cn,prop,prop_name_zh,sales_account, otc.ADCUN,otcd.UADCUN 
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelorder_fax_approvetable_order">
+    <![CDATA[
+    select distinct t.fog_order_num AS ORDERID,p.prop,case when t.FOG_AUDITSTATUS is null then '未审核' when t.FOG_AUDITSTATUS = '5' then 'NoShow' when t.FOG_AUDITSTATUS = '7' then '入住中' when t.FOG_AUDITSTATUS = '8' then '离店' else '' end AS ORDERST
+    from(
+      select distinct cityid,prop,prop_name_zh,sales_account from(
+        select distinct bp.cityid,bp.prop,bp.prop_name_zh,t.sales_account
+        from 
+        t_lm_consult_room t 
+        inner join t_lm_b_prop bp on t.hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and t.rtype='2' and t.status='1' and t.OTYPE='1'
+        where NLS_LOWER(t.sales_account) =NLS_LOWER(:SALES)
+        union all
+        select
+         bp.cityid,bp.prop,bp.prop_name_zh,crt.sales_account
+        from
+        (
+        select distinct t.id, t.rtype, t.city_id,t.sales_account
+        from 
+        t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='1'
+        and NLS_LOWER(t.sales_account) =NLS_LOWER(:SALES)
+        ) crt
+        inner join t_lm_b_prop bp on bp.cityid=crt.city_id
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1' 
+        union all
+        select 
+         bp.cityid,bp.prop,bp.prop_name_zh,ctd.sales_account
+        from
+        (
+        select distinct t.id, t.rtype, t.city_id, t.tag_id,t.sales_account
+        from 
+        t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='1'
+        and NLS_LOWER(t.sales_account) =NLS_LOWER(:SALES)
+        ) ctd
+        left join t_tag_info tif on tif.id = ctd.tag_id
+        left join t_fx_hvp_area fha on tif.id = fha.area_id
+        inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop
+        left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id 
+        left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+        and hex.hotel_id = bp.prop and hex.status='1' 
+    ) dt
+    ) p
+    inner join t_lm_order t on p.prop = t.hotel_id
+    left join t_lm_b_city ct on p.cityid = ct.city_id
+    left join t_fax_details tfd on tfd.order_num = t.fog_order_num 
+    left join t_fax tf on tfd.fax_id = tf.id and tf.link_type='4' and tf.fax_type='1'
+    left join t_fax btf on btf.link_id=tf.link_id and btf.link_type='4' and btf.fax_type='2' and btf.fax_status='1' and tf.barcode=btf.barcode
+    left join
+    (
+     select t.hotel_id AS HotelID,count(fog_order_num) AS ADCUN
+            from T_LM_ORDER t
+        where 
+        ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+        AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+        AND t.FOG_ORDER_NUM IS NOT NULL
+        AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+        AND ((null IS NULL) OR (t.FOG_ORDER_NUM = null))
+        and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+        AND (t.FOG_AUDITSTATUS IS NOT NULL AND t.FOG_AUDITSTATUS IN ('5','7','8'))
+        group by t.hotel_id
+    ) otc on otc.HotelID = p.prop
+    left join
+    (
+     select t.hotel_id AS HotelID,count(fog_order_num) AS UADCUN
+            from T_LM_ORDER t
+        where 
+        ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+        AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+        AND t.FOG_ORDER_NUM IS NOT NULL
+        AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+        AND ((null IS NULL) OR (t.FOG_ORDER_NUM = null))
+        and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+        group by t.hotel_id
+    ) otcd on otcd.HotelID = p.prop
+    where 
+    ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+    AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+    and ((:FaxStatus IS NULL) OR (:FaxStatus = '1' and btf.id is NOT NULL) OR (:FaxStatus = '0' and btf.id is NULL))
+    and 
+    ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+    AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_order_approvetable_byhotel">
+    <![CDATA[  
+    select count(t.fog_order_num) as ordercount,p.cityid,ct.name_cn AS CITYNM,
+    p.prop,p.prop_name_zh,
+    p.tradearea_id,p.sales_account from
+    (
+    select distinct bp.cityid,bp.prop,bp.prop_name_zh,bp.tradearea_id,sh.sales_account from t_lm_b_prop bp
+    left join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop
+    left join t_tag_info tif on tif.id = fha.area_id 
+    left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+    where 
+    ((:HOTELID IS NULL) OR (prop=:HOTELID)) 
+    AND ((:CITYID IS NULL) OR (cityid=:CITYID)) 
+    AND ((:TRADEAREAID IS NULL) OR (tradearea_id=:TRADEAREAID)) 
+    ) p
+    inner join t_lm_order t on p.prop = t.hotel_id 
+    left join t_lm_b_city ct on p.cityid = ct.city_id
+    where 
+    ((:InDateFrom IS NULL) OR (t.out_date>= to_date(:InDateFrom,'yyyy-MM-dd'))) 
+    and ((:InDateTo IS NULL) OR (t.out_date<= to_date(:InDateTo,'yyyy-MM-dd'))) 
+    and ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+    and ((:OrderID IS NULL) OR (t.fog_order_num = :OrderID))
+    AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+    group by cityid,ct.name_cn,prop,prop_name_zh,tradearea_id,sales_account
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_order_approve_fax_byhotel">
+    <![CDATA[
+    select distinct count(distinct t.fog_order_num) as ordercount,p.cityid,ct.name_cn AS CITYNM,
+    p.prop,p.prop_name_zh,
+    p.tradearea_id,'' AS sales_account, otc.ADCUN ,otcd.UADCUN, count(distinct btf.id) AS BCUN
+    from
+    (
+    select distinct bp.cityid,bp.prop,bp.prop_name_zh,bp.tradearea_id,sh.sales_account from t_lm_b_prop bp
+    left join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop
+    left join t_tag_info tif on tif.id = fha.area_id 
+    left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+    where 
+    ((:HOTELID IS NULL) OR (prop=:HOTELID))  
+    AND ((:CITYID IS NULL) OR (cityid=:CITYID)) 
+    AND ((:TRADEAREAID IS NULL) OR (tradearea_id=:TRADEAREAID)) 
+    ) p
+    inner join t_lm_order t on p.prop = t.hotel_id
+    left join t_fax_details tfd on tfd.order_num = t.fog_order_num 
+    left join t_fax tf on tfd.fax_id = tf.id and tf.link_type='4' and tf.fax_type='1'
+    left join t_fax btf on btf.link_id=tf.link_id and btf.link_type='4' and btf.fax_type='2' and btf.fax_status='1' and tf.barcode=btf.barcode
+    left join t_lm_b_city ct on p.cityid = ct.city_id
+    left join
+    (
+     select t.hotel_id AS HotelID,count(fog_order_num) AS ADCUN
+            from T_LM_ORDER t
+        where ((:HOTELID IS NULL) OR (t.HOTEL_ID = :HOTELID))
+        AND ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+        AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+        AND t.FOG_ORDER_NUM IS NOT NULL
+        AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+        AND ((null IS NULL) OR (t.FOG_ORDER_NUM = null))
+        and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+        AND (t.FOG_AUDITSTATUS IS NOT NULL AND t.FOG_AUDITSTATUS IN ('5','7','8'))
+        group by t.hotel_id
+    ) otc on otc.HotelID = p.prop
+    left join
+    (
+     select t.hotel_id AS HotelID,count(fog_order_num) AS UADCUN
+            from T_LM_ORDER t
+        where ((:HOTELID IS NULL) OR (t.HOTEL_ID = :HOTELID))
+        AND ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+        AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+        AND t.FOG_ORDER_NUM IS NOT NULL
+        AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+        AND ((null IS NULL) OR (t.FOG_ORDER_NUM = null))
+        and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+        group by t.hotel_id
+    ) otcd on otcd.HotelID = p.prop
+    where 
+    ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+    AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+    and ((:FaxNum IS NULL) OR (tf.barcode = :FaxNum))
+    and ((:FaxStatus IS NULL) OR (:FaxStatus = '1' and btf.id is NOT NULL) OR (:FaxStatus = '0' and btf.id is NULL))
+    and ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+    and ((:OrderID IS NULL) OR (t.fog_order_num = :OrderID))
+    AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR 
+    ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+    group by cityid,ct.name_cn,prop,prop_name_zh,tradearea_id,sales_account, otc.ADCUN,otcd.UADCUN
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_order_approve_fax_byhotel_order">
+    <![CDATA[
+    select distinct t.fog_order_num AS ORDERID,p.prop,case when t.FOG_AUDITSTATUS is null then '未审核' when t.FOG_AUDITSTATUS = '5' then 'NoShow' when t.FOG_AUDITSTATUS = '7' then '入住中' when t.FOG_AUDITSTATUS = '8' then '离店' else '' end AS ORDERST
+    from
+    (
+    select distinct bp.cityid,bp.prop,bp.prop_name_zh,bp.tradearea_id,sh.sales_account from t_lm_b_prop bp
+    left join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop
+    left join t_tag_info tif on tif.id = fha.area_id 
+    left join t_lm_sales_history sh on bp.prop=sh.hotel_id  and sh.status='1'
+    where 
+    ((:HOTELID IS NULL) OR (prop=:HOTELID))  
+    AND ((:CITYID IS NULL) OR (cityid=:CITYID)) 
+    AND ((:TRADEAREAID IS NULL) OR (tradearea_id=:TRADEAREAID)) 
+    ) p
+    inner join t_lm_order t on p.prop = t.hotel_id
+    left join t_fax_details tfd on tfd.order_num = t.fog_order_num 
+    left join t_fax tf on tfd.fax_id = tf.id and tf.link_type='4' and tf.fax_type='1'
+    left join t_fax btf on btf.link_id=tf.link_id and btf.link_type='4' and btf.fax_type='2' and btf.fax_status='1' and tf.barcode=btf.barcode
+    left join t_lm_b_city ct on p.cityid = ct.city_id
+    left join
+    (
+     select t.hotel_id AS HotelID,count(fog_order_num) AS ADCUN
+            from T_LM_ORDER t
+        where ((:HOTELID IS NULL) OR (t.HOTEL_ID = :HOTELID))
+        AND ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+        AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+        AND t.FOG_ORDER_NUM IS NOT NULL
+        AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+        AND ((null IS NULL) OR (t.FOG_ORDER_NUM = null))
+        and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+        AND (t.FOG_AUDITSTATUS IS NOT NULL AND t.FOG_AUDITSTATUS IN ('5','7','8'))
+        group by t.hotel_id
+    ) otc on otc.HotelID = p.prop
+    left join
+    (
+     select t.hotel_id AS HotelID,count(fog_order_num) AS UADCUN
+            from T_LM_ORDER t
+        where ((:HOTELID IS NULL) OR (t.HOTEL_ID = :HOTELID))
+        AND ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+        AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+        AND t.FOG_ORDER_NUM IS NOT NULL
+        AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+        AND ((null IS NULL) OR (t.FOG_ORDER_NUM = null))
+        and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+        group by t.hotel_id
+    ) otcd on otcd.HotelID = p.prop
+    where 
+    ((:OutSDate IS NULL) OR (t.out_date >= to_date(:OutSDate,'yyyy-MM-dd')))
+    AND ((:OutEDate IS NULL) OR (t.out_date <= to_date(:OutEDate,'yyyy-MM-dd')))
+    and ((:FaxNum IS NULL) OR (tf.barcode = :FaxNum))
+    and ((:FaxStatus IS NULL) OR (:FaxStatus = '1' and btf.id is NOT NULL) OR (:FaxStatus = '0' and btf.id is NULL))
+    and ((:AuditStatus IS NULL) OR 
+    (:AuditStatus = '1' and t.fog_auditstatus IS NULL) OR 
+    (:AuditStatus='2' and t.FOG_AUDITSTATUS='8') OR 
+    (:AuditStatus='3' and t.FOG_AUDITSTATUS='5') OR 
+    (:AuditStatus='4' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='5')) OR 
+    (:AuditStatus='5' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS='8')) OR
+    (:AuditStatus='6' and t.FOG_AUDITSTATUS IN ('5','8')) OR
+    (:AuditStatus='7' and (t.FOG_AUDITSTATUS IS NULL OR t.FOG_AUDITSTATUS IN ('5','8'))))
+    and ((:OrderID IS NULL) OR (t.fog_order_num = :OrderID))
+    AND ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR 
+    ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND t.book_status_other not in ('0','1','2','3','9')))
+    and (t.VENDOR IS NOT NULL AND t.VENDOR IN ('HVP','HOMEINNS','MOTEL168'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="CheckApproveUserBandHotel">
+    <![CDATA[
+   select t.id
+    from 
+    t_lm_consult_room t 
+    where t.rtype='2' and t.status='1' and t.OTYPE='1'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:SALES)
+    union all
+    select 
+    dt.ID
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='1'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:SALES)
+    ) dt
+    union all
+    select 
+    dt.id 
+    from
+    (
+    select  t.id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='1'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:SALES)
+    ) dt
+    group by dt.ID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_main_select">
+    <![CDATA[  
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, 1 AS HTSUM
+    from
+    (
+    select distinct t.id AS ID, case  t.rtype when '0' then '城市' when '1' then '商圈' else '酒店' end AS CONSULTTYPE, 
+    '['||t.hotel_id||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from 
+    t_lm_consult_room t 
+    left join t_lm_b_prop bp on t.hotel_id=bp.prop  and bp.ismyhotel=1
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+    left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=to_date(:EFFECTDATE,'yyyy-MM-dd')) lp on bp.prop= lp.hotel_id
+    and t.rtype='2' and t.status='1' and t.OTYPE='0' 
+    where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:SALESID)
+    ) dt
+    where dt.HEXID IS NULL
+    
+    union all
+    
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(prop) AS HTSUM
+    from
+    (
+    select distinct
+    crt.id AS ID, case crt.rtype when '0' then '城市' when '1' then '商圈' else '酒店' end AS CONSULTTYPE, 
+    '['||crt.city_id||']'||lbc.name_cn AS CONSULTVAL, bp.prop,hex.id AS HEXID,bp.prop_name_zh
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:SALESID)
+    ) crt
+    inner join t_lm_b_prop bp on bp.cityid=crt.city_id  and bp.ismyhotel=1
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    left join t_lm_b_city lbc on bp.cityid= lbc.city_id    
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=to_date(:EFFECTDATE,'yyyy-MM-dd')) lp on bp.prop= lp.hotel_id
+    
+    where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1' 
+    ) dt
+    where dt.HEXID IS NULL
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+    
+    union all
+    
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(hvp_hotel_id) AS HTSUM
+    from    (
+    select 
+    ctd.id AS ID, case ctd.rtype when '0' then '城市' when '1' then '商圈' else '酒店' end AS CONSULTTYPE,
+    '['||ctd.tag_id||']'||lbc.name_cn||'-'||tif.tag_name||'商圈' AS CONSULTVAL, fha.hvp_hotel_id ,hex.id AS HEXID
+    from
+    (
+    select  t.id, t.rtype, t.city_id, t.tag_id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:SALESID)
+    ) ctd
+    left join t_hvp_tag_info tif on tif.id = ctd.tag_id
+    left join t_fx_hvp_area fha on tif.id = fha.area_id
+    inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop  and bp.ismyhotel=1
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = fha.hvp_hotel_id and hex.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=to_date(:EFFECTDATE,'yyyy-MM-dd')) lp on bp.prop= lp.hotel_id
+    left join t_lm_b_city lbc on tif.city_id= lbc.city_id
+    where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+    ) dt
+    where dt.HEXID IS NULL   
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_main_select_byall">
+    <![CDATA[  
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, 1 AS HTSUM
+    from
+    (
+    select distinct t.id AS ID, case  t.rtype when '0' then '城市' when '1' then '商圈' else '酒店' end AS CONSULTTYPE, 
+    '['||t.hotel_id||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from 
+    t_lm_consult_room t 
+    left join t_lm_b_prop bp on t.hotel_id=bp.prop
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+    left join t_lm_sales_history sh on bp.prop=sh.hotel_id and sh.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop= lp.hotel_id
+    and t.rtype='2' and t.status='1' and t.OTYPE='0' and bp.ismyhotel=1
+    where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+    ) dt
+    where dt.HEXID IS NULL
+    
+    union all
+    
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(prop) AS HTSUM
+    from
+    (
+    select distinct
+    crt.id AS ID, case crt.rtype when '0' then '城市' when '1' then '商圈' else '酒店' end AS CONSULTTYPE, 
+    '['||crt.city_id||']'||lbc.name_cn AS CONSULTVAL, bp.prop,hex.id AS HEXID,bp.prop_name_zh
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+    ) crt
+    inner join t_lm_b_prop bp on bp.cityid=crt.city_id and bp.ismyhotel=1
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    left join t_lm_b_city lbc on bp.cityid= lbc.city_id    
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop= lp.hotel_id
+    
+    where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1' 
+    ) dt
+    where dt.HEXID IS NULL
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+    
+    union all
+    
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(hvp_hotel_id) AS HTSUM
+    from
+    (
+    select 
+    ctd.id AS ID, case ctd.rtype when '0' then '城市' when '1' then '商圈' else '酒店' end AS CONSULTTYPE,
+    '['||ctd.tag_id||']'||lbc.name_cn||'-'||tif.tag_name||'商圈' AS CONSULTVAL, fha.hvp_hotel_id ,hex.id AS HEXID
+    from
+    (
+    select  t.id, t.rtype, t.city_id, t.tag_id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+    ) ctd
+    left join t_hvp_tag_info tif on tif.id = ctd.tag_id
+    left join t_fx_hvp_area fha on tif.id = fha.area_id
+    inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop and bp.ismyhotel=1
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = fha.hvp_hotel_id and hex.status='1'
+    inner join (select hotel_id,status,effect_date,Room_type_code,MODIFIER from t_lm_plan where effect_date=trunc(sysdate)) lp on bp.prop= lp.hotel_id
+    left join t_lm_b_city lbc on tif.city_id= lbc.city_id
+    where bp.type=0 AND bp.STATUS='active' AND bp.ONLINE_STATUS='1'  
+    ) dt
+    where dt.HEXID IS NULL   
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_rather_list_select">
+    <![CDATA[
+    select distinct tro.room_code AS ROOMCD,tro.room_code || ' - '||tro.room_name AS ROOMNM,
+    Case when sur.sup_room_id IS NOT NULL then '../../Styles/images/tick.png' else '../../Styles/images/cross.png' end AS RBIMG,
+    Case when sur.sup_room_id IS NOT NULL then '该房型已绑定供应商' else '该房型未绑定供应商' end AS RBMSG,
+    NVL(tcp.dtype,'0') AS DISCOUNTCD,tcp.dvale AS DISCOUNTXT
+    from t_room tro
+    inner join t_price_code_room pcr on tro.hotel_id = pcr.hotel_id and pcr.room_code=tro.room_code and pcr.status='1' and pcr.price_code IN ('LMBAR','LMBAR2')
+    left join t_sup_map_room sur on tro.hotel_id = sur.app_hotel_id and tro.room_code = sur.app_room_id and sur.source='ELONG'
+    left join t_contract_price tcp on tro.hotel_id = tcp.hotel_id and tro.room_code = tcp.room_code 
+    where tro.hotel_id=:HOTELID
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_rather_list_save">
+    <![CDATA[
+    merge into T_CONTRACT_PRICE t1
+    using (select :HOTELID AS HOTEL_ID,:ROOMCODE AS ROOM_CODE, :DTYPE AS DTYPE, :DVALE AS DVALE, :CREATEUSER AS CREATE_USER from dual) t2 
+    on (t1.HOTEL_ID = t2.HOTEL_ID and t1.ROOM_CODE = t2.ROOM_CODE)
+    when matched then
+       update set t1.DTYPE=t2.DTYPE,t1.DVALE=DVALE,t1.UPDATE_TIME=sysdate,t1.UPDATE_USER = t2.CREATE_USER
+       where t1.HOTEL_ID = t2.HOTEL_ID and t1.ROOM_CODE = t2.ROOM_CODE
+    when not matched then
+       insert values (t2.HOTEL_ID,t2.ROOM_CODE,t2.DTYPE,t2.DVALE,'1', sysdate,sysdate, t2.CREATE_USER, t2.CREATE_USER)
+    ]]>
+  </sql>
+
+</sqlList>

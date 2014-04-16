@@ -1,0 +1,1271 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_regchnnel_list">
+    <![CDATA[  
+      select id, regchanel_code AS REGCHANELCODE, regchanel_name AS REGCHANELNM, create_time AS cdtime, update_time AS udtime from t_lm_b_regchanel
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_platForm_list">
+    <![CDATA[  
+      select id, platform_code AS PLATFORMCODE, platform_name AS PLATFORMNM, create_time AS cdtime, update_time AS udtime from t_lm_b_platform
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_ticketype_all_count">
+    <![CDATA[  
+    select Count(tt.ID) from v_lm_user_list tt
+    inner join
+    (select distinct tltu.userid
+    from t_lm_ticket_package tltp
+    left join t_lm_ticket_user tltu
+    on tltp.packagecode=tltu.packagecode and tltu.userid is not null
+    where 
+     ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+    and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+    and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+    and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+    and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+    and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE)) 
+    AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+    ) tlt
+    on tt.LOGINMOBILE=tlt.userid
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_ticketype_all">
+    <![CDATA[  
+    select tt.* from v_lm_user_list tt
+    inner join
+    (select distinct tltu.userid
+    from t_lm_ticket_package tltp
+    left join t_lm_ticket_user tltu
+    on tltp.packagecode=tltu.packagecode and tltu.userid is not null
+    where 
+     ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+    and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+    and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+    and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+    and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+    and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE)) 
+    AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+    ) tlt
+    on tt.LOGINMOBILE=tlt.userid
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_ticketype_ord_count">
+    <![CDATA[  
+    select Count(tt.ID) from v_lm_user_list tt
+    inner join 
+    (select distinct tltb.userid
+    from t_lm_ticket_package tltp
+    inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode 
+    inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode and tltb.STATUS='0'
+    where 
+    ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+    and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+    and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+    and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+    and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+    and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE)) 
+    AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+    ) tlt 
+    on tt.LOGINMOBILE=tlt.userid
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_ticketype_ord">
+    <![CDATA[  
+    select tt.* from v_lm_user_list tt
+    inner join 
+    (select distinct tltb.userid
+    from t_lm_ticket_package tltp
+    inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode 
+    inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode and tltb.STATUS='0'
+    where 
+    ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+    and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+    and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+    and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+    and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+    and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE)) 
+    AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+    ) tlt 
+    on tt.LOGINMOBILE=tlt.userid
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_count">
+    <![CDATA[  
+select Count(tt.ID) from v_lm_user_list tt
+    where 
+    (:UserID IS NULL OR (tt.LOGINMOBILE in (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))))) AND 
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (tt.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+     ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) AND
+    ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (tt.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (tt.platform_code like '%'||:PlatformID||'%')) AND
+    ((:OrderFrom IS NULL) OR (TO_NUMBER(:OrderFrom) <= ALLCOUNT)) AND
+    ((:OrderTo IS NULL) OR (ALLCOUNT <= TO_NUMBER(:OrderTo))) AND
+    ((:OrderSucFrom IS NULL) OR (TO_NUMBER(:OrderSucFrom) <= COMPLECOUNT)) AND
+    ((:OrderSucTo IS NULL) OR (COMPLECOUNT <= TO_NUMBER(:OrderSucTo))) AND
+    (((:LoginSizeStart IS NULL) AND (:LoginSizeEnd IS NULL)) 
+    OR (tt.LOGINMOBILE IN (select distinct t.mobile from t_lm_user_action t 
+    where 
+    ((:LoginSizeStart IS NULL) OR (to_date(:LoginSizeStart, 'yyyy.mm.dd hh24:mi:ss') <= t.today_login)) AND
+    ((:LoginSizeEnd IS NULL) OR (t.today_login<= to_date(:LoginSizeEnd, 'yyyy.mm.dd hh24:mi:ss'))))))
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_no_order_count">
+    <![CDATA[  
+select Count(tt.ID) from 
+     (select "ID","LOGINMOBILE","CREATETIME","SIGN_KEY","SIGNDATE","VERSION","ALLCOUNT","COMPLECOUNT","LASTORDERTIME","REGCHANEL_CODE","REGCHANELNM","PLATFORM_CODE","PLATFORMNM","TODAYLOGIN" from (select ur.ID,
+    ur.login_mobile AS LOGINMOBILE,ur.CREATETIME
+    ,ur.SIGN_KEY,ur.sign_date AS SIGNDATE,ur.VERSION,
+    '' AS ALLCOUNT,'' AS COMPLECOUNT,
+    '' AS lastordertime,
+    ur.regchanel_code,lbr.REGCHANEL_NAME AS REGCHANELNM ,ur.platform_code,lbp.PLATFORM_NAME AS PLATFORMNM,tlua.TODAYLOGIN
+    from t_lm_user ur
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code
+    left join (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t group by t.mobile) tlua
+    on ur.login_mobile=tlua.mobile) dt
+    ) tt
+    where 
+    (:UserID IS NULL OR (tt.LOGINMOBILE in (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))))) AND 
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (tt.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+     ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) AND
+    ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (tt.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (tt.platform_code like '%'||:PlatformID||'%')) AND
+    (:OrderFrom is null) and (:OrderTo  is null) and (:OrderSucFrom  is null) and (:OrderSucTo  is null) and
+    (((:LoginSizeStart IS NULL) AND (:LoginSizeEnd IS NULL)) 
+    OR (tt.LOGINMOBILE IN (select distinct t.mobile from t_lm_user_action t 
+    where 
+    ((:LoginSizeStart IS NULL) OR (to_date(:LoginSizeStart, 'yyyy.mm.dd hh24:mi:ss') <= t.today_login)) AND
+    ((:LoginSizeEnd IS NULL) OR (t.today_login<= to_date(:LoginSizeEnd, 'yyyy.mm.dd hh24:mi:ss'))))))
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_user_count">
+    <![CDATA[  
+    select Count(tt.ID) from v_lm_user_list tt
+    inner join (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum) AS LOGINMOBILE
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))) ustl
+      on tt.LOGINMOBILE =ustl.LOGINMOBILE
+    where 
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (tt.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+     ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) AND
+    ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (tt.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (tt.platform_code like '%'||:PlatformID||'%')) AND
+    ((:OrderFrom IS NULL) OR (TO_NUMBER(:OrderFrom) <= ALLCOUNT)) AND
+    ((:OrderTo IS NULL) OR (ALLCOUNT <= TO_NUMBER(:OrderTo))) AND
+    ((:OrderSucFrom IS NULL) OR (TO_NUMBER(:OrderSucFrom) <= COMPLECOUNT)) AND
+    ((:OrderSucTo IS NULL) OR (COMPLECOUNT <= TO_NUMBER(:OrderSucTo))) AND
+    (((:LoginSizeStart IS NULL) AND (:LoginSizeEnd IS NULL)) 
+    OR (tt.LOGINMOBILE IN (select distinct t.mobile from t_lm_user_action t 
+    where 
+    ((:LoginSizeStart IS NULL) OR (to_date(:LoginSizeStart, 'yyyy.mm.dd hh24:mi:ss') <= t.today_login)) AND
+    ((:LoginSizeEnd IS NULL) OR (t.today_login<= to_date(:LoginSizeEnd, 'yyyy.mm.dd hh24:mi:ss'))))))
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_user_no_order_count">
+    <![CDATA[  
+    select count(tt.ID)
+ from (select ur.ID,
+    ur.login_mobile AS LOGINMOBILE,ur.CREATETIME
+    ,ur.SIGN_KEY,ur.sign_date AS SIGNDATE,ur.VERSION,
+    ur.regchanel_code,lbr.REGCHANEL_NAME AS REGCHANELNM ,ur.platform_code,lbp.PLATFORM_NAME AS PLATFORMNM,
+    tlua.TODAYLOGIN,ur.THIRD_PARTY_VENDOR
+    from 
+    (select t1.ID,t1.login_mobile,t1.CREATETIME,t1.SIGN_KEY,t1.sign_date,t1.VERSION,t1.regchanel_code,t1.platform_code,t1.THIRD_PARTY_VENDOR 
+    from t_lm_user t1
+    where 
+    exists (select * from (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum) AS LGMOBILE
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))) t2 where t1.login_mobile = t2.LGMOBILE) AND
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= t1.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (t1.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (t1.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (t1.platform_code =:PlatformID))
+    ) ur
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code
+    left join (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t 
+    where 
+    exists (select * from (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum) AS LGMOBILE
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))) t4 where t.mobile = t4.LGMOBILE)
+    group by t.mobile) tlua
+    on ur.login_mobile=tlua.mobile) tt
+    where 
+     ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) AND
+    ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    (:OrderFrom is null) and (:OrderTo  is null) and (:OrderSucFrom  is null) and (:OrderSucTo  is null) and
+    (((:LoginSizeStart IS NULL) AND (:LoginSizeEnd IS NULL)) 
+    OR (tt.LOGINMOBILE IN (select distinct t.mobile from t_lm_user_action t 
+    where 
+    exists (select * from (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum) AS LGMOBILE
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))) t3 where t.mobile = t3.LGMOBILE) AND
+    ((:LoginSizeStart IS NULL) OR (to_date(:LoginSizeStart, 'yyyy.mm.dd hh24:mi:ss') <= t.today_login)) AND
+    ((:LoginSizeEnd IS NULL) OR (t.today_login<= to_date(:LoginSizeEnd, 'yyyy.mm.dd hh24:mi:ss'))))))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_count_2012-05-02">
+    <![CDATA[  
+    select Count(ur.ID) 
+    from (
+    select * from t_lm_user where
+    (:UserID IS NULL OR (login_mobile in (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', '')))))
+    AND ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= CREATETIME)) 
+    AND ((:RegistEnd IS NULL) OR (CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) 
+    AND ((:RegChannelID IS NULL) OR (regchanel_code=:RegChannelID))
+    AND ((:PlatformID IS NULL) OR (platform_code like '%'||:PlatformID||'%'))
+    ) ur 
+    left join
+    (select * from (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) lal
+    where ((:OrderCount IS NULL) OR (lal.ALLCOUNT = TO_NUMBER(:OrderCount)) OR (0 < lal.ALLCOUNT AND lal.ALLCOUNT <= TO_NUMBER(:OrderCount)))) act
+    on act.login_mobile=ur.login_mobile
+    left join
+    (select * from 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where book_status='5' and pay_status='1' group by login_mobile) lcl
+    where
+    ((:OrderSuccCount IS NULL) OR (lcl.COMPLECOUNT = TO_NUMBER(:OrderSuccCount)) OR (0 < lcl.COMPLECOUNT AND lcl.COMPLECOUNT <= TO_NUMBER(:OrderSuccCount)))) cpt
+    on cpt.login_mobile=ur.login_mobile
+    left join
+    (select lo.login_mobile,lo.CREATE_TIME AS lastordertime from t_lm_order lo inner join
+    (select login_mobile,max(CREATE_TIME) as mCreateTime from t_lm_order group by login_mobile) ld
+    on lo.login_mobile=ld.login_mobile and lo.CREATE_TIME=ld.mCreateTime) LastT
+    on LastT.login_mobile=ur.login_mobile
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code
+    left join (select * from (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t group by t.mobile) tt where
+     ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) 
+    AND ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss')))) tlua
+    on ur.login_mobile=tlua.mobile
+    ORDER BY ur.CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_select_back_2012-05-02">
+    <![CDATA[  
+    select ur.ID,
+    ur.login_mobile AS LOGINMOBILE,ur.CREATETIME
+    ,ur.SIGN_KEY,ur.sign_date AS SIGNDATE,ur.VERSION,
+    nvl(act.allCount, 0) AS ALLCOUNT,nvl(cpt.compleCount,0) AS COMPLECOUNT,
+    LastT.lastordertime,
+    ur.regchanel_code,lbr.REGCHANEL_NAME AS REGCHANELNM ,ur.platform_code,lbp.PLATFORM_NAME AS PLATFORMNM,tlua.TODAYLOGIN
+    from (
+    select * from t_lm_user where
+    (:UserID IS NULL OR (login_mobile in (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', '')))))
+    AND ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= CREATETIME)) 
+    AND ((:RegistEnd IS NULL) OR (CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) 
+    AND ((:RegChannelID IS NULL) OR (regchanel_code=:RegChannelID))
+    AND ((:PlatformID IS NULL) OR (platform_code like '%'||:PlatformID||'%'))
+    ) ur 
+    left join
+    (select * from (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) lal
+    where ((:OrderCount IS NULL) OR (lal.ALLCOUNT = TO_NUMBER(:OrderCount)) OR (0 < lal.ALLCOUNT AND lal.ALLCOUNT <= TO_NUMBER(:OrderCount)))) act
+    on act.login_mobile=ur.login_mobile
+    left join
+    (select * from 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where book_status='5' and pay_status='1' group by login_mobile) lcl
+    where
+    ((:OrderSuccCount IS NULL) OR (lcl.COMPLECOUNT = TO_NUMBER(:OrderSuccCount)) OR (0 < lcl.COMPLECOUNT AND lcl.COMPLECOUNT <= TO_NUMBER(:OrderSuccCount)))) cpt
+    on cpt.login_mobile=ur.login_mobile
+    left join
+    (select lo.login_mobile,lo.CREATE_TIME AS lastordertime from t_lm_order lo inner join
+    (select login_mobile,max(CREATE_TIME) as mCreateTime from t_lm_order group by login_mobile) ld
+    on lo.login_mobile=ld.login_mobile and lo.CREATE_TIME=ld.mCreateTime) LastT
+    on LastT.login_mobile=ur.login_mobile
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code
+    left join (select * from (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t group by t.mobile) tt where
+     ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) 
+    AND ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss')))) tlua
+    on ur.login_mobile=tlua.mobile
+    ORDER BY ur.CREATETIME Desc
+  ]]>
+  </sql>
+  
+  <sql database="TUANDB" sqlId="t_lm_user_review_select">
+    <![CDATA[  
+    select * from v_lm_user_list tt
+    where 
+     (:UserID IS NULL OR (tt.LOGINMOBILE in (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))))) AND 
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (tt.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+     ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) AND
+    ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (tt.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (tt.platform_code like '%'||:PlatformID||'%')) AND
+    ((:OrderFrom IS NULL) OR (TO_NUMBER(:OrderFrom) <= ALLCOUNT)) AND
+    ((:OrderTo IS NULL) OR (ALLCOUNT <= TO_NUMBER(:OrderTo))) AND
+    ((:OrderSucFrom IS NULL) OR (TO_NUMBER(:OrderSucFrom) <= COMPLECOUNT)) AND
+    ((:OrderSucTo IS NULL) OR (COMPLECOUNT <= TO_NUMBER(:OrderSucTo))) AND
+    (((:LoginSizeStart IS NULL) AND (:LoginSizeEnd IS NULL)) 
+    OR (tt.LOGINMOBILE IN (select distinct t.mobile from t_lm_user_action t 
+    where 
+    ((:LoginSizeStart IS NULL) OR (to_date(:LoginSizeStart, 'yyyy.mm.dd hh24:mi:ss') <= t.today_login)) AND
+    ((:LoginSizeEnd IS NULL) OR (t.today_login<= to_date(:LoginSizeEnd, 'yyyy.mm.dd hh24:mi:ss'))))))
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_select_no_order">
+    <![CDATA[  
+    select "ID","LOGINMOBILE","CREATETIME","SIGN_KEY","SIGNDATE","VERSION","ALLCOUNT","COMPLECOUNT","LASTORDERTIME","REGCHANEL_CODE","REGCHANELNM","PLATFORM_CODE","PLATFORMNM","TODAYLOGIN","THIRD_PARTY_VENDOR" from (select ur.ID,
+    ur.login_mobile AS LOGINMOBILE,ur.CREATETIME
+    ,ur.SIGN_KEY,ur.sign_date AS SIGNDATE,ur.VERSION,
+    '' AS ALLCOUNT,'' AS COMPLECOUNT,
+    '' AS lastordertime,
+    ur.regchanel_code,lbr.REGCHANEL_NAME AS REGCHANELNM ,ur.platform_code,lbp.PLATFORM_NAME AS PLATFORMNM,tlua.TODAYLOGIN,ur.THIRD_PARTY_VENDOR
+    from t_lm_user ur
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code
+    left join (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t group by t.mobile) tlua
+    on ur.login_mobile=tlua.mobile) tt
+    where 
+     (:UserID IS NULL OR (tt.LOGINMOBILE in (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))))) AND 
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (tt.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) AND
+    ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (tt.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (tt.platform_code like '%'||:PlatformID||'%')) AND
+    
+    (:OrderFrom is null) and (:OrderTo  is null) and (:OrderSucFrom  is null) and (:OrderSucTo  is null) and
+    
+    (((:LoginSizeStart IS NULL) AND (:LoginSizeEnd IS NULL)) 
+    OR (tt.LOGINMOBILE IN (select distinct t.mobile from t_lm_user_action t 
+    where 
+    ((:LoginSizeStart IS NULL) OR (to_date(:LoginSizeStart, 'yyyy.mm.dd hh24:mi:ss') <= t.today_login)) AND
+    ((:LoginSizeEnd IS NULL) OR (t.today_login<= to_date(:LoginSizeEnd, 'yyyy.mm.dd hh24:mi:ss'))))))
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_user_select">
+    <![CDATA[  
+    select * from v_lm_user_list tt
+    inner join (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum) AS LOGINMOBILE
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))) ustl
+      on tt.LOGINMOBILE =ustl.LOGINMOBILE
+    where 
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (tt.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+     ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) AND
+    ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (tt.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (tt.platform_code like '%'||:PlatformID||'%')) AND
+    ((:OrderFrom IS NULL) OR (TO_NUMBER(:OrderFrom) <= ALLCOUNT)) AND
+    ((:OrderTo IS NULL) OR (ALLCOUNT <= TO_NUMBER(:OrderTo))) AND
+    ((:OrderSucFrom IS NULL) OR (TO_NUMBER(:OrderSucFrom) <= COMPLECOUNT)) AND
+    ((:OrderSucTo IS NULL) OR (COMPLECOUNT <= TO_NUMBER(:OrderSucTo))) AND
+    (((:LoginSizeStart IS NULL) AND (:LoginSizeEnd IS NULL)) 
+    OR (tt.LOGINMOBILE IN (select distinct t.mobile from t_lm_user_action t 
+    where 
+    ((:LoginSizeStart IS NULL) OR (to_date(:LoginSizeStart, 'yyyy.mm.dd hh24:mi:ss') <= t.today_login)) AND
+    ((:LoginSizeEnd IS NULL) OR (t.today_login<= to_date(:LoginSizeEnd, 'yyyy.mm.dd hh24:mi:ss'))))))
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_user_select_no_order">
+    <![CDATA[  
+    select "ID","LOGINMOBILE","CREATETIME","SIGN_KEY","SIGNDATE","VERSION","ALLCOUNT","COMPLECOUNT","LASTORDERTIME","REGCHANEL_CODE","REGCHANELNM","PLATFORM_CODE","PLATFORMNM","TODAYLOGIN","THIRD_PARTY_VENDOR" 
+    from (select ur.ID,
+    ur.login_mobile AS LOGINMOBILE,ur.CREATETIME
+    ,ur.SIGN_KEY,ur.sign_date AS SIGNDATE,ur.VERSION,
+    ur.regchanel_code,lbr.REGCHANEL_NAME AS REGCHANELNM ,ur.platform_code,lbp.PLATFORM_NAME AS PLATFORMNM,
+    tlua.TODAYLOGIN,ur.THIRD_PARTY_VENDOR,'' AS ALLCOUNT,'' AS COMPLECOUNT,
+    '' AS lastordertime
+    from 
+    (select t1.ID,t1.login_mobile,t1.CREATETIME,t1.SIGN_KEY,t1.sign_date,t1.VERSION,t1.regchanel_code,t1.platform_code,t1.THIRD_PARTY_VENDOR 
+    from t_lm_user t1
+    where 
+    exists (select * from (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum) AS LGMOBILE
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))) t2 where t1.login_mobile = t2.LGMOBILE) AND
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= t1.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (t1.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (t1.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (t1.platform_code =:PlatformID))
+    ) ur
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code
+    left join (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t 
+    where 
+    exists (select * from (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum) AS LGMOBILE
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))) t4 where t.mobile = t4.LGMOBILE)
+    group by t.mobile) tlua
+    on ur.login_mobile=tlua.mobile) tt
+    where 
+     ((:LoginStart IS NULL) OR (to_date(:LoginStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) AND
+    ((:LoginEnd IS NULL) OR (tt.TODAYLOGIN<= to_date(:LoginEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    (:OrderFrom is null) and (:OrderTo  is null) and (:OrderSucFrom  is null) and (:OrderSucTo  is null) and
+    (((:LoginSizeStart IS NULL) AND (:LoginSizeEnd IS NULL)) 
+    OR (tt.LOGINMOBILE IN (select distinct t.mobile from t_lm_user_action t 
+    where 
+    exists (select * from (SELECT REGEXP_SUBSTR (:UserID, '[^,]+', 1,rownum) AS LGMOBILE
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserID) - LENGTH (REPLACE (:UserID, ',', ''))) t3 where t.mobile = t3.LGMOBILE) AND
+    ((:LoginSizeStart IS NULL) OR (to_date(:LoginSizeStart, 'yyyy.mm.dd hh24:mi:ss') <= t.today_login)) AND
+    ((:LoginSizeEnd IS NULL) OR (t.today_login<= to_date(:LoginSizeEnd, 'yyyy.mm.dd hh24:mi:ss'))))))
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_select_back">
+    <![CDATA[  
+    select * from (select ur.ID,
+    ur.login_mobile AS LOGINMOBILE,ur.CREATETIME
+    ,ur.SIGN_KEY,ur.sign_date AS SIGNDATE,ur.VERSION,
+    nvl(act.allCount, 0) AS ALLCOUNT,nvl(cpt.compleCount,0) AS COMPLECOUNT,
+    LastT.lastordertime,
+    ur.regchanel_code,lbr.REGCHANEL_NAME AS REGCHANELNM ,ur.platform_code,lbp.PLATFORM_NAME AS PLATFORMNM
+    from t_lm_user ur
+    left join 
+    (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) act
+    on act.login_mobile=ur.login_mobile
+    left join 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where book_status='5' and pay_status='1' group by login_mobile) cpt
+    on cpt.login_mobile=ur.login_mobile
+    left join
+    (select lo.login_mobile,lo.CREATE_TIME AS lastordertime from t_lm_order lo inner join 
+    (select login_mobile,max(CREATE_TIME) as mCreateTime from t_lm_order group by login_mobile) ld
+    on lo.login_mobile=ld.login_mobile and lo.CREATE_TIME=ld.mCreateTime) LastT
+    on LastT.login_mobile=ur.login_mobile
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code ) tt
+    where 
+    ((:UserID IS NULL) OR (tt.LOGINMOBILE like '%'||:UserID||'%')) AND 
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (tt.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (tt.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (tt.platform_code like '%'||:PlatformID||'%')) AND
+    ((:OrderCount IS NULL) OR (ALLCOUNT = TO_NUMBER(:OrderCount)) OR (0 < ALLCOUNT AND ALLCOUNT <= TO_NUMBER(:OrderCount))) AND
+    ((:OrderSuccCount IS NULL) OR (COMPLECOUNT = TO_NUMBER(:OrderSuccCount)) OR (0 < COMPLECOUNT AND COMPLECOUNT <= TO_NUMBER(:OrderSuccCount)))
+    ORDER BY CREATETIME Desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_select_top">
+    <![CDATA[  
+    select * from (select rownum as rwcount, tt.* from ( select * from (select ur.ID,
+    ur.login_mobile AS LOGINMOBILE,ur.CREATETIME
+    ,ur.SIGN_KEY,ur.sign_date AS SIGNDATE,ur.VERSION,
+    nvl(act.allCount, 0) AS ALLCOUNT,nvl(cpt.compleCount,0) AS COMPLECOUNT,
+    LastT.lastordertime,
+    ur.regchanel_code,lbr.REGCHANEL_NAME AS REGCHANELNM ,ur.platform_code,lbp.PLATFORM_NAME AS PLATFORMNM
+    from t_lm_user ur
+    left join 
+    (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) act
+    on act.login_mobile=ur.login_mobile
+    left join 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where book_status='5' and pay_status='1' group by login_mobile) cpt
+    on cpt.login_mobile=ur.login_mobile
+    left join
+    (select lo.login_mobile,lo.CREATE_TIME AS lastordertime from t_lm_order lo inner join 
+    (select login_mobile,max(CREATE_TIME) as mCreateTime from t_lm_order group by login_mobile) ld
+    on lo.login_mobile=ld.login_mobile and lo.CREATE_TIME=ld.mCreateTime) LastT
+    on LastT.login_mobile=ur.login_mobile
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code ) tt
+    where 
+    ((:UserID IS NULL) OR (tt.LOGINMOBILE like '%'||:UserID||'%')) AND 
+    ((:RegistStart IS NULL) OR (to_date(:RegistStart, 'yyyy.mm.dd hh24:mi:ss') <= tt.CREATETIME)) AND
+    ((:RegistEnd IS NULL) OR (tt.CREATETIME<= to_date(:RegistEnd, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:RegChannelID IS NULL) OR (tt.regchanel_code=:RegChannelID)) AND
+    ((:PlatformID IS NULL) OR (tt.platform_code like '%'||:PlatformID||'%')) AND
+    ((:OrderCount IS NULL) OR (ALLCOUNT = TO_NUMBER(:OrderCount)) OR (0 < ALLCOUNT AND ALLCOUNT <= TO_NUMBER(:OrderCount))) AND
+    ((:OrderSuccCount IS NULL) OR (COMPLECOUNT = TO_NUMBER(:OrderSuccCount)) OR (0 < COMPLECOUNT AND COMPLECOUNT <= TO_NUMBER(:OrderSuccCount)))
+    ORDER BY CREATETIME Desc ) tt ) where rwcount < 21
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_select_succe">
+    <![CDATA[  
+   
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_review_select_unsucce">
+    <![CDATA[  
+   
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_main_select">
+    <![CDATA[  
+    select * from (select ur.ID,
+    ur.login_mobile AS LOGINMOBILE,ur.CREATETIME,TO_CHAR(ur.CREATETIME, 'yyyy-mm-dd hh24:mi:ss') AS CREATEDT
+    ,ur.SIGN_KEY,tlua.TODAYLOGIN AS SIGNDATE,ur.VERSION,
+    nvl(act.allCount, 0) AS ALLCOUNT,nvl(cpt.compleCount,0) AS COMPLECOUNT,
+    LastT.lastordertime,
+    ur.regchanel_code,lbr.REGCHANEL_NAME AS REGCHANELNM ,ur.platform_code,lbp.PLATFORM_NAME AS PLATFORMNM,ur.DEVICETOKEN AS DVTOKEN,ur.VERSION AS VRSION,NVL(tlcu.can_applictaion_amount,0) AS USERCASH
+    from t_lm_user ur
+    left join 
+    (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) act
+    on act.login_mobile=ur.login_mobile
+    left join 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where ((price_code= 'LMBAR' and BOOK_STATUS=5) OR ((price_code= 'LMBAR2' OR price_code= 'BAR' OR price_code= 'BARB') AND (FOG_RESVTYPE='n' or FOG_RESVTYPE='e') AND book_status_other <> '3')) group by login_mobile) cpt
+    on cpt.login_mobile=ur.login_mobile
+    left join
+    (select lo.login_mobile,lo.CREATE_TIME AS lastordertime from t_lm_order lo inner join 
+    (select login_mobile,max(CREATE_TIME) as mCreateTime from t_lm_order group by login_mobile) ld
+    on lo.login_mobile=ld.login_mobile and lo.CREATE_TIME=ld.mCreateTime) LastT
+    on LastT.login_mobile=ur.login_mobile
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code
+    left join t_lm_cash_user tlcu on ur.login_mobile = tlcu.user_id
+    left join (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t group by t.mobile) tlua 
+    on ur.login_mobile=tlua.mobile) tt
+    where 
+    ((:USERID IS NULL) OR (tt.ID=:USERID)) 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_cash_main_select">
+    <![CDATA[  
+    select * from (select ur.ID,
+    ur.login_mobile AS LOGINMOBILE,ur.CREATETIME
+    ,ur.SIGN_KEY,tlua.TODAYLOGIN AS SIGNDATE,ur.VERSION,
+    nvl(act.allCount, 0) AS ALLCOUNT,nvl(cpt.compleCount,0) AS COMPLECOUNT,
+    LastT.lastordertime,
+    ur.regchanel_code,lbr.REGCHANEL_NAME AS REGCHANELNM ,ur.platform_code,
+    lbp.PLATFORM_NAME AS PLATFORMNM,ur.DEVICETOKEN AS DVTOKEN,ur.VERSION AS VRSION,
+    NVL(tlcu.AUDIT_AMOUNT,0) AS CASHVER,NVL(tlcu.can_applictaion_amount,0) AS USECASH,NVL(tlcu.pulling_amount,0) AS CASHAPL
+    from t_lm_user ur
+    left join 
+    (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) act
+    on act.login_mobile=ur.login_mobile
+    left join 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where book_status='5' and pay_status='1' group by login_mobile) cpt
+    on cpt.login_mobile=ur.login_mobile
+    left join
+    (select lo.login_mobile,lo.CREATE_TIME AS lastordertime from t_lm_order lo inner join 
+    (select login_mobile,max(CREATE_TIME) as mCreateTime from t_lm_order group by login_mobile) ld
+    on lo.login_mobile=ld.login_mobile and lo.CREATE_TIME=ld.mCreateTime) LastT
+    on LastT.login_mobile=ur.login_mobile
+    left join T_LM_B_REGCHANEL lbr on ur.regchanel_code=lbr.regchanel_code
+    left join T_LM_B_PLATFORM lbp on ur.platform_code=lbp.platform_code 
+    left join t_lm_cash_user tlcu on ur.login_mobile = tlcu.user_id
+    left join (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t group by t.mobile) tlua 
+    on ur.login_mobile=tlua.mobile
+    ) tt
+    where 
+    ((:USERID IS NULL) OR (tt.ID=:USERID)) 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_cash_detail_select">
+    <![CDATA[
+     select  TO_CHAR(SN) AS PKEY,
+    (CASE BACK_TYPE WHEN 1 THEN '优惠券返现'  WHEN 2 THEN '订单返现'  ELSE ''  END ) ||'-'|| (CASE BACK_TYPE WHEN 1 THEN order_num  WHEN 2 THEN BACK_TICKET_USER_CODE ELSE order_num  END ) AS CHREASON,
+    AMOUNT AS CHAMOUNT,
+    UPDATE_TIME AS CHDTIME,
+    (CASE status WHEN 0 THEN '已提交'  WHEN 1 THEN '已审核'  WHEN 2 THEN '已失败' WHEN 3 THEN '已成功' ELSE ''  END ) AS CHTYPE，
+    '1' AS SELTYPE
+    from t_lm_cash where type=0 and user_id = :USERID
+    union all
+    select TO_CHAR(SN) AS PKEY,
+    '申请提现' ||'-'|| id AS CHREASON,
+    AMOUNT AS CHAMOUNT,
+    UPDATE_TIME AS CHDTIME,
+    (CASE status WHEN 0 THEN '已提交'  WHEN 1 THEN '已审核'  WHEN 2 THEN '已失败' WHEN 3 THEN '已成功' ELSE ''  END ) AS CHTYPE,
+    '0' AS SELTYPE
+    from t_lm_cash where type in (1,2) and user_id = :USERID
+    order by CHDTIME desc
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_cash_detail_select_back">
+    <![CDATA[
+    select  TO_CHAR(order_num) AS PKEY, 
+    (CASE source_type WHEN 1 THEN '订单返现'  WHEN 2 THEN '返现券返现'  ELSE ''  END ) ||'-'|| (CASE source_type WHEN 1 THEN order_num  WHEN 2 THEN ticket_user_code ELSE order_num  END ) AS CHREASON,
+    source_amount AS CHAMOUNT,
+    update_time AS CHDTIME,
+    (CASE status WHEN 0 THEN '审核中'  WHEN 1 THEN '已取消'  WHEN 2 THEN '已确认' ELSE ''  END ) AS CHTYPE，
+    '1' AS SELTYPE
+    from t_lm_cash_cashback where user_id = :USERID
+    union all
+    select TO_CHAR(id) AS PKEY,
+    '申请提现' ||'-'|| id AS CHREASON,
+    PICK_CASH_AMOUNT AS CHAMOUNT,
+    PROCESS_TIME AS CHDTIME,
+    (CASE PROCESS_STATUS WHEN '0' THEN '已申请'  WHEN '1' THEN '已审核'  WHEN '2' THEN '已成功'  WHEN '3' THEN '已失败'  ELSE ''  END ) AS CHTYPE,
+    '0' AS SELTYPE
+    from t_lm_cash_tocash_appl where user_id = :USERID
+    order by CHDTIME desc
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_cash_back_detail_select">
+    <![CDATA[
+     select  
+    (CASE status WHEN 0 THEN '已提交'  WHEN 1 THEN '已审核'  WHEN 2 THEN '已失败' WHEN 3 THEN '已成功' ELSE ''  END ) AS CHTYPE，
+    create_time AS CHDTIME,
+    REMARK,
+    PROCESS_USERID AS UPUSER
+    from t_lm_cash
+    where user_id = :USERID AND SN=:PKEY AND TYPE=0 ORDER BY CHDTIME DESC
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_cash_detail_back_select">
+    <![CDATA[
+    select  TO_CHAR(SN) AS PKEY, 
+    (CASE BACK_TYPE WHEN 1 THEN '订单返现'  WHEN 2 THEN '返现券返现'  ELSE ''  END ) ||'-'|| (CASE BACK_TYPE WHEN 1 THEN order_num  WHEN 2 THEN BACK_TICKET_USER_CODE ELSE order_num  END ) AS CHREASON,
+    AMOUNT AS CHAMOUNT,
+    UPDATE_TIME AS CHDTIME,
+    (CASE status WHEN 0 THEN '已提交'  WHEN 1 THEN '已审核'  WHEN 2 THEN '已失败' WHEN 3 THEN '已成功' ELSE ''  END ) AS CHTYPE，
+    '1' AS SELTYPE
+    from t_lm_cash where user_id = :USERID AND type=0 AND SN=:PKEY
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_cash_detail_appl_select">
+    <![CDATA[
+        select TO_CHAR(SN) AS PKEY,
+    '申请提现' ||'-'|| id AS CHREASON,
+    AMOUNT AS CHAMOUNT,
+    UPDATE_TIME AS CHDTIME,
+    (CASE status WHEN 0 THEN '已提交'  WHEN 1 THEN '已审核'  WHEN 2 THEN '已失败' WHEN 3 THEN '已成功' ELSE ''  END ) AS CHTYPE,
+    '0' AS SELTYPE
+    from t_lm_cash where user_id = :USERID AND type IN (1,2) AND SN=:PKEY
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_cash_appl_detail_select">
+    <![CDATA[
+    select 
+    (CASE status WHEN 0 THEN '已提交'  WHEN 1 THEN '已审核'  WHEN 2 THEN '已失败' WHEN 3 THEN '已成功' ELSE ''  END ) AS CHTYPE,
+    create_time AS CHDTIME,
+    REMARK,
+    PROCESS_USERID AS UPUSER 
+    from t_lm_cash_his where user_id = :USERID AND SN=:PKEY AND TYPE IN (1,2) ORDER BY create_time DESC
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_select_userid">
+    <![CDATA[
+      select t.id from t_lm_user t where t.login_mobile=:MOBILE
+     ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_detail_select_back">
+    <![CDATA[  
+    select 
+    t.id AS LMORDERID,
+    t.fog_order_num AS FOGORDERID,
+    t.login_mobile AS LOGINMOBILE,
+    t.book_source||' '||t.APP_VERSION AS BOOKSOURCE,
+    t.hotel_name AS HOTELNAME,
+    t.room_type_name AS ROOMTYPENAME,
+
+    t.book_total_price AS BOOKTOTALPRICE,
+    CASE t.book_status
+    WHEN '0' THEN '新建' 
+    when '1' then '新建入FOG成功' 
+    when '2' then '新建入fog失败' 
+    when '3' then '超时' 
+    when '4' then '取消单' 
+    when '5' then '成功' 
+    ELSE '' 
+    END AS BOOKSTATUS,
+    TO_CHAR(t.IN_DATE, 'yyyy-mm-dd') AS INDATE,
+    TO_CHAR(t.OUT_DATE, 'yyyy-mm-dd') AS OUTDATE,
+    CASE t.pay_status 
+    WHEN  '0' THEN '未支付' 
+    when '1' then '支付成功' 
+    when '2' then '等待支付' 
+    when '3' then '支付中' 
+    when '4' then '支付失败' 
+    when '5' then '支付确认中' 
+    when '6' then '异常取消' 
+    ELSE '' END 
+    AS PAYSTATUS
+    from t_lm_order t
+    inner join t_lm_user tlu on t.login_mobile=tlu.login_mobile
+    where tlu.id=:USERID ORDER BY t.id desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_user_detail_select">
+    <![CDATA[  
+    select tlo.id AS LMID, tlo.FOG_ORDER_NUM AS FOGORDERID, '' AS USERID,tlo.login_mobile AS LOGINMOBILE, 
+      tlo.price_code AS PRICECODE, tlo.hotel_name AS HOTELNM,tlo.create_time AS CREATETIME, tlo.in_date AS INDATE, tlo.out_date AS OUTDATE,
+      NVL(tlo.BOOK_TOTAL_PRICE, 0) AS BTPRICE,
+      CASE WHEN tlo.FOG_RESVTYPE = 'n' THEN '新单' when tlo.FOG_RESVTYPE = 'e' then 'CC修改单' when tlo.FOG_RESVTYPE = 'c' then 'CC取消单' when tlo.price_code = 'LMBAR' and tlo.BOOK_STATUS = '4' then '用户取消单' when tlo.price_code <> 'LMBAR' and tlo.BOOK_STATUS_OTHER = '3' then '用户取消单'  ELSE '' END AS ORDERSTATUS,
+      CASE WHEN tlo.fog_resvstatus= '0' THEN '待酒店确认' when tlo.fog_resvstatus = '1' then '酒店已确认' ELSE '' END AS FOGRESVSTATUS,
+      CASE WHEN tlo.fog_auditstatus= '5' THEN 'No-Show' when tlo.fog_auditstatus = '7' then '入住中' when tlo.fog_auditstatus = '8' then '已离店' ELSE '未审核' END AS FOGAUDITSTATUS,
+      CASE WHEN tlo.PAY_STATUS = '1' THEN '已支付成功'  ELSE '未支付成功' END AS PAYSTATUS,
+      CASE WHEN tlo.TICKET_USERCODE IS NULL OR tlo.TICKET_USERCODE = '' THEN '0' ELSE '1' END AS TICKET,
+      NVL(tlo.TICKET_AMOUNT, '0.0') AS TICKETAMOUNT
+    from t_lm_order tlo
+    inner join t_lm_user tlu on tlo.login_mobile=tlu.login_mobile
+    where tlu.id=:USERID ORDER BY tlo.id desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_main_select_back">
+    <![CDATA[  
+    select t.id AS ID, case  t.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE, '['||t.hotel_id||']'||bp.prop_name_zh AS CONSULTVAL, 1 AS HTSUM
+    from 
+    t_lm_consult_room t 
+    left join t_lm_b_prop bp on t.hotel_id=bp.prop
+    where t.rtype='2' and t.status='1' and t.OTYPE='0'
+    and t.sales_account = :USERID
+    union all
+    select
+    crt.id AS ID, case crt.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE, '['||crt.city_id||']'||lbc.name_cn AS CONSULTVAL, count(bp.prop) AS HTSUM
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+    and t.sales_account = :USERID
+    ) crt
+    left join t_lm_b_prop bp on bp.cityid=crt.city_id
+    left join t_lm_b_city lbc on bp.cityid= lbc.city_id
+    group by crt.id, crt.rtype, '['||crt.city_id||']'||lbc.name_cn
+    union all
+    select 
+    ctd.id AS ID, case ctd.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE,lbc.name_cn||'-'||'['||ctd.tag_id||']'||tif.tag_name AS CONSULTVAL, count(fha.hvp_hotel_id) AS HTSUM
+    from
+    (
+    select  t.id, t.rtype, t.city_id, t.tag_id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+    and t.sales_account = :USERID
+    ) ctd
+    left join t_tag_info tif on tif.city_id=ctd.city_id and tif.id = ctd.tag_id
+    left join t_fx_hvp_area fha on tif.id = fha.area_id
+    left join t_lm_b_city lbc on tif.city_id= lbc.city_id
+    group by ctd.id , ctd.rtype,lbc.name_cn||'-'||'['||ctd.tag_id||']'||tif.tag_name 
+    union all
+    select
+    crt.id AS ID, case crt.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE, crt.SALES_ID AS CONSULTVAL, count(bp.prop) AS HTSUM
+    from
+    (
+    select t.id, t.rtype, t.SALES_ID
+    from 
+    t_lm_consult_room t where t.rtype='3' and t.status='1' and t.OTYPE='0'
+    and t.sales_account = :USERID
+    ) crt
+    left join T_LM_SALES_HISTORY tsh on NLS_LOWER(tsh.SALES_ACCOUNT)=NLS_LOWER(crt.SALES_ID) and tsh.STATUS='1'
+    left join t_lm_b_prop bp on bp.prop=tsh.HOTEL_ID
+    group by crt.id, crt.rtype, crt.SALES_ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_main_select">
+    <![CDATA[  
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, 1 AS HTSUM
+    from
+    (
+    select t.id AS ID, case  t.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE, 
+    '['||t.hotel_id||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from 
+    t_lm_consult_room t 
+    left join t_lm_b_prop bp on t.hotel_id=bp.prop  and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active' 
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+    where t.rtype='2' and t.status='1' and t.OTYPE='0'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:USERID)
+    ) dt
+    where dt.HEXID IS NULL
+    union all
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(prop) AS HTSUM
+    from
+    (
+    select
+    crt.id AS ID, case crt.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE, 
+    '['||crt.city_id||']'||lbc.name_cn AS CONSULTVAL, bp.prop,hex.id AS HEXID
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:USERID)
+    ) crt
+    left join t_lm_b_prop bp on bp.cityid=crt.city_id  and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active' 
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    left join t_lm_b_city lbc on bp.cityid= lbc.city_id
+    ) dt
+    where dt.HEXID IS NULL
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+    union all
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(hvp_hotel_id) AS HTSUM
+    from
+    (
+    select 
+    ctd.id AS ID, case ctd.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE,
+    '['||ctd.tag_id||']'||lbc.name_cn||'-'||tif.tag_name||'商圈' AS CONSULTVAL, fha.hvp_hotel_id ,hex.id AS HEXID
+    from
+    (
+    select  t.id, t.rtype, t.city_id, t.tag_id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:USERID)
+    ) ctd
+    left join t_tag_info tif on tif.id = ctd.tag_id
+    left join t_fx_hvp_area fha on tif.id = fha.area_id
+    inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop  and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active' 
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = fha.hvp_hotel_id and hex.status='1'
+    left join t_lm_b_city lbc on tif.city_id= lbc.city_id
+    ) dt
+    where dt.HEXID IS NULL
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+    union all
+    select bt.ID, bt.CONSULTTYPE, bt.CONSULTVAL,count(bt.prop) AS HTSUM
+    from
+    (
+    select
+    crt.id AS ID, case crt.rtype when '0' then '城市' when '1' then '商圈' when '2' then '酒店' else '销售' end AS CONSULTTYPE, crt.SALES_ID AS CONSULTVAL, bp.prop, hex.id AS HEXID
+    from
+    (
+    select t.id, t.rtype, t.SALES_ID
+    from 
+    t_lm_consult_room t where t.rtype='3' and t.status='1' and t.OTYPE='0'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:USERID)
+    ) crt
+    left join T_LM_SALES_HISTORY tsh on NLS_LOWER(tsh.SALES_ACCOUNT)=NLS_LOWER(crt.SALES_ID) and tsh.STATUS='1'
+    left join t_lm_b_prop bp on bp.prop=tsh.HOTEL_ID and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active'
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    ) bt
+    where bt.HEXID IS NULL
+    group by bt.ID, bt.CONSULTTYPE, bt.CONSULTVAL
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_porder_user_main_select">
+    <![CDATA[  
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, 1 AS HTSUM
+    from
+    (
+    select t.id AS ID, case  t.rtype when '0' then '城市' when '1' then '商圈' else '酒店' end AS CONSULTTYPE, 
+    '['||t.hotel_id||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from 
+    t_lm_consult_room t 
+    left join t_lm_b_prop bp on t.hotel_id=bp.prop
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+    where t.rtype='2' and t.status='1' and t.OTYPE='1'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:USERID)
+    ) dt
+    where dt.HEXID IS NULL
+    union all
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(prop) AS HTSUM
+    from
+    (
+    select
+    crt.id AS ID, case crt.rtype when '0' then '城市' when '1' then '商圈' else '酒店' end AS CONSULTTYPE, 
+    '['||crt.city_id||']'||lbc.name_cn AS CONSULTVAL, bp.prop,hex.id AS HEXID
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='1'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:USERID)
+    ) crt
+    left join t_lm_b_prop bp on bp.cityid=crt.city_id
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    left join t_lm_b_city lbc on bp.cityid= lbc.city_id
+    ) dt
+    where dt.HEXID IS NULL
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+    union all
+    select 
+    dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL, count(hvp_hotel_id) AS HTSUM
+    from
+    (
+    select 
+    ctd.id AS ID, case ctd.rtype when '0' then '城市' when '1' then '商圈' else '酒店' end AS CONSULTTYPE,
+    '['||ctd.tag_id||']'||lbc.name_cn||'-'||tif.tag_name||'商圈' AS CONSULTVAL, fha.hvp_hotel_id ,hex.id AS HEXID
+    from
+    (
+    select  t.id, t.rtype, t.city_id, t.tag_id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='1'
+    and NLS_LOWER(t.sales_account) = NLS_LOWER(:USERID)
+    ) ctd
+    left join t_tag_info tif on tif.id = ctd.tag_id
+    left join t_fx_hvp_area fha on tif.id = fha.area_id
+    inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = fha.hvp_hotel_id and hex.status='1'
+    left join t_lm_b_city lbc on tif.city_id= lbc.city_id
+    ) dt
+    where dt.HEXID IS NULL
+    group by dt.ID, dt.CONSULTTYPE, dt.CONSULTVAL
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_insert">
+    <![CDATA[  
+    insert into t_lm_consult_room
+    (id, sales_account, rtype, city_id, tag_id, hotel_id, status, createdate, createuser, OTYPE,SALES_ID)
+    values
+    (:TCID, :USERID, :RTYPE, :CITYID, :TAGID, :HOTELID, '1', sysdate, :CREATEUSER, '0', :SALESID)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_porder_user_insert">
+    <![CDATA[  
+    insert into t_lm_consult_room
+    (id, sales_account, rtype, city_id, tag_id, hotel_id, status, createdate, createuser, OTYPE)
+    values
+    (:TCID, :USERID, :RTYPE, :CITYID, :TAGID, :HOTELID, '1', sysdate, :CREATEUSER, '1')
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_hotel_insert">
+    <![CDATA[  
+    insert into t_lm_consult_room_hotel_ex
+      (id, tlcrid, hotel_id, status, createdate, createuser)
+    values
+      (:ID, :TLCRID, :HOTELID, '1', sysdate, :CREATEUSER)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_insert_check">
+    <![CDATA[
+    select 
+    id
+    from t_lm_consult_room
+    where
+    sales_account = :USERID
+    and rtype=:RTYPE
+    and city_id=:CITYID
+    and tag_id=:TAGID
+    and hotel_id=:HOTELID
+    and status = '1'
+    and OTYPE='0'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_insert_city_check">
+    <![CDATA[
+    select 
+    id
+    from t_lm_consult_room
+    where
+    sales_account = :USERID
+    and rtype=:RTYPE
+    and city_id=:CITYID
+    and :TAGID IS NULL
+    and :HOTELID IS NULL
+    and :SALESID IS NULL
+    and status = '1'
+    and OTYPE='0'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_insert_tag_check">
+    <![CDATA[
+    select 
+    id
+    from t_lm_consult_room
+    where
+    sales_account = :USERID
+    and rtype=:RTYPE
+    and :CITYID IS NULL
+    and tag_id=:TAGID
+    and :HOTELID IS NULL
+    and :SALESID IS NULL
+    and status = '1'
+    and OTYPE='0'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_insert_hotel_check">
+    <![CDATA[
+    select 
+    id
+    from t_lm_consult_room
+    where
+    sales_account = :USERID
+    and rtype=:RTYPE
+    and :CITYID IS NULL
+    and :TAGID IS NULL
+    and hotel_id=:HOTELID
+    and :SALESID IS NULL
+    and status = '1'
+    and OTYPE='0'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_insert_sales_check">
+    <![CDATA[
+    select 
+    id
+    from t_lm_consult_room
+    where
+    sales_account = :USERID
+    and rtype=:RTYPE
+    and :CITYID IS NULL
+    and :TAGID IS NULL
+    and :HOTELID IS NULL
+    and SALES_ID=:SALESID
+    and status = '1'
+    and OTYPE='0'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_porder_insert_city_check">
+    <![CDATA[
+    select 
+    id
+    from t_lm_consult_room
+    where
+    sales_account = :USERID
+    and rtype=:RTYPE
+    and city_id=:CITYID
+    and :TAGID IS NULL
+    and :HOTELID IS NULL
+    and status = '1'
+    and OTYPE='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_porder_insert_tag_check">
+    <![CDATA[
+    select 
+    id
+    from t_lm_consult_room
+    where
+    sales_account = :USERID
+    and rtype=:RTYPE
+    and :CITYID IS NULL
+    and tag_id=:TAGID
+    and :HOTELID IS NULL
+    and status = '1'
+    and OTYPE='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_porder_insert_hotel_check">
+    <![CDATA[
+    select 
+    id
+    from t_lm_consult_room
+    where
+    sales_account = :USERID
+    and rtype=:RTYPE
+    and :CITYID IS NULL
+    and :TAGID IS NULL
+    and hotel_id=:HOTELID
+    and status = '1'
+    and OTYPE='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_detail_select">
+    <![CDATA[
+    select  '['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from 
+    t_lm_consult_room t 
+    left join t_lm_b_prop bp on t.hotel_id=bp.prop and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active'
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+    where t.rtype='2' and t.status='1' and t.OTYPE='0'
+    and t.id = :KEYID
+    union all
+    select
+    '['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='0'
+    and t.id = :KEYID
+    ) crt
+    left join t_lm_b_prop bp on bp.cityid=crt.city_id and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active'
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    union all
+    select 
+    '['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from
+    (
+    select  t.id, t.rtype, t.city_id, t.tag_id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='0'
+    and t.id = :KEYID
+    ) ctd
+    left join t_tag_info tif on tif.id = ctd.tag_id
+    left join t_fx_hvp_area fha on tif.id = fha.area_id
+    inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active'
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = bp.prop and hex.status='1'
+    union all
+    select 
+    '['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from
+    (
+    select  t.id, t.rtype, t.SALES_ID
+    from 
+    t_lm_consult_room t where t.rtype='3' and t.status='1' and t.OTYPE='0'
+    and t.id = :KEYID
+    ) ctd
+    inner join T_LM_SALES_HISTORY tsh on NLS_LOWER(tsh.SALES_ACCOUNT)=NLS_LOWER(ctd.SALES_ID) and tsh.STATUS='1'
+    inner join t_lm_b_prop bp on bp.prop=tsh.HOTEL_ID and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active'
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = bp.prop and hex.status='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_porder_user_detail_select">
+    <![CDATA[
+    select  '['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from 
+    t_lm_consult_room t 
+    left join t_lm_b_prop bp on t.hotel_id=bp.prop
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=t.id and hex.hotel_id = bp.prop and hex.status='1'
+    where t.rtype='2' and t.status='1' and t.OTYPE='1'
+    and t.id = :KEYID
+    union all
+    select
+    '['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from
+    (
+    select t.id, t.rtype, t.city_id
+    from 
+    t_lm_consult_room t where t.rtype='0' and t.status='1' and t.OTYPE='1'
+    and t.id = :KEYID
+    ) crt
+    left join t_lm_b_prop bp on bp.cityid=crt.city_id
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=crt.id and hex.hotel_id = bp.prop and hex.status='1'
+    union all
+    select 
+    '['||bp.prop||']'||bp.prop_name_zh AS CONSULTVAL, hex.id AS HEXID
+    from
+    (
+    select  t.id, t.rtype, t.city_id, t.tag_id
+    from 
+    t_lm_consult_room t where t.rtype='1' and t.status='1' and t.OTYPE='1'
+    and t.id = :KEYID
+    ) ctd
+    left join t_tag_info tif on tif.id = ctd.tag_id
+    left join t_fx_hvp_area fha on tif.id = fha.area_id
+    inner join t_lm_b_prop bp on fha.hvp_hotel_id=bp.prop
+    left join t_lm_consult_room_hotel_ex hex on hex.tlcrid=ctd.id and hex.hotel_id = bp.prop and hex.status='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_pre_city">
+    <![CDATA[
+    select bp.prop AS HOTELID, '['||bp.prop||']'||bp.prop_name_zh AS HOTELNM, '' AS BANDNM, '删除' AS CTL
+    from t_lm_b_prop bp
+    where bp.cityid=:CITYID and :TAGID IS NULL and :HOTELID IS NULL and :SALESID IS NULL and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active' 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_pre_tag">
+    <![CDATA[
+    select bp.prop AS HOTELID, '['||bp.prop||']'||bp.prop_name_zh AS HOTELNM, '' AS BANDNM, '删除' AS CTL
+    from t_lm_b_prop bp 
+    inner join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop 
+    where fha.area_id = :TAGID AND :CITYID IS NULL and :HOTELID IS NULL and :SALESID IS NULL and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active' 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_pre_hotel">
+    <![CDATA[
+    select bp.prop AS HOTELID, '['||bp.prop||']'||bp.prop_name_zh AS HOTELNM, '' AS BANDNM, '删除' AS CTL
+    from t_lm_b_prop bp
+    where :CITYID IS NULL and :TAGID IS NULL and bp.prop = :HOTELID and :SALESID IS NULL and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active' 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_pre_sales">
+    <![CDATA[
+    select bp.prop AS HOTELID, '['||bp.prop||']'||bp.prop_name_zh AS HOTELNM, '' AS BANDNM, '删除' AS CTL
+    from t_lm_b_prop bp
+    inner join T_LM_SALES_HISTORY tsh on bp.prop=tsh.HOTEL_ID
+    where :CITYID IS NULL and :TAGID IS NULL and :HOTELID IS NULL and NLS_LOWER(tsh.SALES_ACCOUNT)=NLS_LOWER(:SALESID) and bp.ismyhotel='1' and bp.online_status='1' and bp.status='active' and tsh.STATUS='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_room_user_del">
+    <![CDATA[
+    update t_lm_consult_room set status = '0'
+    where
+    id = :CONID
+    and status = '1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_porder_user_pre_city">
+    <![CDATA[
+    select bp.prop AS HOTELID, '['||bp.prop||']'||bp.prop_name_zh AS HOTELNM, '' AS BANDNM, '删除' AS CTL
+    from t_lm_b_prop bp
+    where bp.cityid=:CITYID and :TAGID IS NULL and :HOTELID IS NULL
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_porder_user_pre_tag">
+    <![CDATA[
+    select bp.prop AS HOTELID, '['||bp.prop||']'||bp.prop_name_zh AS HOTELNM, '' AS BANDNM, '删除' AS CTL
+    from t_lm_b_prop bp 
+    inner join t_fx_hvp_area fha on fha.hvp_hotel_id=bp.prop 
+    where fha.area_id = :TAGID AND :CITYID IS NULL and :HOTELID IS NULL
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_consult_porder_user_pre_hotel">
+    <![CDATA[
+    select bp.prop AS HOTELID, '['||bp.prop||']'||bp.prop_name_zh AS HOTELNM, '' AS BANDNM, '删除' AS CTL
+    from t_lm_b_prop bp
+    where :CITYID IS NULL and :TAGID IS NULL and bp.prop = :HOTELID
+  ]]>
+  </sql>
+
+</sqlList>

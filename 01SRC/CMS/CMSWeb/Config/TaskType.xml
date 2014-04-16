@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TaskList>
+  <TaskCat id="C001">
+    <code>T01</code>
+    <name>价格计划变更</name>
+  </TaskCat>
+  
+  <TaskCat id="C001">
+    <code>T02</code>
+    <name>酒店计划1</name>
+  </TaskCat>
+  
+  <TaskCat id="C002">
+    <code>T001</code>
+    <name>修改酒店详情</name>  
+  </TaskCat>
+</TaskList>
+

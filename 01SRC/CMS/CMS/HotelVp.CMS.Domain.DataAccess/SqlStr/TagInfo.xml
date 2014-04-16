@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_tag_info_search">
+    <![CDATA[  
+      select * from t_tag_info where (:CITYID IS NULL OR (CITY_ID LIKE '%'||:CITYID||'%')) AND (:TAGNAME IS NULL OR (TAG_NAME LIKE '%'||:TAGNAME||'%')) order by id desc
+  ]]>   
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_tag_info_search_count">
+    <![CDATA[  
+      select count(*) from t_tag_info where (:CITYID IS NULL OR (CITY_ID LIKE '%'||:CITYID||'%')) AND (:TAGNAME IS NULL OR (TAG_NAME LIKE '%'||:TAGNAME||'%'))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_tag_info_insert">
+    <![CDATA[  
+      insert into t_tag_info(ID,TAG_NAME,LONGITUDE,LATITUDE,TYPE_ID,STATUS,CITY_ID,CITY_NAME,PINYIN_LONG,PINYIN_SHORT)
+      values(t_tag_info_SEQ.Nextval,:TAGNAME,:LONGITUDE,:LATITUDE,:TYPEID,:STATUS,:CITYID,:CITYNAME,:PINYINLONG,:PINYINSHORT)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_tag_info_update">
+    <![CDATA[  
+      update t_tag_info set TAG_NAME=:TAGNAME,LONGITUDE=:LONGITUDE,LATITUDE=:LATITUDE,TYPE_ID=:TYPEID,
+      STATUS=:STATUS,CITY_ID=:CITYID,CITY_NAME=:CITYNAME,PINYIN_LONG=:PINYINLONG,PINYIN_SHORT=:PINYINSHORT
+      where ID=:ID
+  ]]>
+  </sql>
+</sqlList>

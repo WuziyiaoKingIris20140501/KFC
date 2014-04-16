@@ -1,0 +1,311 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_master_order_all_info">
+    <![CDATA[
+      select count(id) AS COLVALUE from t_lm_order t 
+      where TO_DATE((to_char(sysdate -1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%'
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_order_all_info_today">
+    <![CDATA[
+      select count(id) AS COLVALUE from t_lm_order t 
+      where TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate + 1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%' 
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_order_sum_info">
+    <![CDATA[
+    select to_char(sysdate-1, 'yyyy-MM-dd') AS YESTERDATE2, sum(book_price) AS SUMPRICE from t_lm_order t 
+    where ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'))
+    AND TO_DATE((to_char(sysdate -1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+    AND t.create_time <= TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+    AND CONTACT_NAME not like '%测试%' 
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_order_sum_info_today">
+    <![CDATA[
+      select to_char(sysdate, 'yyyy-MM-dd') AS YESTERDATE2, sum(book_price) AS SUMPRICE from t_lm_order t 
+    where ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'))
+    AND TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+    AND t.create_time <= TO_DATE((to_char(sysdate + 1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+    AND CONTACT_NAME not like '%测试%' 
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_order_list_info">
+    <![CDATA[
+      select price_code AS PRICECODE,book_source AS BOOKSOURCE,count(id) AS COLVALUE from t_lm_order t 
+      where ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') and (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'))
+      AND TO_DATE((to_char(sysdate -1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%' 
+      group by price_code,book_source order by price_code,book_source
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_order_list_info_today">
+    <![CDATA[
+      select price_code AS PRICECODE,book_source AS BOOKSOURCE,count(id) AS COLVALUE from t_lm_order t 
+      where ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') and (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'))
+      AND TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate + 1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%' 
+      group by price_code,book_source order by price_code,book_source
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_in_room_info">
+    <![CDATA[
+      select price_code AS PRICECODE,book_source AS BOOKSOURCE,count(id) AS COLVALUE from t_lm_order t 
+      where (t.price_code= 'BAR' OR t.price_code= 'BARB') and (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'
+       AND TO_DATE((to_char(sysdate -1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND trunc(t.IN_DATE,'dd') = TO_DATE(to_char(sysdate-1, 'yyyy-MM-dd'),'yyyy-MM-dd')
+      AND CONTACT_NAME not like '%测试%' 
+      group by price_code,book_source order by price_code,book_source
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_in_room_info_today">
+    <![CDATA[
+      select price_code AS PRICECODE,book_source AS BOOKSOURCE,count(id) AS COLVALUE from t_lm_order t 
+      where (t.price_code= 'BAR' OR t.price_code= 'BARB') and (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'
+      AND TO_DATE((to_char(sysdate , 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate+1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND trunc(t.IN_DATE,'dd') = TO_DATE(to_char(sysdate, 'yyyy-MM-dd'),'yyyy-MM-dd')
+      AND CONTACT_NAME not like '%测试%' 
+      group by price_code,book_source order by price_code,book_source
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_user_info">
+    <![CDATA[
+      select ur.YESTERDATE,ur.COLNMS,NVL(urt.COLT,0) AS COLVALUE from (select to_char(sysdate-1, 'yyyy-MM-dd') AS YESTERDATE,NVL(PLATFORM_CODE,'OTHER') AS COLNMS
+      from t_lm_user 
+      group by  PLATFORM_CODE) ur 
+      left join (select count(LOGIN_MOBILE) AS COLT,NVL(PLATFORM_CODE,'OTHER') AS COLNMS
+      from t_lm_user 
+      where trunc(CREATETIME,'dd') = TO_DATE(to_char(sysdate-1, 'yyyy-MM-dd'),'yyyy-MM-dd')
+      group by PLATFORM_CODE) urt on ur.COLNMS = urt.COLNMS
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_user_info_today">
+    <![CDATA[
+      select :StartDate AS startDate,
+      :EndDate AS endDate,count(LOGIN_MOBILE) AS COLVALUE,NVL(PLATFORM_CODE,'OTHER') AS COLNMS
+      from t_lm_user 
+      where     
+      CREATETIME >= TO_DATE(:StartDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and CREATETIME < TO_DATE(:EndDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and LOGIN_MOBILE IS NOT NULL
+      group by PLATFORM_CODE
+      union all
+      select :StartDate AS startDate,
+            :EndDate AS endDate,count(id) AS COLVALUE,NVL(PLATFORM_CODE,'OTHER') AS COLNMS
+      from t_lm_user 
+      where     
+      CREATETIME >= TO_DATE(:StartDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and CREATETIME < TO_DATE(:EndDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and LOGIN_MOBILE IS NULL
+      group by PLATFORM_CODE
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_user_info_today_back">
+    <![CDATA[
+      select :StartDate AS startDate,
+      :EndDate AS endDate,urt.COLNMS,NVL(urt.COLT,0) AS COLVALUE from 
+      (select count(LOGIN_MOBILE) AS COLT,NVL(PLATFORM_CODE,'OTHER') AS COLNMS
+      from t_lm_user 
+      where     
+      CREATETIME >= TO_DATE(:StartDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+        and CREATETIME < TO_DATE(:EndDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      group by PLATFORM_CODE
+      ) urt
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_user_info_today_new">
+    <![CDATA[
+      select ot.OUSER,nt.NUSER from 
+ 
+      (
+      
+      select count(LOGIN_MOBILE) AS OUSER
+      from t_lm_user 
+      where     
+      CREATETIME >= TO_DATE(:StartDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and CREATETIME < TO_DATE(:EndDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and LOGIN_MOBILE IS NOT NULL
+      
+      ) 
+      ot,
+      (
+      
+      select count(id) AS NUSER
+      from t_lm_user 
+      where     
+      CREATETIME >= TO_DATE(:StartDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and CREATETIME < TO_DATE(:EndDate || ' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and LOGIN_MOBILE IS NULL
+      
+      ) nt
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_proc_info">
+    <![CDATA[
+      select count(TASK_NAME) AS COLVALUE, TASK_CODE,TASK_NAME AS COLNMS from t_lm_proc_exam where TASK_STATUS=0 group by TASK_CODE,TASK_NAME
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_ticket_info">
+    <![CDATA[
+      select dt.ALTicket,tt.SUTicket from (select count(t.fog_order_num) AS SUTicket from t_lm_order t 
+      where ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'))
+      AND TO_DATE((to_char(sysdate -1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%' 
+      AND t.ticket_usercode IS NOT NULL) tt
+      ,
+      (select count(t.fog_order_num) AS ALTicket from t_lm_order t 
+      where TO_DATE((to_char(sysdate -1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%'
+      AND t.ticket_usercode IS NOT NULL) dt
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_ticket_info_today">
+    <![CDATA[
+      select dt.ALTicket,tt.SUTicket from (select count(t.fog_order_num) AS SUTicket from t_lm_order t 
+      where ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') AND (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'))
+      AND TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate + 1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%' 
+      AND t.ticket_usercode IS NOT NULL) tt
+      ,
+      (select count(t.fog_order_num) AS ALTicket from t_lm_order t 
+      where TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate + 1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%'
+      AND t.ticket_usercode IS NOT NULL) dt
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_ticket_info">
+    <![CDATA[
+      select price_code AS PRICECODE,count(id) AS COLVALUE from t_lm_order t 
+      where ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') and (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'))
+      AND TO_DATE((to_char(sysdate -1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%' 
+      AND t.ticket_usercode IS NOT NULL
+      group by price_code order by price_code
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_ticket_info_today">
+    <![CDATA[
+      select price_code AS PRICECODE,count(id) AS COLVALUE from t_lm_order t 
+      where ((t.price_code= 'LMBAR' and t.BOOK_STATUS=5) OR ((t.price_code= 'LMBAR2' OR t.price_code= 'BAR' OR t.price_code= 'BARB') and (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'))
+      AND TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate + 1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND CONTACT_NAME not like '%测试%' 
+      AND t.ticket_usercode IS NOT NULL
+      group by price_code order by price_code
+    ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_order_ticket_in_room_info">
+    <![CDATA[
+      select count(id) AS COLVALUE from t_lm_order t 
+      where (t.price_code= 'BAR' OR t.price_code= 'BARB') and (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'
+      AND TO_DATE((to_char(sysdate -1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND trunc(t.IN_DATE,'dd') = TO_DATE(to_char(sysdate-1, 'yyyy-MM-dd'),'yyyy-MM-dd')
+      AND CONTACT_NAME not like '%测试%' 
+      AND t.ticket_usercode IS NOT NULL
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_order_ticket_in_room_info_today">
+    <![CDATA[
+      select count(id) AS COLVALUE from t_lm_order t 
+      where (t.price_code= 'BAR' OR t.price_code= 'BARB') and (t.FOG_RESVTYPE='n' or t.FOG_RESVTYPE='e') AND t.book_status_other <> '3'
+      AND TO_DATE((to_char(sysdate , 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss') <= t.create_time 
+      AND t.create_time <= TO_DATE((to_char(sysdate+1, 'yyyy-MM-dd')||' 04:00:00'), 'yyyy-mm-dd hh24:mi:ss')
+      AND trunc(t.IN_DATE,'dd') = TO_DATE(to_char(sysdate, 'yyyy-MM-dd'),'yyyy-MM-dd')
+      AND CONTACT_NAME not like '%测试%' 
+      AND t.ticket_usercode IS NOT NULL
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_user_today_login_info">
+    <![CDATA[
+      select count(distinct mobile) AS COLVALUE,:StartDate AS StartDate,:EndDate AS EndDate,use_code from t_lm_user_action
+      where
+      TODAY_LOGIN >= TO_DATE(:StartDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss')
+      and TODAY_LOGIN < TO_DATE(:EndDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and mobile is not null
+      group by use_code
+      union all
+      select count(distinct user_id) AS COLVALUE,:StartDate AS StartDate,:EndDate AS EndDate,use_code from t_lm_user_action 
+      where 
+      TODAY_LOGIN >= TO_DATE(:StartDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and TODAY_LOGIN < TO_DATE(:EndDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and (mobile is null or mobile='')
+      group by use_code
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_user_today_login_info_back">
+    <![CDATA[
+      select count(*) as COLVALUE,:StartDate AS StartDate,:EndDate AS EndDate,use_code from (
+      select NVL(Mobile,'OTHER') AS COLNMS,use_code from t_lm_user_action 
+      where 
+      TODAY_LOGIN >= TO_DATE(:StartDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      and TODAY_LOGIN < TO_DATE(:EndDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+      group by  Mobile,use_code)
+      group by use_code
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_user_today_login_info_new">
+    <![CDATA[
+      select ot.OUSER,nt.NUSER from
+      (
+      select count(distinct mobile) AS OUSER from t_lm_user_action
+      where
+      TODAY_LOGIN >= TO_DATE(:StartDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss')
+      and TODAY_LOGIN < TO_DATE(:EndDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+          and mobile is not null
+          ) ot
+          ,
+          (
+          select count(distinct user_id) AS NUSER from t_lm_user_action 
+          where 
+          TODAY_LOGIN >= TO_DATE(:StartDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+          and TODAY_LOGIN < TO_DATE(:EndDate ||' 04:00:00', 'yyyy-mm-dd hh24:mi:ss') 
+          and (mobile is null or mobile='')) nt
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_master_user_yesterday_login_info">
+    <![CDATA[
+    select count(*) as COLVALUE,to_char(sysdate-1, 'yyyy-MM-dd') AS YESTERDATE,use_code from (
+    select NVL(Mobile,'OTHER') AS COLNMS,use_code from t_lm_user_action
+    where  TRUNC(TODAY_LOGIN,'dd') = TRUNC(SYSDATE-1,'dd') group by  Mobile,use_code)
+    group by use_code
+      ]]>
+  </sql>
+</sqlList>

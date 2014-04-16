@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_client">
+    <![CDATA[  
+      select clientcode,clientnm from t_lm_client    
+  ]]>   
+  </sql>
+  
+  <sql database ="TUANDB" sqlId="t_lm_city">
+    <![CDATA[
+      select  city_id, name_cn from t_lm_city     
+    ]]>
+  </sql>
+  
+  <sql database ="TUANDB" sqlId="t_lm_ticket_rule_delete">
+    <![CDATA[
+      delete from T_LM_TICKET_RULE where ID=:ID
+    ]]>
+    <param id="@ID" Type="Int32" />    
+  </sql>
+  
+  <sql database ="TUANDB" sqlId="t_lm_ticket_rule_select">
+    <![CDATA[
+      select * from T_LM_TICKET_RULE order by ID  
+    ]]>    
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_ticket_rule_insert">
+    <![CDATA[
+       INSERT INTO T_LM_TICKET_RULE(ID,TICKETRULECODE,CREATETIME,ORDAMT,STARTTIME,ENDTIME,STARTDATE,ENDDATE,HOTELID,CITYID,USEFLG,TICKETRULEDESC,TICKETRULENAME,CLIENTCODE,USECODE,HOTELNAME) VALUES 
+       (:ID,:TICKETRULECODE,:CREATETIME,:ORDAMT,:STARTTIME,:ENDTIME,:STARTDATE,:ENDDATE,:HOTELID,:CITYID,:USEFLG,:TICKETRULEDESC,:TICKETRULENAME,:CLIENTCODE,:USECODE,:HOTELNAME)
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_ticket_user_export">
+    <![CDATA[
+      select tlu.packagecode AS "优惠券礼包编号", tlp.packagename AS "优惠券活动名" ,tlu.ticketusercode AS "优惠券号码", tlu.userid AS "用户ID",   tlu.ticketamt AS "优惠券金额",  
+      CASE WHEN tlu.status = '0' THEN '有效' when tlu.status = '1' then '无效'  when tlu.status = '2' then '已过期' when tlu.status = '3' then '已使用' ELSE '' END AS "优惠券权利状态",   
+      CASE WHEN tlu.flag = 0 THEN '前台领用' when tlu.flag = 1 then '后台批量生产'  when tlu.flag = 2 then '手动发放用户'  ELSE '' END AS "生成渠道" 
+      from t_lm_ticket_user tlu
+      left join t_lm_ticket_package tlp on tlp.packagecode=tlu.packagecode
+      where tlu.packagecode=:PACKAGECODE
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_ticket_all_type">
+    <![CDATA[
+     select count(tltp.packagecode) AS ALLPG , tltp.packagetype 
+      from t_lm_ticket_package tltp
+      where 
+      ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+      and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+      and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+      and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+      and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+      and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE)) 
+      AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+      group by tltp.packagetype
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_ticket_all_user">
+    <![CDATA[
+     select count(distinct tltu.userid) ALLUSER ,tltp.packagetype 
+    from t_lm_ticket_package tltp
+    left join t_lm_ticket_user tltu 
+    on tltp.packagecode=tltu.packagecode and tltu.userid is not null
+    where 
+    ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+    and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+    and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+    and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+    and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+    and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE)) 
+    AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+    group by tltp.packagetype
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_ticket_ord_user">
+    <![CDATA[
+     select count(distinct dt.userid) AS ORDUSER, dt.packagetype from (
+    select distinct tltb.userid, packagetype 
+    from t_lm_ticket_package tltp
+    inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode 
+    inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode and tltb.STATUS='0'
+     where 
+    ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+    and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+    and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+    and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+    and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+    and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE)) 
+    AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+    ) dt
+    group by dt.packagetype
+
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_ticket_all_ord">
+    <![CDATA[
+     select count(tltb.cnfnum) ALLORD,tltp.packagetype, tlo.price_code  from t_lm_ticket_package tltp
+    inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+    inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode
+    inner join t_lm_order tlo on tltb.cnfnum=tlo.fog_order_num
+     where 
+    ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+    and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+    and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+    and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+    and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+    and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE)) 
+    AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+    group by tltp.packagetype, tlo.price_code
+    order by tltp.packagetype, tlo.price_code
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_ticket_suc_ord">
+    <![CDATA[
+     select count(tlol.id) AS SUCORD, tltp.packagetype, tlol.price_code 
+    from t_lm_ticket_package tltp
+    inner join t_lm_ticket_user tltu on tltp.packagecode=tltu.packagecode and userid is not null
+    inner join t_lm_ticket_sub tltb on tltu.ticketusercode=tltb.ticketusercode AND tltb.STATUS='0'
+    inner join t_lm_order tlol on tltb.cnfnum=tlol.fog_order_num 
+    AND ((tlol.price_code = 'LMBAR' AND tlol.book_status = '5') OR 
+    ((tlol.price_code = 'LMBAR2' OR tlol.price_code = 'BAR' OR tlol.price_code = 'BARB') AND (tlol.FOG_AUDITSTATUS = '8')))
+    where 
+    ((:PACKAGENAME IS NULL) OR (tltp.PACKAGENAME LIKE '%'||:PACKAGENAME||'%'))
+    and ((:AMOUNTFROM IS NULL) OR (tltp.AMOUNT >= :AMOUNTFROM))
+    and ((:AMOUNTTO IS NULL) OR (tltp.AMOUNT <= :AMOUNTTO))
+    and ((:STARTDATE IS NULL) OR (tltp.STARTDATE >= :STARTDATE))
+    and ((:ENDDATE IS NULL) OR (tltp.STARTDATE <= :ENDDATE)) 
+    and ((:PACKAGETYPE IS NULL) OR (tltp.packagetype = :PACKAGETYPE)) 
+    AND ((:TICKETDT IS NULL) OR (:TICKETDT = '0' AND trunc(sysdate,'dd') > TO_DATE(tltp.enddate, 'yyyy-mm-dd')) OR (:TICKETDT = '1' AND trunc(sysdate,'dd') <= TO_DATE(tltp.enddate, 'yyyy-mm-dd') AND trunc(sysdate,'dd') >= TO_DATE(tltp.startdate, 'yyyy-mm-dd')))
+    group by tltp.packagetype, tlol.price_code
+    order by tltp.packagetype, tlol.price_code
+    ]]>
+  </sql>
+  
+</sqlList>

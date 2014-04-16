@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_b_dbsearch_table">
+    <![CDATA[  
+      SELECT Table_name AS Cols FROM  User_tables order by Table_name asc
+  ]]>   
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_dbsearch_detail">
+    <![CDATA[  
+      
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_dbsearch_tablecolums">
+    <![CDATA[  
+    select user_tab_cols.column_name, user_col_comments.comments  from user_tab_cols 
+    LEFT join user_col_comments on user_col_comments.TABLE_NAME=USER_TAB_COLS.TABLE_NAME 
+    and user_col_comments.COLUMN_NAME=USER_TAB_COLS.COLUMN_NAME
+    where user_tab_cols.table_name=:TABLENM
+  ]]>
+  </sql>
+
+</sqlList>

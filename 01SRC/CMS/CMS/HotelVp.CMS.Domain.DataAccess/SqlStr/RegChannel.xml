@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_b_regchanel">
+    <![CDATA[  
+        SELECT lm.ID, lm.ID AS REGCHANELID,lm.regchanel_code AS REGchanelcode,lm.regchanel_name AS REGchanelnm, lm.status AS ONLINESTATUS, 
+      (CASE lm.status WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS， 
+      lm.create_time AS CDTIME, lm.update_time AS UDTIME from t_lm_b_regchanel lm
+      where ((:REGCHANELNAME IS NULL) OR (lm.regchanel_name LIKE '%'||:REGCHANELNAME||'%'))
+      AND ((:ONLINESTATUS IS NULL) OR (lm.status=:ONLINESTATUS))
+      AND ((:StartDTime IS NULL) OR (to_date(:StartDTime, 'yyyy.mm.dd hh24:mi:ss') <= lm.create_time))
+      AND ((:EndDTime IS NULL) OR (lm.create_time <= to_date(:EndDTime, 'yyyy.mm.dd hh24:mi:ss'))) ORDER BY lm.ID DESC
+  ]]>
+  </sql>
+  <sql database="TUANDB" sqlId="t_lm_b_regchanel_sigle">
+    <![CDATA[  
+       select lm.regchanel_code AS REGCHANELCODE,lm.regchanel_name AS REGCHANELNM from t_lm_b_regchanel lm 
+        where (lm.regchanel_code = :REGCHANELCODE)
+        OR (lm.regchanel_name = :REGCHANELNM)
+  ]]>
+  </sql>
+  <sql database="TUANDB" sqlId="t_lm_b_regchanel_updatesigle">
+    <![CDATA[  
+       select lm.regchanel_code AS REGCHANELCODE,lm.regchanel_name AS REGCHANELNM from t_lm_b_regchanel lm 
+        where (lm.regchanel_code <> :REGCHANELCODE)
+        AND (lm.regchanel_name = :REGCHANELNM)
+  ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_regchanel_insert">
+    <![CDATA[
+       INSERT INTO t_lm_b_regchanel(ID,  regchanel_code,  regchanel_name, status,  create_time, update_time) VALUES 
+       (:ID,  :REGCHANELCODE,  :REGCHANELNM,  '0',SYSDATE, SYSDATE)
+    ]]>
+  </sql>
+  <sql database ="TUANDB" sqlId="t_lm_b_regchanel_update">
+    <![CDATA[
+       UPDATE t_lm_b_regchanel SET regchanel_name=:REGCHANELNM,status=:ONLINESTATUS, update_time=SYSDATE WHERE regchanel_code=:ID
+    ]]>
+  </sql>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <sql database="TUANDB" sqlId="t_lm_regchanel">
+    <![CDATA[  
+      select ID, REGCHANELCODE, REGCHANELNM, REGCHANELNM||'('||REGCHANELCODE||')' AS DISPLAYNM from T_LM_REGCHANEL  
+  ]]>   
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_cs_regchanel">
+    <![CDATA[  
+        SELECT cs.ID, lm.ID AS REGCHANELID,lm.REGchanelcode,lm.REGchanelnm, cs.ONLINESTATUS, 
+(CASE cs.ONLINESTATUS  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS， 
+cs.CDTIME, cs.UDTIME from T_CS_REGCHANEL cs inner join T_LM_REGCHANEL lm on cs.REGchanelid=lm.id
+        where ((:REGCHANELNAME IS NULL) OR (lm.regchanelnm LIKE '%'||:REGCHANELNAME||'%'))
+        AND ((:ONLINESTATUS IS NULL) OR (cs.ONLINESTATUS=:ONLINESTATUS))
+        AND ((:StartDTime IS NULL) OR (to_date(:StartDTime, 'yyyy.mm.dd hh24:mi:ss') <= cs.CDTIME))
+        AND ((:EndDTime IS NULL) OR (cs.CDTIME <= to_date(:EndDTime, 'yyyy.mm.dd hh24:mi:ss'))) ORDER BY lm.ID DESC
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_cs_regchanel_sigle">
+    <![CDATA[  
+       SELECT ID, REGCHANELID,  ONLINESTATUS,  CDTIME,  UDTIME from T_CS_REGCHANEL WHERE REGCHANELCODE=:REGCHANELCODE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_regchanel_sigle">
+    <![CDATA[  
+       select lm.REGCHANELCODE,lm.REGCHANELNM from t_lm_regchanel lm 
+        where (lm.REGCHANELCODE = :REGCHANELCODE)
+        OR (lm.REGCHANELNM = :REGCHANELNM)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_regchanel_updatesigle">
+    <![CDATA[  
+       select lm.REGCHANELCODE,lm.REGCHANELNM from t_lm_regchanel lm 
+        where (lm.REGCHANELCODE <> :REGCHANELCODE)
+        AND (lm.REGCHANELNM = :REGCHANELNM)
+  ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_cs_regchanel_insert">
+    <![CDATA[
+       INSERT INTO T_CS_REGCHANEL(ID,  REGCHANELID,  ONLINESTATUS,  CDTIME, UDTIME) VALUES 
+       (:ID,  :REGCHANELID,  :ONLINESTATUS,  SYSDATE, SYSDATE)
+    ]]>
+  </sql>
+  
+  <sql database ="TUANDB" sqlId="t_lm_regchanel_insert">
+    <![CDATA[
+       INSERT INTO T_LM_REGCHANEL(ID,  REGCHANELCODE,  REGCHANELNM,  CDTIME, UDTIME) VALUES 
+       (:ID,  :REGCHANELCODE,  :REGCHANELNM,  SYSDATE, SYSDATE)
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_cs_regchanel_update">
+    <![CDATA[
+       UPDATE T_CS_REGCHANEL SET ONLINESTATUS=:ONLINESTATUS, UDTIME=SYSDATE WHERE ID=:ID
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_regchanel_update">
+    <![CDATA[
+       UPDATE t_lm_regchanel SET REGCHANELNM=:REGCHANELNM, UDTIME=SYSDATE WHERE REGCHANELCODE=:REGCHANELCODE
+    ]]>
+  </sql>
+  
+</sqlList>

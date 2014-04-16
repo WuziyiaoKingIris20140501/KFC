@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8954506C-B345-4A6C-892C-C3B880066A4E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HotelVp.CMS.Domain.DataAccess</RootNamespace>
+    <AssemblyName>HotelVp.CMS.Domain.DataAccess</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>%24/HotelVPBackend/CMS/01SRC/CMS/CMS/HotelVp.CMS.Domain.DataAccess</SccProjectName>
+    <SccLocalPath>.</SccLocalPath>
+    <SccAuxPath>http://10.0.0.24:8080/tfs/hotelvp</SccAuxPath>
+    <SccProvider>{4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <RegisterForComInterop>false</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="HotelVp.Common, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\04Ref\HotelVp.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="HotelVp.Common.Data, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\04Ref\HotelVp.Common.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="HotelVp.Common.DataConfiguration, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\04Ref\HotelVp.Common.DataConfiguration.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CashBack\CashBackDA.cs" />
+    <Compile Include="Common\MasterInfoDA.cs" />
+    <Compile Include="Common\WebAutoCompleteDA.cs" />
+    <Compile Include="Cruise\CruiseInfoDA.cs" />
+    <Compile Include="GeneralSetting\OrderSearchDA.cs" />
+    <Compile Include="GeneralSetting\TagInfoDA.cs" />
+    <Compile Include="HotelPlan\HotelPlanInfoDA.cs" />
+    <Compile Include="Hotel\HotelsConsultRoomManagerDA.cs" />
+    <Compile Include="Hotel\HotelInfoEXDA.cs" />
+    <Compile Include="Hotel\HotelBlackDA.cs" />
+    <Compile Include="Image\ImageDA.cs" />
+    <Compile Include="ELong\ELRelationDA.cs" />
+    <Compile Include="Issue\IssueInfoDA.cs" />
+    <Compile Include="GeneralSetting\PartnerDA.cs" />
+    <Compile Include="Hotel\APPContentDA.cs" />
+    <Compile Include="Invoice\InvoiceDA.cs" />
+    <Compile Include="GeneralSetting\ChannelDA.cs" />
+    <Compile Include="Common\CommonDA.cs" />
+    <Compile Include="GeneralSetting\CityDA.cs" />
+    <Compile Include="Destination\DestinationDA.cs" />
+    <Compile Include="GeneralSetting\DbSearchDA.cs" />
+    <Compile Include="GeneralSetting\FAQDA.cs" />
+    <Compile Include="GeneralSetting\HotelGroupDA.cs" />
+    <Compile Include="GeneralSetting\LmSystemLogDA.cs" />
+    <Compile Include="Hotel\HotelInfoDA.cs" />
+    <Compile Include="Order\OrderFeedbackDA.cs" />
+    <Compile Include="Order\OrderInfoDA.cs" />
+    <Compile Include="Promotion\PromotionTypeDA.cs" />
+    <Compile Include="Push\PushDA.cs" />
+    <Compile Include="ReportCenter\ReportCenterDA.cs" />
+    <Compile Include="Security\MenuDA.cs" />
+    <Compile Include="Hotel\HotelFacilitiesDA.cs" />
+    <Compile Include="Security\RightDA.cs" />
+    <Compile Include="Security\RoleDA.cs" />
+    <Compile Include="Security\UserElementDA.cs" />
+    <Compile Include="SendFaxByWebTurnPicture\WebSiteThumbnail.cs" />
+    <Compile Include="Settlement\SeltDA.cs" />
+    <Compile Include="Ticket\TicketInfoDA.cs" />
+    <Compile Include="UserGroup\UserSearchDA.cs" />
+    <Compile Include="UserGroup\UserGroupDA.cs" />
+    <Compile Include="GeneralSetting\PaymentDA.cs" />
+    <Compile Include="GeneralSetting\RegChannelDA.cs" />
+    <Compile Include="GeneralSetting\PlatformDA.cs" />
+    <Compile Include="Promotion\PromotionDA.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Configuration\DataCommand_CruiseInfo.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_Image.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_IssueInfo.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_CashBack.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_Push.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_HotelInfo.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_Partner.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_AutoSearch.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_LmSystemLog.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_Common.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_Channel.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Configuration\DataCommand_Security.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HotelVp.CMS.Domain.Entity\HotelVp.CMS.Domain.Entity.csproj">
+      <Project>{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}</Project>
+      <Name>HotelVp.CMS.Domain.Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HotelVp.CMS.Domain.ResourceAccess\HotelVp.CMS.Domain.Resource.csproj">
+      <Project>{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}</Project>
+      <Name>HotelVp.CMS.Domain.Resource</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Configuration\DbCommandFiles.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SqlStr\Channel.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\City.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\APPContent.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\CashBack.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\HotelPlanInfo.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\OrderFeedback.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="SqlStr\OrderSearch.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="SqlStr\Settlement.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\TagInfo.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\HotelsConsultRoomManager.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\HotelInfoEX.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\HotelBlackList.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="SqlStr\Image.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\ELRelation.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\ReportCenter.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\IssueInfo.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\MasterPageInfo.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\Push.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\MasterInfo.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\User.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\Invoice.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\LmSystemLog.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\DbSearch.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\FAQInfo.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\HotelInfo.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="SqlStr\HotelGroup.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\HotelFacilities.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\OrderInfo.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\WebAutoComplete.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\Destination.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\UserGroup.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="SqlStr\Payment.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\RegChannel.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\Platform.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlStr\Promotion.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="SqlStr\Ticket.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)Configuration\*.*" "$(SolutionDir)CMSWeb\bin\Configuration" /I /s /h /d /y
+xcopy "$(ProjectDir)$(OutDir)SqlStr\*.*" "$(SolutionDir)CMSWeb\bin\SqlStr" /I /s /h /d /y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

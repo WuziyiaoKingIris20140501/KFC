@@ -1,0 +1,313 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_Invoice_all_top_byuserid">
+    <![CDATA[  
+         select * from (select rownum as rwcount, tt.* from ( SELECT tli.ID, tli.INVOICE_CODE AS INVOICECODE, tli.CNFNUM, tli.INVOICE_AMOUNT AS INVOICEAMOUNT, tli.INVOICE_HEAD AS INVOICEHEAD, 
+        tli.INVOICE_BODY AS INVOICEBODY, tli.INVOICE_ADDR AS INVOICEADDR, tli.MEMO, tli.CREATE_TIME AS CREATETIME,tli.UPDATE_TIME AS UPDATETIME, 
+        (CASE tli.STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS ONLINEDIS, 
+        tli.SEND_CODE AS SENDCODE, tli.APPLY_TIME AS APPLYTIME, 
+        (CASE tli.APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS APPLYCHANELNM, tli.USERID, tli.INVOICE_TIME AS INVOICETIME, tli.SEND_TIME AS SENDTIME, tli.OPERATOR,
+        tli.CONTRACT_TEL AS CONTRACTTEL, tli.ZIPCODE, tli.RECEIVER_NAME AS RECEIVERNAME, tli.INVOICE_NUM AS INVOICENUM, tli.SEND_NAME AS SENDNAME,ur.id AS URID
+        FROM T_LM_INVOICE tli
+        left join (select ID,LOGIN_MOBILE from t_lm_user) ur on tli.userid = ur.login_mobile
+      where 
+      ((:USERID IS NULL) OR (tli.USERID =:USERID)) AND
+      ((:CNFNUM IS NULL) OR (tli.CNFNUM =:CNFNUM)) AND
+      ((:SENDCODE IS NULL) OR (tli.SEND_CODE =:SENDCODE)) AND
+      ((:INVSTATUS IS NULL) OR (tli.STATUS =:INVSTATUS)) AND
+      ((:APPLYCHANEL IS NULL) OR (tli.APPLY_CHANEL =:APPLYCHANEL)) AND
+      (((:APPLYBEGINDATE IS NULL) OR (to_date(:APPLYBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.APPLY_TIME)) and ((:APPLYENDDATE IS NULL) OR (tli.APPLY_TIME <= to_date(:APPLYENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) AND
+      (((:SENDBEGINDATE IS NULL) OR (to_date(:SENDBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.SEND_TIME)) and ((:SENDENDDATE IS NULL) OR (tli.SEND_TIME <= to_date(:SENDENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) 
+      ORDER BY tli.APPLY_TIME DESC ) tt ) where rwcount < 21
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_Invoice_all_top">
+    <![CDATA[  
+         select * from (select rownum as rwcount, tt.* from ( SELECT tli.ID, tli.INVOICE_CODE AS INVOICECODE, tli.CNFNUM, tli.INVOICE_AMOUNT AS INVOICEAMOUNT, tli.INVOICE_HEAD AS INVOICEHEAD, 
+        tli.INVOICE_BODY AS INVOICEBODY, tli.INVOICE_ADDR AS INVOICEADDR, tli.MEMO, tli.CREATE_TIME AS CREATETIME,tli.UPDATE_TIME AS UPDATETIME, 
+        (CASE tli.STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS ONLINEDIS, 
+        tli.SEND_CODE AS SENDCODE, tli.APPLY_TIME AS APPLYTIME, 
+        (CASE tli.APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS APPLYCHANELNM, ur.login_mobile AS USERID, tli.INVOICE_TIME AS INVOICETIME, tli.SEND_TIME AS SENDTIME, tli.OPERATOR,
+        tli.CONTRACT_TEL AS CONTRACTTEL, tli.ZIPCODE, tli.RECEIVER_NAME AS RECEIVERNAME, tli.INVOICE_NUM AS INVOICENUM, tli.SEND_NAME AS SENDNAME,ur.id AS URID
+        FROM T_LM_INVOICE tli
+        inner join (select ID,LOGIN_MOBILE from t_lm_user) ur on tli.userid = ur.id
+      where 
+      ((:USERID IS NULL) OR (ur.login_mobile =:USERID)) AND
+      ((:CNFNUM IS NULL) OR (tli.CNFNUM =:CNFNUM)) AND
+      ((:SENDCODE IS NULL) OR (tli.SEND_CODE =:SENDCODE)) AND
+      ((:INVSTATUS IS NULL) OR (tli.STATUS =:INVSTATUS)) AND
+      ((:APPLYCHANEL IS NULL) OR (tli.APPLY_CHANEL =:APPLYCHANEL)) AND
+      (((:APPLYBEGINDATE IS NULL) OR (to_date(:APPLYBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.APPLY_TIME)) and ((:APPLYENDDATE IS NULL) OR (tli.APPLY_TIME <= to_date(:APPLYENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) AND
+      (((:SENDBEGINDATE IS NULL) OR (to_date(:SENDBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.SEND_TIME)) and ((:SENDENDDATE IS NULL) OR (tli.SEND_TIME <= to_date(:SENDENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) 
+      ORDER BY tli.APPLY_TIME DESC ) tt ) where rwcount < 21
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_Invoice_all_byuserid">
+    <![CDATA[  
+         SELECT tli.ID, tli.INVOICE_CODE AS INVOICECODE, tli.CNFNUM, tli.INVOICE_AMOUNT AS INVOICEAMOUNT, tli.INVOICE_HEAD AS INVOICEHEAD, 
+        tli.INVOICE_BODY AS INVOICEBODY, tli.INVOICE_ADDR AS INVOICEADDR, tli.MEMO, tli.CREATE_TIME AS CREATETIME,tli.UPDATE_TIME AS UPDATETIME, 
+        (CASE tli.STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS ONLINEDIS, 
+        tli.SEND_CODE AS SENDCODE, tli.APPLY_TIME AS APPLYTIME, 
+        (CASE tli.APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS APPLYCHANELNM, tli.USERID, tli.INVOICE_TIME AS INVOICETIME, tli.SEND_TIME AS SENDTIME, tli.OPERATOR,
+        tli.CONTRACT_TEL AS CONTRACTTEL, tli.ZIPCODE, tli.RECEIVER_NAME AS RECEIVERNAME, tli.INVOICE_NUM AS INVOICENUM, tli.SEND_NAME AS SENDNAME,ur.id AS URID
+        FROM T_LM_INVOICE tli
+        left join (select ID,LOGIN_MOBILE from t_lm_user) ur on tli.userid = ur.login_mobile
+      where 
+      ((:USERID IS NULL) OR (tli.USERID =:USERID)) AND
+      ((:CNFNUM IS NULL) OR (tli.CNFNUM =:CNFNUM)) AND
+      ((:SENDCODE IS NULL) OR (tli.SEND_CODE =:SENDCODE)) AND
+      ((:INVSTATUS IS NULL) OR (tli.STATUS =:INVSTATUS)) AND
+      ((:APPLYCHANEL IS NULL) OR (tli.APPLY_CHANEL =:APPLYCHANEL)) AND
+      (((:APPLYBEGINDATE IS NULL) OR (to_date(:APPLYBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.APPLY_TIME)) and ((:APPLYENDDATE IS NULL) OR (tli.APPLY_TIME <= to_date(:APPLYENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) AND
+      (((:SENDBEGINDATE IS NULL) OR (to_date(:SENDBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.SEND_TIME)) and ((:SENDENDDATE IS NULL) OR (tli.SEND_TIME <= to_date(:SENDENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) 
+      ORDER BY tli.APPLY_TIME DESC
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_Invoice_all">
+    <![CDATA[  
+         SELECT tli.ID, tli.INVOICE_CODE AS INVOICECODE, tli.CNFNUM, tli.INVOICE_AMOUNT AS INVOICEAMOUNT, tli.INVOICE_HEAD AS INVOICEHEAD, 
+        tli.INVOICE_BODY AS INVOICEBODY, tli.INVOICE_ADDR AS INVOICEADDR, tli.MEMO, tli.CREATE_TIME AS CREATETIME,tli.UPDATE_TIME AS UPDATETIME, 
+        (CASE tli.STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS ONLINEDIS, 
+        tli.SEND_CODE AS SENDCODE, tli.APPLY_TIME AS APPLYTIME, 
+        (CASE tli.APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS APPLYCHANELNM, ur.login_mobile AS USERID, tli.INVOICE_TIME AS INVOICETIME, tli.SEND_TIME AS SENDTIME, tli.OPERATOR,
+        tli.CONTRACT_TEL AS CONTRACTTEL, tli.ZIPCODE, tli.RECEIVER_NAME AS RECEIVERNAME, tli.INVOICE_NUM AS INVOICENUM, tli.SEND_NAME AS SENDNAME,ur.id AS URID
+        FROM T_LM_INVOICE tli
+        inner join (select ID,LOGIN_MOBILE from t_lm_user) ur on tli.userid = ur.id
+      where 
+      ((:USERID IS NULL) OR (ur.login_mobile =:USERID)) AND
+      ((:CNFNUM IS NULL) OR (tli.CNFNUM =:CNFNUM)) AND
+      ((:SENDCODE IS NULL) OR (tli.SEND_CODE =:SENDCODE)) AND
+      ((:INVSTATUS IS NULL) OR (tli.STATUS =:INVSTATUS)) AND
+      ((:APPLYCHANEL IS NULL) OR (tli.APPLY_CHANEL =:APPLYCHANEL)) AND
+      (((:APPLYBEGINDATE IS NULL) OR (to_date(:APPLYBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.APPLY_TIME)) and ((:APPLYENDDATE IS NULL) OR (tli.APPLY_TIME <= to_date(:APPLYENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) AND
+      (((:SENDBEGINDATE IS NULL) OR (to_date(:SENDBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.SEND_TIME)) and ((:SENDENDDATE IS NULL) OR (tli.SEND_TIME <= to_date(:SENDENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) 
+      ORDER BY tli.APPLY_TIME DESC
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_Invoice_all_excel_byuserid">
+    <![CDATA[  
+         SELECT ID AS "ID(自增ID)",
+        INVOICE_CODE AS "INVOICE_CODE(发票代码)",
+        CNFNUM AS "CNFNUM(订单号)", 
+        INVOICE_AMOUNT AS "INVOICE_AMOUNT(发票金额)",
+        INVOICE_HEAD AS "INVOICE_HEAD(发票抬头)",
+        INVOICE_BODY AS "INVOICE_BODY(发票内容)",
+        INVOICE_ADDR AS "INVOICE_ADDR(邮寄地址)",
+        MEMO AS "MEMO(备注)",
+        CREATE_TIME AS "CREATE_TIME(创建时间)",
+        UPDATE_TIME AS "UPDATE_TIME(更新时间)",
+        (CASE STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS "STATUS(状态)", 
+        SEND_CODE AS "SEND_CODE(邮寄单号)",
+        APPLY_TIME AS "APPLY_TIME(申请时间)",
+        (CASE APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS "APPLY_CHANEL(申请渠道)",
+        USERID AS "USERID(注册手机号)", 
+        INVOICE_TIME AS "INVOICE_TIME(确认开票时)", 
+        SEND_TIME AS "SEND_TIME(确认邮寄时)", 
+        OPERATOR AS "OPERATOR(操作人)",
+        CONTRACT_TEL AS "CONTRACT_TEL(联系电话)", 
+        ZIPCODE AS "ZIPCODE(邮寄编码)",
+        RECEIVER_NAME AS "RECEIVER_NAME(收件人姓名)",
+        INVOICE_NUM AS "INVOICE_NUM(发票号码)", 
+        SEND_NAME AS "SEND_NAME(邮寄方名称)"
+        FROM T_LM_INVOICE
+        where 
+        ((:USERID IS NULL) OR (USERID =:USERID)) AND
+        ((:CNFNUM IS NULL) OR (CNFNUM =:CNFNUM)) AND
+        ((:SENDCODE IS NULL) OR (SEND_CODE =:SENDCODE)) AND
+        ((:INVSTATUS IS NULL) OR (STATUS =:INVSTATUS)) AND
+        ((:APPLYCHANEL IS NULL) OR (APPLY_CHANEL =:APPLYCHANEL)) AND
+        (((:APPLYBEGINDATE IS NULL) OR (to_date(:APPLYBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= APPLY_TIME)) and ((:APPLYENDDATE IS NULL) OR (APPLY_TIME <= to_date(:APPLYENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) AND
+        (((:SENDBEGINDATE IS NULL) OR (to_date(:SENDBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= SEND_TIME)) and ((:SENDENDDATE IS NULL) OR (SEND_TIME <= to_date(:SENDENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) 
+        ORDER BY APPLY_TIME DESC 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_Invoice_all_excel">
+    <![CDATA[  
+         SELECT tli.ID AS "ID(自增ID)",
+        tli.INVOICE_CODE AS "INVOICE_CODE(发票代码)",
+        tli.CNFNUM AS "CNFNUM(订单号)", 
+        tli.INVOICE_AMOUNT AS "INVOICE_AMOUNT(发票金额)",
+        tli.INVOICE_HEAD AS "INVOICE_HEAD(发票抬头)",
+        tli.INVOICE_BODY AS "INVOICE_BODY(发票内容)",
+        tli.INVOICE_ADDR AS "INVOICE_ADDR(邮寄地址)",
+        tli.MEMO AS "MEMO(备注)",
+        tli.CREATE_TIME AS "CREATE_TIME(创建时间)",
+        tli.UPDATE_TIME AS "UPDATE_TIME(更新时间)",
+        (CASE tli.STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS "STATUS(状态)", 
+        tli.SEND_CODE AS "SEND_CODE(邮寄单号)",
+        tli.APPLY_TIME AS "APPLY_TIME(申请时间)",
+        (CASE tli.APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS "APPLY_CHANEL(申请渠道)",
+        ur.LOGIN_MOBILE AS "USERID(注册手机号)", 
+        tli.INVOICE_TIME AS "INVOICE_TIME(确认开票时)", 
+        tli.SEND_TIME AS "SEND_TIME(确认邮寄时)", 
+        tli.OPERATOR AS "OPERATOR(操作人)",
+        tli.CONTRACT_TEL AS "CONTRACT_TEL(联系电话)", 
+        tli.ZIPCODE AS "ZIPCODE(邮寄编码)",
+        tli.RECEIVER_NAME AS "RECEIVER_NAME(收件人姓名)",
+        tli.INVOICE_NUM AS "INVOICE_NUM(发票号码)", 
+        tli.SEND_NAME AS "SEND_NAME(邮寄方名称)"
+        FROM T_LM_INVOICE tli
+        inner join (select ID,LOGIN_MOBILE from t_lm_user) ur on tli.userid = ur.id
+        where 
+        ((:USERID IS NULL) OR (ur.LOGIN_MOBILE =:USERID)) AND
+        ((:CNFNUM IS NULL) OR (tli.CNFNUM =:CNFNUM)) AND
+        ((:SENDCODE IS NULL) OR (tli.SEND_CODE =:SENDCODE)) AND
+        ((:INVSTATUS IS NULL) OR (tli.STATUS =:INVSTATUS)) AND
+        ((:APPLYCHANEL IS NULL) OR (tli.APPLY_CHANEL =:APPLYCHANEL)) AND
+        (((:APPLYBEGINDATE IS NULL) OR (to_date(:APPLYBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.APPLY_TIME)) and ((:APPLYENDDATE IS NULL) OR (tli.APPLY_TIME <= to_date(:APPLYENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) AND
+        (((:SENDBEGINDATE IS NULL) OR (to_date(:SENDBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.SEND_TIME)) and ((:SENDENDDATE IS NULL) OR (tli.SEND_TIME <= to_date(:SENDENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) 
+        ORDER BY tli.APPLY_TIME DESC 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_Invoice_all_excel_top_byuserid">
+    <![CDATA[  
+        select * from (select rownum as rwcount, tt.* from (  SELECT ID AS "ID(自增ID)",
+        INVOICE_CODE AS "INVOICE_CODE(发票代码)",
+        CNFNUM AS "CNFNUM(订单号)", 
+        INVOICE_AMOUNT AS "INVOICE_AMOUNT(发票金额)",
+        INVOICE_HEAD AS "INVOICE_HEAD(发票抬头)",
+        INVOICE_BODY AS "INVOICE_BODY(发票内容)",
+        INVOICE_ADDR AS "INVOICE_ADDR(邮寄地址)",
+        MEMO AS "MEMO(备注)",
+        CREATE_TIME AS "CREATE_TIME(创建时间)",
+        UPDATE_TIME AS "UPDATE_TIME(更新时间)",
+        (CASE STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS "STATUS(状态)", 
+        SEND_CODE AS "SEND_CODE(邮寄单号)",
+        APPLY_TIME AS "APPLY_TIME(申请时间)",
+        (CASE APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS "APPLY_CHANEL(申请渠道)",
+        USERID AS "USERID(注册手机号)", 
+        INVOICE_TIME AS "INVOICE_TIME(确认开票时)", 
+        SEND_TIME AS "SEND_TIME(确认邮寄时)", 
+        OPERATOR AS "OPERATOR(操作人)",
+        CONTRACT_TEL AS "CONTRACT_TEL(联系电话)", 
+        ZIPCODE AS "ZIPCODE(邮寄编码)",
+        RECEIVER_NAME AS "RECEIVER_NAME(收件人姓名)",
+        INVOICE_NUM AS "INVOICE_NUM(发票号码)", 
+        SEND_NAME AS "SEND_NAME(邮寄方名称)"
+        FROM T_LM_INVOICE
+        where 
+        ((:USERID IS NULL) OR (USERID =:USERID)) AND
+        ((:CNFNUM IS NULL) OR (CNFNUM =:CNFNUM)) AND
+        ((:SENDCODE IS NULL) OR (SEND_CODE =:SENDCODE)) AND
+        ((:INVSTATUS IS NULL) OR (STATUS =:INVSTATUS)) AND
+        ((:APPLYCHANEL IS NULL) OR (APPLY_CHANEL =:APPLYCHANEL)) AND
+        (((:APPLYBEGINDATE IS NULL) OR (to_date(:APPLYBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= APPLY_TIME)) and ((:APPLYENDDATE IS NULL) OR (APPLY_TIME <= to_date(:APPLYENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) AND
+        (((:SENDBEGINDATE IS NULL) OR (to_date(:SENDBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= SEND_TIME)) and ((:SENDENDDATE IS NULL) OR (SEND_TIME <= to_date(:SENDENDDATE, 'yyyy.mm.dd hh24:mi:ss'))))
+        ORDER BY APPLY_TIME DESC ) tt ) where rwcount < 21
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_Invoice_all_excel_top">
+    <![CDATA[  
+    select * from (select rownum as rwcount, tt.* from ( SELECT tli.ID AS "ID(自增ID)",
+    tli.INVOICE_CODE AS "INVOICE_CODE(发票代码)",
+    tli.CNFNUM AS "CNFNUM(订单号)",
+    tli.INVOICE_AMOUNT AS "INVOICE_AMOUNT(发票金额)",
+    tli.INVOICE_HEAD AS "INVOICE_HEAD(发票抬头)",
+    tli.INVOICE_BODY AS "INVOICE_BODY(发票内容)",
+    tli.INVOICE_ADDR AS "INVOICE_ADDR(邮寄地址)",
+    tli.MEMO AS "MEMO(备注)",
+    tli.CREATE_TIME AS "CREATE_TIME(创建时间)",
+    tli.UPDATE_TIME AS "UPDATE_TIME(更新时间)",
+    (CASE tli.STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS "STATUS(状态)",
+    tli.SEND_CODE AS "SEND_CODE(邮寄单号)",
+    tli.APPLY_TIME AS "APPLY_TIME(申请时间)",
+    (CASE tli.APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS "APPLY_CHANEL(申请渠道)",
+    ur.LOGIN_MOBILE AS "USERID(注册手机号)",
+    tli.INVOICE_TIME AS "INVOICE_TIME(确认开票时)",
+    tli.SEND_TIME AS "SEND_TIME(确认邮寄时)",
+    tli.OPERATOR AS "OPERATOR(操作人)",
+    tli.CONTRACT_TEL AS "CONTRACT_TEL(联系电话)",
+    tli.ZIPCODE AS "ZIPCODE(邮寄编码)",
+    tli.RECEIVER_NAME AS "RECEIVER_NAME(收件人姓名)",
+    tli.INVOICE_NUM AS "INVOICE_NUM(发票号码)",
+    tli.SEND_NAME AS "SEND_NAME(邮寄方名称)"
+    FROM T_LM_INVOICE tli
+    inner join (select ID,LOGIN_MOBILE from t_lm_user) ur on tli.userid = ur.id
+    where
+    ((:USERID IS NULL) OR (ur.LOGIN_MOBILE =:USERID)) AND
+    ((:CNFNUM IS NULL) OR (tli.CNFNUM =:CNFNUM)) AND
+    ((:SENDCODE IS NULL) OR (tli.SEND_CODE =:SENDCODE)) AND
+    ((:INVSTATUS IS NULL) OR (tli.STATUS =:INVSTATUS)) AND
+    ((:APPLYCHANEL IS NULL) OR (tli.APPLY_CHANEL =:APPLYCHANEL)) AND
+    (((:APPLYBEGINDATE IS NULL) OR (to_date(:APPLYBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.APPLY_TIME)) and ((:APPLYENDDATE IS NULL) OR (tli.APPLY_TIME <= to_date(:APPLYENDDATE, 'yyyy.mm.dd hh24:mi:ss')))) AND
+    (((:SENDBEGINDATE IS NULL) OR (to_date(:SENDBEGINDATE, 'yyyy.mm.dd hh24:mi:ss') <= tli.SEND_TIME)) and ((:SENDENDDATE IS NULL) OR (tli.SEND_TIME <= to_date(:SENDENDDATE, 'yyyy.mm.dd hh24:mi:ss'))))
+    ORDER BY tli.APPLY_TIME DESC ) tt ) where rwcount < 21
+  ]]>
+</sql>
+
+  <sql database="TUANDB" sqlId="t_lm_Invoice_detail">
+    <![CDATA[  
+        SELECT tli.ID, tli.INVOICE_CODE AS INVOICECODE, tli.CNFNUM, tli.INVOICE_AMOUNT AS INVOICEAMOUNT, tli.INVOICE_HEAD AS INVOICEHEAD, 
+        tli.INVOICE_BODY AS INVOICEBODY, tli.INVOICE_ADDR AS INVOICEADDR, tli.MEMO, tli.CREATE_TIME AS CREATETIME,tli.UPDATE_TIME AS UPDATETIME, 
+        (CASE tli.STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS ONLINEDIS, tli.STATUS AS ONLINESTATUS,
+        tli.SEND_CODE AS SENDCODE, tli.APPLY_TIME AS APPLYTIME, 
+        (CASE tli.APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS APPLYCHANELNM, ur.login_mobile AS USERID, tli.INVOICE_TIME AS INVOICETIME, tli.SEND_TIME AS SENDTIME, tli.OPERATOR,
+        tli.CONTRACT_TEL AS CONTRACTTEL, tli.ZIPCODE, tli.RECEIVER_NAME AS RECEIVERNAME, tli.INVOICE_NUM AS INVOICENUM, tli.SEND_NAME AS SENDNAME, tli.OPERATOR_MEMO AS OPERATORMEMO
+        FROM T_LM_INVOICE tli
+        inner join (select ID,LOGIN_MOBILE from t_lm_user) ur on tli.userid = ur.id
+        where tli.ID=:ID
+  ]]>
+  </sql>
+  
+  <sql database="TUANDB" sqlId="t_lm_Invoice_detail_back">
+    <![CDATA[  
+        SELECT ID, INVOICE_CODE AS INVOICECODE, CNFNUM, INVOICE_AMOUNT AS INVOICEAMOUNT, INVOICE_HEAD AS INVOICEHEAD, 
+        INVOICE_BODY AS INVOICEBODY, INVOICE_ADDR AS INVOICEADDR, MEMO, CREATE_TIME AS CREATETIME,UPDATE_TIME AS UPDATETIME, 
+        (CASE STATUS  WHEN 0 THEN '未申请'  WHEN 1 THEN '已申请'  WHEN 2 THEN '已开具'  WHEN 3 THEN '已邮寄'  ELSE ''  END ) AS ONLINEDIS, STATUS AS ONLINESTATUS,
+        SEND_CODE AS SENDCODE, APPLY_TIME AS APPLYTIME, 
+        (CASE APPLY_CHANEL  WHEN 0 THEN '客服电话'  WHEN 1 THEN '手机客户端' ELSE ''  END ) AS APPLYCHANELNM, USERID, INVOICE_TIME AS INVOICETIME, SEND_TIME AS SENDTIME, OPERATOR,
+        CONTRACT_TEL AS CONTRACTTEL, ZIPCODE, RECEIVER_NAME AS RECEIVERNAME, INVOICE_NUM AS INVOICENUM, SEND_NAME AS SENDNAME, OPERATOR_MEMO AS OPERATORMEMO
+        FROM T_LM_INVOICE
+        where 
+        ID=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_Invoice_update_back_send">
+    <![CDATA[  
+      update t_lm_invoice
+       set status = :ONLINESTATUS,
+       SEND_CODE = null, SEND_NAME=null,SEND_TIME=null, OPERATOR=:OPERATOR,OPERATOR_MEMO=:REMARK, UPDATE_TIME=sysdate
+      where id = :ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_Invoice_update_back_invoice">
+    <![CDATA[  
+      update t_lm_invoice
+       set status = :ONLINESTATUS,invoice_num = null,OPERATOR=:OPERATOR,OPERATOR_MEMO=:REMARK, UPDATE_TIME=sysdate
+      where id = :ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_Invoice_update_invoicenum">
+    <![CDATA[  
+      update t_lm_invoice
+       set invoice_num = :INVOICENUM,status = 2,OPERATOR=:OPERATOR,OPERATOR_MEMO=:REMARK, UPDATE_TIME=sysdate
+      where id = :ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_Invoice_update_send">
+    <![CDATA[  
+      update t_lm_invoice
+       set SEND_CODE = :SENDCODE, SEND_NAME=:SENDNAME,status = 3,OPERATOR=:OPERATOR,SEND_TIME=sysdate,OPERATOR_MEMO=:REMARK, UPDATE_TIME=sysdate
+      where id = :ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_Invoice_update_invoicenum_check">
+    <![CDATA[  
+      select invoice_num from t_lm_invoice
+      where id <> :ID and invoice_num = :INVOICENUM
+  ]]>
+  </sql>
+
+</sqlList>

@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+  <siteMapNode url="" title="今夜酒店特价后台管理系统"  description="今夜酒店特价后台管理系统">
+    <siteMapNode title="优惠券管理" description="优惠券管理">
+      <siteMapNode url="~/WebUI/Ticket/TicketRule.aspx" title="设置基本规则" description="设置基本规则" />
+      <siteMapNode url="~/WebUI/Ticket/TicketPackage.aspx" title="优惠券礼包管理" description="优惠券礼包管理" />
+      <siteMapNode url="~/WebUI/Ticket/SetTicketUseRule.aspx" title="关联优惠券与规则" description="关联优惠券与规则" />
+      <siteMapNode url="~/WebUI/Ticket/BatchCreateTicket.aspx" title="批量生成抵用券" description="批量生成抵用券" />
+      <siteMapNode url="~/WebUI/Ticket/GrantTicketByPhone.aspx" title="发券给指定的用户" description="发券给指定的用户" />
+      <siteMapNode url="~/WebUI/Ticket/TicketUseInfo.aspx" title="查看优惠活动" description="查看优惠活动" />
+      <siteMapNode url="~/WebUI/Ticket/TicketUseDetail.aspx" title="优惠券使用详情" description="优惠券使用详情" />
+      <siteMapNode url="~/WebUI/Ticket/TicketFastSetting.aspx" title="优惠券快速设置" description="优惠券快速设置" />
+    </siteMapNode>
+    <siteMapNode title="促销管理" description="促销管理">
+      <siteMapNode url="~/WebUI/Promotion/PromotionInfoManager.aspx" title="新建促销信息" description="新建促销信息" />
+      <siteMapNode url="~/WebUI/Promotion/ReviewPromotionInfo.aspx" title="促销信息管理" description="促销信息管理" />
+      <siteMapNode url="~/WebUI/Promotion/PromotionInfoDetail.aspx" title="促销信息详细" description="促销信息详细" />
+    </siteMapNode>
+    <siteMapNode title="多供体系" description="多供体系">
+      <siteMapNode url="~/WebUI/Hotel/HotelSupMappingPage.aspx" title="供应商酒店关联" description="供应商酒店关联" />
+      <siteMapNode url="~/WebUI/SupChannel/HotelCreateManager.aspx" title="新增酒店" description="新增酒店" />
+    </siteMapNode>
+    <siteMapNode title="酒店管理" description="酒店管理">
+      <siteMapNode url="~/WebUI/Hotel/HotelPlanOffline.aspx" title="酒店计划上下线设置 " description="酒店计划上下线设置 " />
+      <siteMapNode url="~/WebUI/Hotel/HotelPlanSearch.aspx" title="酒店上下线状态查询 " description="酒店上下线状态查询 " />
+      <siteMapNode url="~/WebUI/Hotel/OnlineHotel.aspx" title="酒店上下线设置" description="酒店上下线设置" />
+      <siteMapNode url="~/WebUI/Hotel/HotelInfoManager.aspx" title="酒店信息管理" description="酒店信息管理" />
+      <siteMapNode url="~/WebUI/Hotel/HotelFacilitiesSearch.aspx" title="酒店服务设施管理" description="酒店服务设施管理" />
+      <siteMapNode url="~/WebUI/Hotel/HotelFacilitiesDetail.aspx" title="酒店服务设施明细" description="酒店服务设施明细" />
+      <siteMapNode url="~/WebUI/Hotel/FacilitiesHoteSetting.aspx" title="酒店服务设施设置" description="酒店服务设施设置" />
+      <siteMapNode url="~/WebUI/Hotel/HotelFullRoomManager.aspx" title="酒店标记满房" description="酒店标记满房" />
+      <siteMapNode url="~/WebUI/Hotel/HotelRoomPriceManager.aspx" title="酒店价格计划维护" description="酒店价格计划维护" />
+      <siteMapNode url="~/WebUI/Hotel/HotelSalesManager.aspx" title="酒店销售管理" description="酒店销售管理" />
+      <siteMapNode url="~/WebUI/Hotel/HotelSalesPlanManager.aspx?eh=99" title="99特价计划维护" description="99特价计划维护" />
+      <siteMapNode url="~/WebUI/Hotel/HotelSalesPlanManager.aspx" title="酒店销售计划维护" description="酒店销售计划维护" />
+      <siteMapNode url="~/WebUI/Hotel/ReviewHotelSalesPlan.aspx" title="酒店定时计划查看" description="酒店定时计划查看" />
+      <siteMapNode url="~/WebUI/Hotel/HotelSalesPlanDetail.aspx" title="酒店定时计划详情" description="酒店定时计划详情" />
+      <siteMapNode url="~/WebUI/Hotel/HotelRoomInventoryControl.aspx" title="房态控制" description="房态控制" />
+      <siteMapNode url="~/WebUI/CashBack/CreateCashByOrder.aspx" title="订单提现申请" description="订单提现申请" />
+      <siteMapNode url="~/WebUI/Hotel/CoreHotelDailyCheck.aspx" title="核心酒店每日检查" description="核心酒店每日检查" />
+      <siteMapNode url="~/WebUI/Hotel/ReviewHotelRoomPlan.aspx" title="销售计划查询" description="销售计划查询" />
+      <siteMapNode url="~/WebUI/Hotel/PictureInfoManager.aspx" title="图片管理" description="图片管理" />
+      <siteMapNode url="~/WebUI/Hotel/HotelBedType.aspx" title="床型管理" description="床型管理" />
+      <siteMapNode url="~/WebUI/Hotel/HotelConsultingRoomTable.aspx" title="询房表" description="询房表" />
+      <siteMapNode url="~/WebUI/Hotel/HotelOnlinePlan.aspx" title="销售计划查询" description="销售计划查询" />
+      <siteMapNode url="~/WebUI/Hotel/HotelBlackListManager.aspx" title="分销渠道库存过滤" description="分销渠道库存过滤" />
+      <siteMapNode url="~/WebUI/Hotel/CunsultWorkManager.aspx" title="房控工作管理" description="房控工作管理" />
+      <siteMapNode url="~/WebUI/Hotel/HotelComparisonPage.aspx" title="酒店比价" description="酒店比价" />
+      <siteMapNode url="~/WebUI/GeneralSetting/HotelTagInfoSearchPage.aspx" title="酒店商圈管理" description="酒店商圈管理" />
+      <siteMapNode url="~/WebUI/Hotel/HotelConsultingRoom.aspx" title="酒店询房表" description="酒店询房表" />
+
+      <siteMapNode url="~/WebUI/Settlement/SettlementUnitPage.aspx" title="酒店结算单位管理" description="酒店结算单位管理" />
+    </siteMapNode>
+
+    <siteMapNode title="订单管理" description="订单管理">
+      <siteMapNode url="~/WebUI/Order/OrderSearch.aspx" title="订单查询 " description="订单查询" />
+      <siteMapNode url="~/WebUI/Order/OrderOperation.aspx" title="订单操作" description="订单操作" />
+      <siteMapNode url="~/WebUI/Order/OrderConfirmInfoManager.aspx" title="订单确认" description="订单确认" />
+      <siteMapNode url="~/WebUI/Order/OrderConfirmManager.aspx" title="订单审核" description="订单审核" />
+      <siteMapNode url="~/WebUI/Order/OrderAutoRefreshPage.aspx" title="预付订单自动提示查询" description="预付订单自动提示查询" />
+      <siteMapNode url="~/WebUI/DBQuery/ReviewLmSystemLogPage.aspx" title="LM订单历史查询" description="LM订单历史查询" />
+      <siteMapNode url="~/WebUI/DBQuery/LmSystemLogDetailPage.aspx" title="LM订单历史详情" description="LM订单历史详情" />
+      <siteMapNode url="~/WebUI/DBQuery/LmSystemLogDetailByOrderID.aspx" title="LM订单历史详情" description="LM订单历史详情" />
+      <siteMapNode url="~/WebUI/DBQuery/ReviewLmSystemLogPageByNew.aspx" title="LM订单历史查询" description="LM订单历史查询" />
+      <siteMapNode url="~/WebUI/DBQuery/LmSystemLogDetailPageByNew.aspx" title="LM订单历史详情" description="LM订单历史详情" />
+      <siteMapNode url="~/WebUI/DBQuery/LmOrderLogPage.aspx" title="LM订单历史查询（New Page）" description="LM订单历史查询（New Page）" />
+      <siteMapNode url="~/WebUI/DBQuery/LmOrderAnalysis.aspx" title="LM订单趋势分析" description="LM订单趋势分析" />
+      <siteMapNode url="~/WebUI/Issue/ReviewOverTimeOrder.aspx" title="超时处理订单查询" description="超时处理订单查询" />
+      <siteMapNode url="~/WebUI/DBQuery/LmOrderSurveyAnalysis.aspx" title="订单Survey分析" description="LM订单Survey分析" />
+      <siteMapNode url="~/WebUI/Order/OrderApprovedManager.aspx" title="订单审核" description="订单审核" />
+      <siteMapNode url="~/WebUI/Order/OrderOperateStatus.aspx" title="订单状态操作" description="订单状态操作" />
+      <siteMapNode url="~/WebUI/Hotel/ReciveFaxSearch.aspx" title="接收传真管理" description="接收传真管理" />
+      <siteMapNode url="~/WebUI/Order/NSUserComplain.aspx" title="NS用户申诉" description="NS用户申诉" />
+
+      <siteMapNode url="~/WebUI/DBQuery/OrderSettleManager.aspx" title="结算对账单查询" description="结算对账单查询" />
+
+
+      <siteMapNode url="~/WebUI/Order/OrderApprovedFax.aspx" title="订单审核" description="订单审核" />
+      <siteMapNode url="~/WebUI/Order/OrderDBApprovedFax.aspx" title="订单审核(复审)" description="订单审核(复审)" />
+    </siteMapNode>
+
+    <siteMapNode title="APP信息审核" description="APP信息审核">
+      <siteMapNode url="~/WebUI/Hotel/APPContentSearch.aspx" title="APP内容审核" description="APP内容审核" />
+      <siteMapNode url="~/WebUI/Hotel/APPContentDetail.aspx" title="APP内容审核详细" description="APP内容审核详细" />
+      <siteMapNode url="~/WebUI/Hotel/APPContentAutoSearch.aspx" title="APP酒店自动审核" description="APP酒店自动审核" />
+      <siteMapNode url="~/WebUI/Hotel/HotelCompareManager.aspx" title="酒店数据同步检查" description="酒店数据同步检查" />
+    </siteMapNode>
+
+    <siteMapNode title="Issue单管理" description="Issue单管理">
+      <siteMapNode url="~/WebUI/Issue/SaveIssueManager.aspx" title="新建Issue单" description="新建Issue单" />
+      <siteMapNode url="~/WebUI/Issue/ReviewIssueManager.aspx" title="查询Issue单" description="查询Issue单" />
+    </siteMapNode>
+
+    <siteMapNode title="Push消息管理" description="Push消息管理">
+      <siteMapNode url="~/WebUI/Push/PushManagerPage.aspx" title="发送Push消息" description="发送Push消息" />
+      <siteMapNode url="~/WebUI/Push/PushHistoryManager.aspx" title="历史消息查询" description="历史消息查询" />
+      <siteMapNode url="~/WebUI/Push/PushSearchDeatilPage.aspx" title="历史消息详情" description="历史消息详情" />
+      <siteMapNode url="~/WebUI/Push/JPushManagerPage.aspx" title="锦江Push消息管理" description="锦江Push消息管理" />
+    </siteMapNode>
+
+    <siteMapNode title="Push消息中心管理" description="Push消息中心管理">
+      <siteMapNode url="~/WebUI/Push/PushInfoManagerPage.aspx" title="发送Push消息" description="发送Push消息" />
+      <siteMapNode url="~/WebUI/Push/PushInfoHistoryManager.aspx" title="历史消息查询" description="历史消息查询" />
+      <siteMapNode url="~/WebUI/Push/PushInfoSearchDeatilPage.aspx" title="历史消息详情" description="历史消息详情" />
+    </siteMapNode>
+    
+      <siteMapNode url="" title="综合管理" description="综合管理">
+      <siteMapNode url="~/WebUI/GeneralSetting/HotelGroupSearchPage.aspx" title="酒店集团管理" description="酒店集团管理" />
+      <siteMapNode url="~/WebUI/GeneralSetting/CitySearchPage.aspx" title="城市管理" description="城市管理" />
+      <siteMapNode url="~/WebUI/GeneralSetting/ChannelSearchPage.aspx" title="渠道管理" description="渠道管理" />
+      <siteMapNode url="~/WebUI/GeneralSetting/RegChannelSearchPage.aspx" title="注册渠道管理" description="注册渠道管理" />
+      <siteMapNode url="~/WebUI/GeneralSetting/PlatformSearchPage.aspx" title="应用平台管理" description="应用平台管理" />
+      <siteMapNode url="~/WebUI/GeneralSetting/PaymentSearchPage.aspx" title="支付方式管理" description="支付方式管理" />
+      <siteMapNode url="~/WebUI/DBQuery/DBSearchPage.aspx" title="DB查询管理" description="DB查询管理" />
+      <siteMapNode url="~/WebUI/GeneralSetting/FAQ.aspx" title="FAQ管理" description="FAQ管理" />
+      <siteMapNode url="~/WebUI/Invoice/InvoiceManagerSearch.aspx" title="发票管理" description="发票管理" />
+      <siteMapNode url="~/WebUI/Hotel/HotelMapFrame.aspx" title="酒店地图" description="酒店地图" />
+      <siteMapNode url="~/WebUI/GeneralSetting/FacilitiesTypeSearchPage.aspx" title="酒店服务设施类别管理" description="酒店服务设施类别管理" />
+      <siteMapNode url="~/WebUI/GeneralSetting/PartnerMangerPage.aspx" title="合作渠道链接管理" description="合作渠道链接管理" />
+        <siteMapNode url="~/WebUI/Promotion/PromotionTypeManager.aspx" title="促销方式管理" description="促销方式管理" />
+      </siteMapNode>
+    <siteMapNode url="" title="用户相关" description="用户相关">
+      <siteMapNode url="~/WebUI/UserGroup/CreateUserGroupPage.aspx" title="新建用户组" description="新建用户组" />
+      <siteMapNode url="~/WebUI/UserGroup/UserGroupDetailPage.aspx" title="用户组详情" description="用户组详情" />
+      <siteMapNode url="~/WebUI/UserGroup/ReviewUserGroupDetailPage.aspx" title="用户组详情" description="用户组详情" />
+      <siteMapNode url="~/WebUI/UserGroup/ReviewUserGroupPage.aspx" title="查看用户组" description="查看用户组" />
+      <siteMapNode url="~/WebUI/Feedback/Advice.aspx" title="用户反馈信息" description="用户反馈信息" />
+      <siteMapNode url="~/WebUI/UserGroup/ReviewUserPage.aspx" title="用户查询" description="用户查询" />
+      <siteMapNode url="~/WebUI/UserGroup/UserDetailPage.aspx" title="用户详情" description="用户详情" />
+      <siteMapNode url="~/WebUI/CashBack/UserCashDetailPage.aspx" title="现金账户详情" description="现金账户详情" />
+      <siteMapNode url="~/WebUI/UserGroup/UserOPMapFrame.aspx" title="用户热点图" description="用户热点图" />
+      <siteMapNode url="~/WebUI/UserGroup/ConsultRoomUserPage.aspx" title="询房用户管理" description="询房用户管理" />
+      <siteMapNode url="~/WebUI/UserGroup/ConsultPOrderUserPage.aspx" title="订单审核任务分配管理" description="订单审核任务分配管理" />
+    </siteMapNode>
+    <siteMapNode url="" title="目的地" description="目的地">
+      <siteMapNode url="~/WebUI/Destination/DestinationTypeSearch.aspx" title="目的地类型管理" description="目的地类型管理" />
+      <siteMapNode url="~/WebUI/Destination/DestinationManagerSearch.aspx" title="目的地管理" description="目的地管理" />
+   </siteMapNode>
+    
+    <siteMapNode url="" title="返现管理" description="返现管理">
+      <siteMapNode url="~/WebUI/CashBack/CashApplOperateSearch.aspx" title="用户提现处理" description="用户提现处理" />
+      <siteMapNode url="~/WebUI/CashBack/CashApplSearch.aspx" title="用户提现查询" description="用户提现查询" />
+      <siteMapNode url="~/WebUI/CashBack/CashChangeSearch.aspx" title="现金账户变动查询" description="现金账户变动查询" />
+      <siteMapNode url="~/WebUI/CashBack/CashApplProcess.aspx" title="用户提现处理详情" description="用户提现处理详情" />
+      <siteMapNode url="~/WebUI/CashBack/CreateCashBack.aspx" title="创建提现申请" description="创建提现申请" />
+    </siteMapNode>
+    
+    <siteMapNode url="" title="系统管理" description="系统管理">     
+      <siteMapNode url="~/Security/Users/UserManage.aspx" title="用户管理" description="用户管理" />
+      <siteMapNode url="~/Security/Roles/RoleManage.aspx" title="角色管理" description="角色管理" />
+      <siteMapNode url="~/Security/Permissions/MenuManage.aspx" title="菜单管理" description="菜单管理" />
+      <siteMapNode url="~/Security/Permissions/RightFrame.aspx" title="菜单权限设置" description="菜单权限设置" />
+    </siteMapNode>
+
+    <siteMapNode url="" title="报表中心" description="报表中心">
+      <siteMapNode url="~/WebUI/ReportCenter/GeneralDataWeekly.aspx" title="General数据(周)" description="General数据(周)" />
+      <siteMapNode url="~/WebUI/ReportCenter/QunaerDataWeekly.aspx" title="去哪儿数据(周)" description="去哪儿数据(周)" />
+      <siteMapNode url="~/WebUI/ReportCenter/CCCancelDataWeekly.aspx" title="客服取消单原因(周)" description="客服取消单原因(周)" />
+      <siteMapNode url="~/WebUI/ReportCenter/DuplicateOrderDataWeekly.aspx" title="重复预订状况(周)" description="重复预订状况(周)" />
+      <siteMapNode url="~/WebUI/ReportCenter/FRCancelDataWeekly.aspx" title="满房取消状况(周)" description="满房取消状况(周)" />
+      <siteMapNode url="~/WebUI/ReportCenter/CohortAnalysisDataWeekly.aspx" title="Cohort分析数据查询" description="Cohort分析数据查询" />
+      <siteMapNode url="~/WebUI/ReportCenter/HotelSalesDataWeekly.aspx" title="酒店销售分析报表" description="酒店销售分析报表" />
+      <siteMapNode url="~/WebUI/ReportCenter/PodinnsDataWeekly.aspx" title="布丁每日产量表查询" description="布丁每日产量表查询" />
+      <siteMapNode url="~/WebUI/ReportCenter/GeneralDataReport.aspx" title="每月产量表查询" description="每月产量表查询" />
+      
+    </siteMapNode>
+
+
+
+    <siteMapNode title="游轮管理" description="游轮管理">
+      <siteMapNode url="~/WebUI/Route/RouteControl.aspx" title="航线管理" description="航线管理" />
+      <siteMapNode url="~/WebUI/Route/RouteStock.aspx" title="库存管理" description="库存管理" />
+      <siteMapNode url="~/WebUI/Route/RouteReport.aspx" title="报表中心" description="报表中心" />
+    </siteMapNode>
+    
+
+  </siteMapNode>
+</siteMap>

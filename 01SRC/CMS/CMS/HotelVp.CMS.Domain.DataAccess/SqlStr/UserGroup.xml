@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_regchnnel_list">
+    <![CDATA[  
+      select id, regchanel_code AS REGCHANELCODE, regchanel_name AS REGCHANELNM, create_time AS cdtime, update_time AS udtime from t_lm_b_regchanel
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_platForm_list">
+    <![CDATA[  
+      select id, platform_code AS PLATFORMCODE, platform_name AS PLATFORMNM, create_time AS cdtime, update_time AS udtime from t_lm_b_platform
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup">
+    <![CDATA[  
+      select id, usergroup_name from t_lm_usergroup where usergroup_name=:USERGROUPNM
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_insert">
+    <![CDATA[  
+       insert into t_lm_usergroup (id, usergroup_name, regist_start, regist_end, login_start, login_end, submit_order_from, submit_order_to, complete_order_from, complete_order_to, last_order_start, last_order_end, manual_add, create_time, update_time)
+  values (:ID, :USERGROUPNAME, TO_DATE(:REGISTSTART, 'yyyy.mm.dd hh24:mi:ss'), TO_DATE(:REGISTEND, 'yyyy.mm.dd hh24:mi:ss'),   TO_DATE(:LOGINSTART, 'yyyy.mm.dd hh24:mi:ss'),   TO_DATE(:LOGINEND, 'yyyy.mm.dd hh24:mi:ss'),  :SUBMITORDERFROM ,  :SUBMITORDERTO ,  :COMPLETEORDERFROM ,  :COMPLETEORDERTO ,   TO_DATE(:LASTORDERSTART, 'yyyy.mm.dd hh24:mi:ss'),  TO_DATE(:LASTORDEREND, 'yyyy.mm.dd hh24:mi:ss'), :MANUALADD, sysdate, sysdate)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_rechanel_insert">
+    <![CDATA[  
+    insert into t_lm_ugroup_rcl
+    (id, usergroup_id, regchanel_code, create_time, update_time)
+    SELECT t_lm_ugroup_b_rcl_seq.nextval, :USERGROUPID_RCL,REGEXP_SUBSTR (:REGCHANELCODE, '[^,]+', 1,rownum) AS Login_mobile, sysdate, sysdate
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:REGCHANELCODE) - LENGTH (REPLACE (:REGCHANELCODE, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_platform_insert">
+    <![CDATA[  
+    insert into t_lm_ugroup_ptm
+    (id, usergroup_id, platform_code, create_time, update_time)
+    SELECT t_lm_ugroup_b_rcl_seq.nextval, :USERGROUPID_PTM,REGEXP_SUBSTR (:PLATFORMCODE, '[^,]+', 1,rownum) AS Login_mobile, sysdate, sysdate
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PLATFORMCODE) - LENGTH (REPLACE (:PLATFORMCODE, ',', ''))
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_select">
+    <![CDATA[  
+    select 
+    tt.ID,tt.usergroup_name AS USERGROUPNAME,
+    tt.CREATETIME,
+    tt.USERCOUNT,
+    (CASE tt.RegistTime WHEN '~' THEN '不限制' ELSE tt.RegistTime END ) as REGISTTIME,
+    (CASE tt.LoginTime WHEN '~' THEN '不限制' ELSE tt.LoginTime END ) as LOGINTIME,
+    (CASE tt.SubmitOrder WHEN '~' THEN '不限制' ELSE tt.SubmitOrder END ) as SUBMITORDER,
+    (CASE tt.CompleteOrder WHEN '~' THEN '不限制' ELSE tt.CompleteOrder END ) as COMPLETEORDER
+    from (select id, usergroup_name,to_char(create_time,'yyyy-mm-dd hh:mi:ss') as CreateTime, 
+    nvl(ult.counts，0) AS usercount ,
+    to_char(regist_start,'yyyy-mm-dd')||'~'||to_char(regist_end,'yyyy-mm-dd') AS RegistTime,
+    to_char(login_start,'yyyy-mm-dd')||'~'||to_char(login_end,'yyyy-mm-dd') AS LoginTime, 
+    to_char(submit_order_from)||'~'||to_char(submit_order_to) AS SubmitOrder, 
+    to_char(complete_order_from)||'~'||to_char(complete_order_to) AS CompleteOrder 
+    from t_lm_usergroup left join (select usergroup_id, count(login_mobile) as counts from t_lm_ugroup_ult group by usergroup_id) ult on ult.usergroup_id = t_lm_usergroup.id
+    order by create_time desc ) tt where rownum < 11
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_review_select">
+    <![CDATA[  
+    select 
+    tt.ID,tt.usergroup_name AS USERGROUPNAME,
+    to_char(tt.create_time,'yyyy-mm-dd hh:mi:ss') as CREATETIME,
+    tt.USERCOUNT,
+    (CASE when tt.regchanelNm is null THEN '不限制' ELSE tt.regchanelNm END ) as REGCHANELNM,
+    (CASE tt.SubmitOrder WHEN '~' THEN '不限制' ELSE tt.SubmitOrder END ) as SUBMITORDER
+    from (select id, usergroup_name,t_lm_usergroup.create_time, 
+    nvl(ult.counts，0) AS usercount ,
+    reg.regchanelNm,
+    to_char(submit_order_from)||'~'||to_char(submit_order_to) AS SubmitOrder
+    from t_lm_usergroup left join (
+    select usergroup_id, count(login_mobile) as counts 
+    from t_lm_ugroup_ult group by usergroup_id) ult on ult.usergroup_id = t_lm_usergroup.id
+    left join ( select usergroup_id,wm_concat(tbc.regchanel_name) AS regchanelNm from t_lm_ugroup_rcl urc
+    inner join t_lm_b_regchanel tbc on tbc.regchanel_code=urc.regchanel_code
+    group by usergroup_id) reg ON reg.usergroup_id = t_lm_usergroup.id
+    order by create_time desc ) tt 
+    where ((:USERGROUPNAME IS NULL) OR (tt.usergroup_name LIKE '%'||:USERGROUPNAME||'%') OR (tt.ID LIKE '%'||:USERGROUPNAME||'%'))
+    AND ((:StartDTime IS NULL) OR (to_date(:StartDTime, 'yyyy.mm.dd hh24:mi:ss') <= tt.create_time))
+    AND ((:EndDTime IS NULL) OR (tt.create_time <= to_date(:EndDTime, 'yyyy.mm.dd hh24:mi:ss')))
+    AND ((:StartCount IS NULL) OR (TO_NUMBER(:StartCount) <= tt.USERCOUNT))
+    AND ((:EndCount IS NULL) OR (tt.USERCOUNT <= TO_NUMBER(:EndCount))) order by tt.create_time desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_main_select">
+    <![CDATA[  
+    select
+    tt.ID,
+    tt.usergroup_name AS USERGROUPNAME,
+    (CASE when tt.regchanelNm is null THEN '不限制' ELSE tt.regchanelNm END ) as REGCHANELNM,
+    (CASE when tt.platformNm is null THEN '不限制' ELSE tt.platformNm END ) as PLATFORMNM,
+    (CASE tt.RegistTime WHEN '~' THEN '不限制' ELSE tt.RegistTime END ) as REGISTTIME,
+    (CASE tt.LoginTime WHEN '~' THEN '不限制' ELSE tt.LoginTime END ) as LOGINTIME,
+    (CASE tt.SubmitOrder WHEN '~' THEN '不限制' ELSE tt.SubmitOrder END ) as SUBMITORDER,
+    (CASE tt.CompleteOrder WHEN '~' THEN '不限制' ELSE tt.CompleteOrder END ) as COMPLETEORDER,
+    (CASE tt.LastOrder WHEN '~' THEN '不限制' ELSE tt.LastOrder END ) as LASTORDER,
+    tt.manual_add AS MANUALADD,
+    (CASE when tt.autoCount is null THEN 0 ELSE tt.autoCount END ) as AUTOCOUNT,
+    (CASE when tt.manualCount is null THEN 0 ELSE tt.manualCount END ) as MANUALCOUNT
+    from (select tlu.id, tlu.usergroup_name, reg.regchanelNm, ptm.platformNm,
+    to_char(tlu.regist_start, 'yyyy.mm.dd')||'~'||to_char(tlu.regist_end, 'yyyy.mm.dd') AS RegistTime,
+    to_char(tlu.login_start, 'yyyy.mm.dd')||'~'||to_char(tlu.login_end, 'yyyy.mm.dd') AS LoginTime,
+    to_char(tlu.submit_order_from)||'~'||to_char(tlu.submit_order_to) AS SubmitOrder,
+    to_char(tlu.complete_order_from)||'~'||to_char(tlu.complete_order_to) AS CompleteOrder,
+    to_char(tlu.last_order_start, 'yyyy.mm.dd')||'~'||to_char(tlu.last_order_end, 'yyyy.mm.dd') AS LastOrder,
+    tlu.manual_add,nvl(ulta.autoCount,0) + nvl(ultm.manualCount, 0) AS autoCount,ultm.manualCount
+    from t_lm_usergroup tlu
+    left join ( select usergroup_id,wm_concat(tbc.regchanel_name) AS regchanelNm from t_lm_ugroup_rcl urc
+        inner join t_lm_b_regchanel tbc on tbc.regchanel_code=urc.regchanel_code
+        group by usergroup_id) reg ON reg.usergroup_id = tlu.id
+    left join ( select usergroup_id,wm_concat(tbp.platform_name) AS platformNm from t_lm_ugroup_ptm upm
+        inner join t_lm_b_platform tbp on tbp.platform_code=upm.platform_code
+        group by usergroup_id) ptm ON ptm.usergroup_id = tlu.id
+    left join (select usergroup_id,count(Login_mobile) AS autoCount from t_lm_ugroup_ult
+        where add_type='0'
+        group by usergroup_id) ulta ON ulta.usergroup_id = tlu.id
+     left join (select usergroup_id,count(Login_mobile) AS manualCount from t_lm_ugroup_ult
+        where add_type='1'
+        group by usergroup_id) ultm ON ultm.usergroup_id = tlu.id    
+        ) tt  
+    where tt.id = :USERGROUPID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_detail_count">
+    <![CDATA[  
+    select 
+    count(ult.login_mobile)
+    from t_lm_usergroup ugp 
+    inner join t_lm_ugroup_ult ult on ugp.id=ult.usergroup_id
+    left join t_lm_user ur on ur.login_mobile=ult.login_mobile
+    left join 
+    (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) act
+    on act.login_mobile=ult.login_mobile
+    left join 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where ((price_code= 'LMBAR' and BOOK_STATUS=5) OR ((price_code= 'LMBAR2' OR price_code= 'BAR' OR price_code= 'BARB') AND (FOG_RESVTYPE='n' or FOG_RESVTYPE='e') AND book_status_other <> '3')) group by login_mobile) cpt
+    on cpt.login_mobile=ult.login_mobile
+    left join T_LM_B_REGCHANEL brl on brl.REGCHANEL_CODE=ur.REGCHANEL_CODE
+    left join T_LM_B_PLATFORM ptm on ptm.PLATFORM_CODE=ur.PLATFORM_CODE
+    where ugp.id=:USERGROUPID ORDER BY ult.id desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_detail_select">
+    <![CDATA[  
+    select 
+    ult.login_mobile AS LOGINMOBILE,to_char(ur.createtime, 'yyyy.mm.dd hh24:mi:ss') AS CREATETIME ,brl.REGCHANEL_NAME AS REGCHANELNM, ptm.PLATFORM_NAME AS PLATFORMNM
+    ,ur.SIGN_KEY,to_char(ur.sign_date, 'yyyy.mm.dd hh24:mi:ss') AS SIGNTIME,
+    nvl(act.allCount, 0) AS ALLCOUNT,nvl(cpt.compleCount,0) AS COMPLECOUNT, ur.ID AS USERID
+    from t_lm_usergroup ugp 
+    inner join t_lm_ugroup_ult ult on ugp.id=ult.usergroup_id
+    left join t_lm_user ur on ur.login_mobile=ult.login_mobile
+    left join 
+    (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) act
+    on act.login_mobile=ult.login_mobile
+    left join 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where ((price_code= 'LMBAR' and BOOK_STATUS=5) OR ((price_code= 'LMBAR2' OR price_code= 'BAR' OR price_code= 'BARB') AND (FOG_RESVTYPE='n' or FOG_RESVTYPE='e') AND book_status_other <> '3')) group by login_mobile) cpt
+    on cpt.login_mobile=ult.login_mobile
+    left join T_LM_B_REGCHANEL brl on brl.REGCHANEL_CODE=ur.REGCHANEL_CODE
+    left join T_LM_B_PLATFORM ptm on ptm.PLATFORM_CODE=ur.PLATFORM_CODE
+    where ugp.id=:USERGROUPID ORDER BY ult.id desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_detail_query">
+    <![CDATA[  
+    select 
+    ult.login_mobile AS LOGINMOBILE,to_char(ur.createtime, 'yyyy.mm.dd hh24:mi:ss') AS CREATETIME ,brl.REGCHANEL_NAME AS REGCHANELNM, ptm.PLATFORM_NAME AS PLATFORMNM
+    ,ur.SIGN_KEY,to_char(tlua.TODAYLOGIN, 'yyyy.mm.dd hh24:mi:ss') AS SIGNTIME,
+    nvl(act.allCount, 0) AS ALLCOUNT,nvl(cpt.compleCount,0) AS COMPLECOUNT, ur.ID AS USERID
+    from t_lm_usergroup ugp 
+    inner join t_lm_ugroup_ult ult on ugp.id=ult.usergroup_id
+    left join t_lm_user ur on ur.login_mobile=ult.login_mobile
+    left join 
+    (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) act
+    on act.login_mobile=ult.login_mobile
+    left join 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where ((price_code= 'LMBAR' and BOOK_STATUS=5) OR ((price_code= 'LMBAR2' OR price_code= 'BAR' OR price_code= 'BARB') AND (FOG_RESVTYPE='n' or FOG_RESVTYPE='e') AND book_status_other <> '3')) group by login_mobile) cpt
+    on cpt.login_mobile=ult.login_mobile
+    left join T_LM_B_REGCHANEL brl on brl.REGCHANEL_CODE=ur.REGCHANEL_CODE
+    left join T_LM_B_PLATFORM ptm on ptm.PLATFORM_CODE=ur.PLATFORM_CODE
+    left join (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t group by t.mobile) tlua
+    on ult.login_mobile=tlua.mobile
+    where ugp.id=:USERGROUPID ORDER BY ult.id desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_ult_insert">
+    <![CDATA[  
+    insert into t_lm_ugroup_ult
+    (id, usergroup_id, login_mobile, add_type,create_time, update_time)
+    select t_lm_ugroup_ult_seq.nextval,:USERGROUPID, userList.LOGINMOBILE, '0', sysdate, sysdate from (select * from (select 
+    ur.login_mobile AS LOGINMOBILE,ur.createtime
+    ,ur.SIGN_KEY,ur.sign_date,
+    nvl(act.allCount, 0) AS ALLCOUNT,nvl(cpt.compleCount,0) AS COMPLECOUNT,
+    LastT.lastordertime,
+    ur.regchanel_code,ur.platform_code,tlua.TODAYLOGIN
+    from t_lm_user ur
+    left join 
+    (select count(id) AS allCount ,login_mobile from t_lm_order group by login_mobile) act
+    on act.login_mobile=ur.login_mobile
+    left join 
+    (select count(id) AS compleCount ,login_mobile from t_lm_order where ((price_code= 'LMBAR' and BOOK_STATUS=5) OR ((price_code= 'LMBAR2' OR price_code= 'BAR' OR price_code= 'BARB') AND (FOG_RESVTYPE='n' or FOG_RESVTYPE='e') AND book_status_other <> '3')) group by login_mobile) cpt
+    on cpt.login_mobile=ur.login_mobile
+    left join
+    (select lo.login_mobile,lo.CREATE_TIME AS lastordertime from t_lm_order lo inner join 
+    (select login_mobile,max(CREATE_TIME) as mCreateTime from t_lm_order group by login_mobile) ld
+    on lo.login_mobile=ld.login_mobile and lo.CREATE_TIME=ld.mCreateTime) LastT
+    on LastT.login_mobile=ur.login_mobile
+    left join (select t.mobile,max(t.today_login) AS TODAYLOGIN from t_lm_user_action t group by t.mobile) tlua
+    on ur.login_mobile=tlua.mobile
+    ) tt
+    where 
+    ((:REGISTSTART IS NULL) OR (to_date(:REGISTSTART, 'yyyy.mm.dd hh24:mi:ss') <= tt.createtime)) AND
+    ((:REGISTEND IS NULL) OR (tt.createtime<= to_date(:REGISTEND, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:LOGINSTART IS NULL) OR (to_date(:LOGINSTART, 'yyyy.mm.dd hh24:mi:ss') <= tt.TODAYLOGIN)) AND
+    ((:LOGINEND IS NULL) OR (tt.TODAYLOGIN<= to_date(:LOGINEND, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:SUBMITORDERFROM IS NULL) OR (to_number(:SUBMITORDERFROM) <= tt.ALLCOUNT)) AND
+    ((:SUBMITORDERTO IS NULL) OR (tt.ALLCOUNT<= to_number(:SUBMITORDERTO) )) AND
+    ((:COMPLETEORDERFROM IS NULL) OR (to_number(:COMPLETEORDERFROM) <= tt.COMPLECOUNT)) AND
+    ((:COMPLETEORDERTO IS NULL) OR (tt.COMPLECOUNT<= to_number(:COMPLETEORDERTO) )) AND
+    ((:LASTORDERSTART IS NULL) OR (to_date(:LASTORDERSTART, 'yyyy.mm.dd hh24:mi:ss') <= tt.lastordertime)) AND
+    ((:LASTORDEREND IS NULL) OR (tt.lastordertime<= to_date(:LASTORDEREND, 'yyyy.mm.dd hh24:mi:ss') )) AND
+    ((:REGCHANNELLIST IS NULL) OR (tt.regchanel_code IN (SELECT REGEXP_SUBSTR (:REGCHANNELLIST, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:REGCHANNELLIST) - LENGTH (REPLACE (:REGCHANNELLIST, ',', ''))
+      +1))) AND
+    ((:PLATFORMLIST IS NULL) OR (tt.platform_code IN (SELECT REGEXP_SUBSTR (:PLATFORMLIST, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PLATFORMLIST) - LENGTH (REPLACE (:PLATFORMLIST, ',', ''))
+      +1) )) ) userList
+  ]]>
+  </sql>
+  <sql database="TUANDB" sqlId="t_lm_usergroup_ult_manual_insert">
+    <![CDATA[  
+      merge into t_lm_ugroup_ult t1
+      using (SELECT :USERGROUPID as usergroup_id, REGEXP_SUBSTR (:MANUALADD, '[^,]+', 1,rownum) AS Login_mobile
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:MANUALADD) - LENGTH (REPLACE (:MANUALADD, ',', ''))
+      +1) t2 
+      on (t1.usergroup_id = t2.usergroup_id and t1.login_mobile = t2.Login_mobile)
+      when not matched then
+      insert values (t_lm_ugroup_ult_seq.nextval, t2.usergroup_id, t2.Login_mobile,'1',sysdate,sysdate)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_historylist">
+    <![CDATA[  
+      select Login_mobile AS Loginmobile from t_lm_usergroup tlu
+      inner join t_lm_ugroup_ult ultm
+       ON ultm.usergroup_id = tlu.id    
+      where tlu.usergroup_name=:USERGROUPNM
+  ]]>
+  </sql>
+
+</sqlList>

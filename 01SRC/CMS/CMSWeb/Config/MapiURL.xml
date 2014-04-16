@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mapiList>
+  <mapi lmApiID="AdviceSearchUrl">/advice.xml</mapi>
+  <mapi lmApiID="AdviceSearchJsonUrl">/advice.json</mapi>
+  <mapi lmApiID="QueryUserSignUrl">/rest/member/lmuserQuery.json</mapi>
+</mapiList>

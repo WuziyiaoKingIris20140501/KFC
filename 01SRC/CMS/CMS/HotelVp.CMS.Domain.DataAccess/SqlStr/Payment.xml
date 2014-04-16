@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_lm_b_platform">
+    <![CDATA[  
+      select lp.ID, lp.platform_code AS PlatformCODE, lp.platform_name AS PlatformNM from t_lm_b_platform lp where lp.status='1'
+  ]]>   
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_payment">
+    <![CDATA[  
+      select lm.id AS PAYMENTID, lm.payment_code AS paymentcode, lm.payment_name AS paymentnm, lm.create_time AS cdtime, lm.update_time AS udtime from t_lm_b_payment lm
+      where
+      ((:ID IS NULL) OR (lm.id = :ID))
+      AND ((:PAYMENTNAME IS NULL) OR (lm.payment_name LIKE '%'||:PAYMENTNAME||'%'))
+      AND ((:StartDTime IS NULL) OR (to_date(:StartDTime, 'yyyy.mm.dd hh24:mi:ss') <= lm.create_time))
+      AND ((:EndDTime IS NULL) OR (lm.create_time <= to_date(:EndDTime, 'yyyy.mm.dd hh24:mi:ss'))) ORDER BY lm.ID DESC
+  ]]>
+  </sql>
+  
+  <sql database="TUANDB" sqlId="t_lm_b_payment_all">
+    <![CDATA[  
+      SELECT ls.ID,lp.platform_code as PLATMENTID,lp.platform_name AS PLATFORMNM, lp.platform_code AS PLATFORMCODE ,
+      ls.ONLINESTATUS,ls.PAYMENTNM, ls.PAYMENTID,ls.PAYMENTCODE
+      from (select id, platform_code, platform_name, status from t_lm_b_platform where status='1') lp 
+      left join (select * from (Select cs.ID,cs.status AS ONLINESTATUS,cs.platform_code,lm.payment_code AS PAYMENTID,lm.payment_code AS PAYMENTCODE,lm.payment_name AS PAYMENTNM
+      FROM t_lm_b_payment lm inner join t_lm_b_payment_plat cs on cs.payment_code=lm.payment_code and lm.ID =:PAYMENTID) )ls ON ls.platform_code=lp.platform_code
+      ORDER BY ls.ID DESC
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_cs_payment_sigle">
+    <![CDATA[  
+       SELECT ID, PaymentID, PayForm_ID, ONLINESTATUS,  CDTIME,  UDTIME from T_CS_Payment WHERE PaymentID=:PAYMENTID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_payment_sigle">
+    <![CDATA[  
+       select lm.payment_code AS PAYMENTCODE,lm.payment_name AS PAYMENTNM from t_lm_b_payment lm 
+        where (lm.payment_code = :PAYMENTCODE)
+        OR (lm.payment_name = :PAYMENTNM)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_payment_updatesigle">
+    <![CDATA[  
+       select lm.payment_code AS PAYMENTCODE,lm.payment_name AS PAYMENTNM from t_lm_b_payment lm 
+        where (lm.ID <> :ID)
+        AND (lm.payment_name = :PAYMENTNM)
+  ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_payment_plat_insert">
+    <![CDATA[
+       INSERT INTO t_lm_b_payment_plat(ID,  payment_code, platform_code, status,  create_time, update_time) VALUES 
+       (:ID,  :PAYMENTID,  :PLATFORM_ID, :ONLINESTATUS,  SYSDATE, SYSDATE)
+    ]]>
+  </sql>
+  
+  <sql database ="TUANDB" sqlId="t_lm_b_payment_insert">
+    <![CDATA[
+       INSERT INTO t_lm_b_payment(ID,  payment_code,  payment_name,  create_time, update_time) VALUES 
+       (:ID,  :PAYMENTCODE,  :PAYMENTNM,  SYSDATE, SYSDATE)
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_payment_plat_update">
+    <![CDATA[
+       merge into t_lm_b_payment_plat t1
+      using (select to_number(:ID) AS ID, :PAYMENTID AS payment_code,:PLATFORM_ID AS platform_code,:ONLINESTATUS AS status from dual) t2 
+      on (t1.payment_code = t2.payment_code and t1.platform_code = t2.platform_code)
+      when matched then
+         update set t1.status=t2.status, t1.update_time=sysdate
+         where t1.payment_code = t2.payment_code and t1.platform_code = t2.platform_code and t1.status<>t2.status
+      when not matched then
+         insert values (t2.ID, t2.payment_code,t2.platform_code,t2.status,sysdate,sysdate)
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_b_payment_update">
+    <![CDATA[
+       UPDATE  t_lm_b_payment SET payment_name=:PAYMENTNM, update_time=SYSDATE WHERE ID=:ID
+    ]]>
+  </sql>
+  
+</sqlList>

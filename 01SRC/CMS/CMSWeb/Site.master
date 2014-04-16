@@ -1,0 +1,129 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.master.cs" Inherits="Site" %>
+<%@ Register assembly="System.Web.DataVisualization, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" namespace="System.Web.UI.DataVisualization.Charting" tagprefix="asp" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head id="Head1" runat="server">
+    <title>CMS酒店管理系统</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>    
+    <meta http-equiv="X-UA-Compatible" content="IE=8,chrome=1"/>
+    <link href="Styles/public.css" type="text/css" rel="Stylesheet" />
+    <link href="Styles/Sites.css" type="text/css" rel="Stylesheet" />
+    <script language="javascript" type="text/javascript" src='<%=ResolveClientUrl("~/Scripts/WdatePicker.js")%>'></script>
+    <script language="javascript" type="text/javascript" src='<%=ResolveClientUrl("~/Scripts/common.js")%>'></script>
+
+<%--    <link type="text/css" href="http://ajax.microsoft.com/ajax/jquery.ui/1.8.5/themes/blitzer/jquery-ui.css" rel="Stylesheet" />
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.4.4.js"></script>  
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.6/jquery-ui.js"></script>--%>
+
+    <%--<link href="Styles/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src='<%=ResolveClientUrl("~/Scripts/jquery-1.4.4.js")%>'></script>
+    <script type="text/javascript" src='<%=ResolveClientUrl("~/Scripts/jquery-ui.js")%>'></script>--%>
+
+   
+    <link href="Styles/jquery-ui-1.8.18.custom.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src='<%=ResolveClientUrl("~/Scripts/jquery-1.7.1.min.js")%>'></script>
+    <script type="text/javascript" src='<%=ResolveClientUrl("~/Scripts/jquery-ui-1.8.18.custom.min.js")%>'></script>
+    <script language="javascript" type="text/javascript">
+        $(function () {
+
+            $("#accordion").accordion({ active: parseInt(document.getElementById("hidMenuSpan").value), collapsible: true });
+
+            if (document.getElementById("<%=hidChangeMenu.ClientID%>").value == "0") {
+                document.getElementById("<%=tdSite.ClientID%>").style.display = "none";
+                document.getElementById("<%=tdPages.ClientID%>").style.width = "100%";
+            }
+            else {
+                document.getElementById("<%=tdSite.ClientID%>").style.display = "";
+                document.getElementById("<%=tdSite.ClientID%>").style.width = "12%";
+                document.getElementById("<%=tdPages.ClientID%>").style.width = "88%";
+            }
+            
+        });
+
+        function changeMenu() {
+            if (document.getElementById("<%=tdSite.ClientID%>").style.display == "none") {
+                document.getElementById("<%=tdSite.ClientID%>").style.display = "";
+                document.getElementById("<%=tdSite.ClientID%>").style.width = "12%";
+                document.getElementById("<%=tdPages.ClientID%>").style.width = "88%";
+                document.getElementById("<%=hidChangeMenu.ClientID%>").value = "1";
+            }
+            else {
+                document.getElementById("<%=tdSite.ClientID%>").style.display = "none";
+                document.getElementById("<%=tdPages.ClientID%>").style.width = "100%";
+                document.getElementById("<%=hidChangeMenu.ClientID%>").value = "0";
+            }
+
+
+//            if (document.getElementById("<%=tdSite.ClientID%>").style.display == "none") {
+//                document.getElementById("<%=tdSite.ClientID%>").style.display = "";
+//                document.getElementById("<%=tdSite.ClientID%>").style.width = "12%";
+//                document.getElementById("<%=tdPages.ClientID%>").style.width = "88%";
+//                document.getElementById("<%=hidChangeMenu.ClientID%>").value = "1";
+//            }
+//            else {
+//                document.getElementById("<%=tdSite.ClientID%>").style.marginleft = "-1000px";
+//                document.getElementById("<%=tdPages.ClientID%>").style.width = "100%";
+//                document.getElementById("<%=hidChangeMenu.ClientID%>").value = "0";
+//            }
+        }
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <table style="width:100%" cellpadding="0" cellspacing="0"  >
+        <tr>
+            <td colspan="2" class="newtop">
+                <table style="width:100%;background-color:#3A599C">
+                    <tr>
+                        <td style="width:50%">
+                            <div style="text-align:left;vertical-align:middle;padding: 0.4em 0.8em 0.6em 1em;font-size:20px">
+                                <asp:HiddenField ID="hidChangeMenu" runat="server"/>
+                                <div style="float:left;margin-top:-8px;cursor:pointer;" onclick="changeMenu()" ><img src='<%=ResolveClientUrl("~/Images/toggleSidebar.png")%>'style="width:36px;height:36px;" title="点我隐藏菜单" /></div><div style="float:left;margin-left:10px;margin-top:-5px;"><a id="A1" href="~/Default.aspx" runat="server"><div style="font-family:微软雅黑"><font color="white">今夜酒店特价后台管理系统 - KFC</font></div></a></div>
+                            </div>
+                        </td>
+                        <td style="width:50%">
+                            <div style="text-align:right;vertical-align:middle;padding: 0.8em 0.8em 0.8em 1em;font-size:12px">
+                                    <strong style="color:white;"><%=UserSession.Current.UserDspName %></strong><br/> 
+                                    <asp:LinkButton  ID="lbtnLogout" runat="server" onclick="lbtnLogout_Click"><font style="color:white;">注销 </font></asp:LinkButton>
+                                    <div style="display:none;"><asp:LinkButton  ID="lbtnUpdatePwd" runat="server" onclick="lbtnUpdatePwd_Click"><font style="color:white;"> ｜ 修改密码</font></asp:LinkButton></div>
+                                    <asp:HiddenField ID="hidMenuSpan" runat="server"/>
+                             </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            
+        </tr>
+        <tr>
+            <td style="width:12%; vertical-align:top" id="tdSite" runat="server">
+            <div style="margin:3px;margin-top:8px">
+                <div>
+                   <div id="accordion" style="width:185px;font-size:small;margin-left:2px;" runat="server"></div>
+                </div>
+              </div>
+            </td>
+            <td  style="width:88%; vertical-align:top;" id="tdPages" runat="server">
+                <div style ="margin-left:14px;padding:0.6em 0em 0.1em 0em;border:1px;width:96%" id="dvMapPath" runat="server">
+                    <ul class="breadcrumb">
+                        <asp:SiteMapPath ID="SiteMapPath1" runat="server">
+                    </asp:SiteMapPath>
+                    </ul>
+                </div>
+                <div id="dvLbMap" runat="server">
+                <h2>
+                    &nbsp;&nbsp;&nbsp;<font color="#3A599C"><asp:Label ID="lbDefMap" runat="server" Text="欢迎使用今夜酒店特价后台管理系统！" /></font>
+                </h2>
+                </div>
+                <div>
+                <asp:ContentPlaceHolder ID="MainContent" runat="server">
+                    <p>
+                        GridviewControl.ResetGridView(this.gridViewOrder);</p>
+                </asp:ContentPlaceHolder>
+                </div>  
+            </td>
+        </tr>
+        </table>
+    </form>
+</body>
+</html>

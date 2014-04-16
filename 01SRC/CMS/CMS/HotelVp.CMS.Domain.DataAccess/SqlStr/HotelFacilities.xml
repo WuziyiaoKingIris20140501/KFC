@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_hotel_list_all">
+    <![CDATA[  
+     select 
+    tlb.facilities_code AS FACILITIESCODE, 
+    tlb.name_zh AS FACILITIESNM, 
+    tlb.seq AS HTSEQ,tbf.facilities_type_seq AS TYPESEQ,tbf.facilities_type_name AS TYPENAME
+    from 
+    t_lm_b_facilities tlb
+    left join t_lm_b_facilities_type tbf on tlb.type=tbf.facilities_type_code
+    order by tbf.facilities_type_seq asc, tlb.seq asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_detal">
+    <![CDATA[  
+     select id, name_zh, name_en, TYPE, FACILITIES_CODE,status, SEQ,create_time, update_time from t_lm_b_facilities where id=:id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_type_detal">
+    <![CDATA[  
+     select id, facilities_type_code AS FtCode, facilities_type_name AS FtName, 
+    facilities_type_seq AS FtSeq, status AS FtStatus, create_time, update_time 
+    from t_lm_b_facilities_type where id=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_type_list_all">
+    <![CDATA[  
+    select 
+    facilities_type_code AS TYPECODE, 
+    facilities_type_name AS TYPENAME
+    from t_lm_b_facilities_type order by FACILITIES_TYPE_SEQ asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_seq_max">
+    <![CDATA[  
+    select NVL(max(SEQ), 0)+1
+    from T_LM_B_FACILITIES where TYPE=:TYPE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_max_for_update">
+    <![CDATA[  
+    select SEQ
+    from T_LM_B_FACILITIES where id=:ID AND TYPE=:TYPE
+  ]]>
+  </sql>
+  
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_type_seq_max">
+    <![CDATA[  
+    select NVL(max(facilities_type_seq), 0)+1
+    from t_lm_b_facilities_type
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_list_all">
+  <![CDATA[  
+   select tlb.ID, tlb.name_zh AS FACILITIESNM, tlb.FACILITIES_CODE AS FACILITIESCODE,
+  (CASE tlb.status  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS, 
+  tlb.create_time AS CDTIME , tlb.update_time AS UDTIME ,tlb.seq AS FTSEQ, tlb.type, tbf.facilities_type_name AS FTTYPENM
+  from t_lm_b_facilities tlb
+  left join t_lm_b_facilities_type tbf on tlb.type = tbf.facilities_type_code
+  where (:TYPE IS NULL OR type=:TYPE) order by tlb.seq asc
+  ]]>
+</sql>
+  
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_service">
+    <![CDATA[  
+   select ID, name_zh AS FACILITIESNM, FACILITIES_CODE AS FACILITIESCODE,
+  (CASE status  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS, 
+  create_time AS CDTIME , update_time AS UDTIME  from t_lm_b_facilities where type='S' order by id desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_type_list">
+    <![CDATA[  
+    select id AS FTID, facilities_type_code AS FTCODE, facilities_type_name AS FTNM, facilities_type_seq AS FTSEQ, 
+    (CASE status  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS, create_time AS CDTIME, UPDATE_TIME AS UDTIME from t_lm_b_facilities_type 
+    order by facilities_type_seq asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities">
+    <![CDATA[  
+      select ID, name_zh AS FACILITIESNM, FACILITIES_CODE AS FACILITIESCODE,
+  (CASE status  WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS, 
+  create_time AS CDTIME , update_time AS UDTIME  from t_lm_b_facilities where type='F' order by id desc
+  ]]>
+  </sql>
+  
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_check">
+    <![CDATA[  
+    select ID, name_zh from t_lm_b_facilities
+    where name_zh = :CHKNAME and type=:TYPE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_type_check">
+    <![CDATA[  
+    select ID from t_lm_b_facilities_type
+    where facilities_type_name = :CHKNAME OR facilities_type_code=:CHKCODE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_type_insert">
+    <![CDATA[  
+     insert into t_lm_b_facilities_type
+  (id, facilities_type_code, facilities_type_name, facilities_type_seq, status, create_time, update_time)
+values
+  (:ID, :CODE, :NAMECN, TO_NUMBER(:SEQ), '0', sysdate, sysdate)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_insert">
+    <![CDATA[  
+      insert into t_lm_b_facilities
+   (id, name_zh, type, status,FACILITIES_CODE,seq,create_time, update_time)
+ values
+   (:ID,:NAMECN, :TYPE, '1', :CODE,:SEQ,sysdate, sysdate)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_update">
+    <![CDATA[  
+     update t_lm_b_facilities set name_zh=:NAMECN, status=:ONLINESTATUS, type=:TYPE, SEQ=:SEQ,update_time=sysdate where ID=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_type_update">
+    <![CDATA[  
+     update t_lm_b_facilities_type set FACILITIES_TYPE_NAME=:NAMECN, FACILITIES_TYPE_CODE=:CODE, status=:ONLINESTATUS, update_time=sysdate where ID=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_update_check">
+    <![CDATA[  
+     select ID, name_zh from t_lm_b_facilities
+    where name_zh = :CHKNAME and type=:TYPE and ID<>:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_type_update_check">
+    <![CDATA[  
+      select id
+      from t_lm_b_facilities_type where (facilities_type_code=:CHKCODE OR facilities_type_name=:CHKNAME) AND id <> :ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_hotel">
+    <![CDATA[  
+     select id, facilities_code AS FACILITIESCODE, hotel_id, update_time 
+     from t_lm_b_facilities_hotel where hotel_id=:HOTELID and STATUS='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_service_save_update">
+    <![CDATA[  
+     update t_lm_b_facilities_hotel set STATUS='0', update_time =sysdate where hotel_id=:HOTELID and STATUS='1'
+  ]]>
+  </sql>
+  
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_service_save">
+      <![CDATA[  
+      merge into t_lm_b_facilities_hotel t1
+      using (select :HOTELID AS HOTEL_ID,:FACILITIESCODE AS FACILITIES_CODE from dual) t2 
+      on (t1.HOTEL_ID = t2.HOTEL_ID and t1.FACILITIES_CODE = t2.FACILITIES_CODE)
+      when matched then
+         update set t1.status='1', t1.update_time=sysdate
+         where t1.HOTEL_ID = t2.HOTEL_ID and t1.FACILITIES_CODE = t2.FACILITIES_CODE
+      when not matched then
+         insert values (t_lm_b_facilities_hotel_SEQ.nextval, t2.FACILITIES_CODE,t2.HOTEL_ID,'1',sysdate,sysdate)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_type_seq_update">
+    <![CDATA[  
+     update t_lm_b_facilities_type set facilities_type_seq=TO_NUMBER(:SEQ), update_time =sysdate where id=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_facilities_seq_update">
+    <![CDATA[  
+     update t_lm_b_facilities set seq=TO_NUMBER(:SEQ), update_time =sysdate where id=:ID
+  ]]>
+  </sql>
+
+</sqlList>

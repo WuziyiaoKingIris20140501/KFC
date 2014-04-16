@@ -1,0 +1,164 @@
+﻿@charset "UTF-8";
+/* CSS Document */
+body{font-size:12px; margin:0px; font-family:"Microsoft YaHei",微软雅黑,"MicrosoftJhengHei",华文细黑,STHeiti,MingLiu ;}
+
+a:link, a:visited
+{
+    color: #034af3;
+}
+
+a:hover
+{
+    color: #1d60ff;
+    text-decoration: none;
+}
+
+a:active
+{
+    color: #034af3;
+}
+
+ a.leftnav
+    {
+    text-decoration: none;
+    }
+
+a.leftnav:hover 
+{
+text-decoration: underline;
+}
+
+/*行头*/
+.RowTitle 
+{
+    background-color:#6379B2;
+    height:30px; 
+    padding:9px 0px 0px 10px;
+    font-weight:bold;
+    color:White;
+    border:1px #999999;
+ }
+
+/* the table of the page */
+.Table_BodyCSS
+{	
+	border:1px #999999;	
+	border-collapse:collapse;	
+	width:99%;	
+}
+
+td.tdcell  /* td cell sytle */
+{    	
+	border:1px #999999;
+	height:20px; 
+    font-family:"Microsoft YaHei",微软雅黑,"MicrosoftJhengHei",华文细黑,STHeiti,MingLiu ;   
+    color:Black;        
+    word-break:break-all;    
+    text-indent:10px;
+}
+
+
+/*GridView的样式风格*/
+.GView_BodyCSS 
+   {
+        font-size:12px;
+        font-family:"Microsoft YaHei",微软雅黑,"MicrosoftJhengHei",华文细黑,STHeiti,MingLiu ; 
+        border:1px #999999;
+        border-collapse:collapse;
+        color:Black;
+	    width:100%;
+	    border-width:1px;
+   }
+   
+.GView_BodyCSS td
+{
+    border:1px #999999 solid;
+    border-collapse:collapse;
+    color:Black;
+}
+
+.GView_BodyCSS th
+{
+    border:1px #999999 solid;
+    border-collapse:collapse;
+}
+
+ .GView_HeaderCSS
+ {
+      background-color:#6379B2;
+      border:1px #999999 solid; 
+      font-family:"Microsoft YaHei",微软雅黑,"MicrosoftJhengHei",华文细黑,STHeiti,MingLiu ;
+      color:White;
+      height:auto;
+      font-size:13px;
+ }
+ 
+ .GView_PagerItemCSS{
+    font-family:"Microsoft YaHei",微软雅黑,"MicrosoftJhengHei",华文细黑,STHeiti,MingLiu ;
+    border:0px; 
+}
+ 
+.GView_ItemCSS
+{
+     /*奇数行*/     
+     /*background:url(../images/bg-frame0201.gif);*/
+     
+     background:white;
+     line-height:20px; 
+}
+ 
+.GView_AlternatingItemCSS
+{
+    /*偶数行*/     
+     background:#f6f6f6;
+     border-top:1px #999999 solid; 
+     border-bottom:1px #999999 solid;
+     line-height:20px; 
+}
+  
+.GView_FooterCSS
+{ 
+    /*DataGrid最后一行:文中并未涉及*/ 
+     text-align:right;
+}
+
+/*用户弹出一个窗体，使用div的方式,bgDiv为背景层，popupDiv为显示的页面*/
+
+.bgDiv
+{
+    display: none;
+    position:absolute;
+    top: 0px;
+    left: 0px;
+    right:0px;
+    background-color: #777;
+    filter:progid:DXImageTransform.Microsoft.Alpha(style=3,opacity=25,finishOpacity=75)
+    opacity: 0.6;
+}
+
+.popupDiv
+{
+    width: 400px;
+    height:300px;
+    margin-top:100px;
+    margin-left:150px;
+    position:absolute;
+    padding: 1px;
+    vertical-align: middle;
+    text-align:center;
+    border: solid 2px #ff8300;
+    z-index: 10001;
+    display: none;
+    background-color:White;
+}
+
+.ImgBtn
+{    
+     /*background:url(../images/tab/buttonbg2.png);*/
+     height:25px; 
+     width:102px;
+     border:0px;
+     border-style:solid;
+     
+}   
+

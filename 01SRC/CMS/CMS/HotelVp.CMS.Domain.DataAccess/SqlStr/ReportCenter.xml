@@ -1,0 +1,1298 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="GeneralDataReport">
+    <![CDATA[
+    select 
+    to_char(tt.week,'yyyy-mm-dd') AS Week, nvl(xjd.XQJD,0) AS 新签酒店数,
+    --TO_CHAR(nvl(rsj.RSJD,0)/7,'999990.99') AS DONHT,
+    nvl(ut."新用户数",0) AS 新用户数,nvl(ut."iOS新用户",0) AS IOS新用户, nvl(ut."Android新用户",0) AS AND新用户,nvl(ut."WP用户",0) AS WP新用户,
+    nvl(tt."登录用户数",0) AS 登录用户数,nvl(tt."iOS用户",0) AS IOS用户,nvl(tt."Android用户",0) AS AND用户,nvl(st."订单总数",0) AS 总订单数,
+    nvl(lt."LM成功订单",0)+nvl(ot."常规现付成功订单",0) AS 成功订单数,case when nvl(tt."登录用户数",0) = 0 then '0%' else to_char((nvl(lt."LM成功订单",0)+nvl(ot."常规现付成功订单",0))/nvl(tt."登录用户数",0)*100,'9990.99')||'%' end AS 转化率,
+    case when nvl(st."订单总数",0) = 0 then '0%' else to_char((nvl(lt."LM成功订单",0)+nvl(ot."常规现付成功订单",0))/nvl(st."订单总数",0)*100,'9990.99')||'%' end AS "成功单%", 
+    case when (nvl(lt."LM成功订单",0)+nvl(ot."常规现付成功订单",0)) = 0 then '￥0' else '￥' || TO_CHAR(((nvl(lt."LM成功订单",0))*nvl(lt."LM客单价",0) + nvl(ot."常规现付成功订单",0)*nvl(ot."常规现付客单价",0)) / (nvl(lt."LM成功订单",0)+nvl(ot."常规现付成功订单",0)),'9990.00')  end AS 成功订单客单价,
+    nvl(lt."LM成功订单",0) AS LM成功订单,'￥'|| nvl(lt."LM客单价",'0') AS LM客单价,nvl(ot."常规现付成功订单",0) AS 常规现付成功订单,'￥'||nvl(ot."常规现付客单价",'0') AS 常规现付客单价,
+    nvl(st."用戶取消订单",0) AS 用户取消订单数, case when nvl(st."订单总数",0) = 0 then '0%' else TO_CHAR(nvl(st."用戶取消订单",0)/nvl(st."订单总数",0)*100,'9990.99') || '%' end AS "用户取消订单%",
+    nvl(lt."LM用戶取消订单",0) AS 用户取消LM,nvl(ot."用户取消常规",0) AS 用户取消常规,nvl(st."cc取消订单",0) AS CC取消订单数,case when nvl(st."订单总数",0) = 0 then '0%' else TO_CHAR(nvl(st."cc取消订单",0)/ nvl(st."订单总数",0)*100,'9990.99') || '%' end AS "CC取消订单数%",
+    nvl(lt."cc取消订单LM",0) AS CC取消LM,nvl(ot."CC取消常规",0) AS CC取消常规,nvl(st."no-show订单",0) AS "no-show订单数", case when nvl(st."订单总数",0) = 0 then '0%' else TO_CHAR(nvl(st."no-show订单",0)/nvl(st."订单总数",0)*100,'9990.99') || '%' end AS "no-show订单数%",
+    nvl(lt."no-show订单LM",0) AS "no-show订单LM",nvl(ot."no-show订单常规",0) AS "no-show订单常规",lj.CGPJ AS LM订单确认时间 ,cj.CGPJ AS 常规订单确认时间 
+    from (
+   select
+    (trunc(case when (to_char(today_login,'hh24') < 0) then trunc(today_login) else (today_login)+1 end ,'iw'))-1 as week,
+    nvl(count(distinct mobile),0) as "登录用户数",
+    nvl(count(distinct(decode(use_code,'IOS',mobile))),0) as  "iOS用户",
+    nvl(count(distinct(decode(use_code,'ANDROID',mobile))),0) as  "Android用户"
+
+    from T_LM_USER_ACTION WHERE TODAY_LOGIN IS NOT NULL
+    GROUP BY trunc(case when (to_char(today_login,'hh24') < 0 ) then trunc(today_login) else (today_login)+1 end ,'iw')
+    order by trunc(case when (to_char(today_login,'hh24') < 0) then trunc(today_login) else (today_login)+1 end ,'iw') desc ) tt
+
+    left join 
+    (
+      SELECT
+      (trunc(case when (to_char(CREATETIME,'hh24') < 0) then trunc(CREATETIME) else (CREATETIME)+1 end ,'iw'))-1 as week,
+      nvl(count(login_mobile),0) as "新用户数",
+      nvl(count(decode(platform_code,'IOS',login_mobile)),0) as  "iOS新用户",
+      nvl(count(decode(platform_code,'ANDROID',login_mobile)),0) as  "Android新用户",
+      nvl(count(decode(platform_code,'WP',login_mobile)),0) as  "WP用户"
+
+      from T_LM_USER
+      GROUP BY trunc(case when (to_char(CREATETIME,'hh24') < 0 ) then trunc(CREATETIME) else (CREATETIME)+1 end ,'iw')
+      order by trunc(case when (to_char(CREATETIME,'hh24') < 0) then trunc(CREATETIME) else (CREATETIME)+1 end ,'iw') desc
+    ) ut
+    
+    on tt.week = ut.week
+    
+    left join
+    (
+      SELECT
+      (trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw'))-1 as week,
+      count(decode(book_status_other ,'4',id,'6',id,'7',id,'8',id))
+      as "常规现付成功订单",
+      to_char(avg(decode(book_status_other,'4',book_total_price,'6',book_total_price,'7',book_total_price,'8',book_total_price,decode(pay_status,'1',book_total_price))),'9990.00') as "常规现付客单价",
+      count(decode(book_status_other ,'3',id)) as  "用户取消常规",
+      count(decode(book_status_other ,'9',id)) as  "CC取消常规",
+      count(decode(book_status_other ,'5',id)) as  "no-show订单常规"
+      from
+
+      t_lm_order
+      where
+      price_code in ('BAR','BARB')
+      and
+      CONTACT_NAME  not like '%测试%'
+      and
+      guest_names  not like '%测试%'
+      and
+      hotel_name  not like '%测试%'
+      and
+      CONTACT_NAME  not like '%test%'
+      and
+      guest_names  not like '%test%'
+      and
+      hotel_name  not like '%test%'
+      and
+      CONTACT_TEL not like '15811213288'
+      GROUP BY trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw')
+      order by trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw') desc
+
+    ) ot
+    
+    on tt.week = ot.week
+    
+    left join
+    
+    (
+      SELECT
+      (trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw'))-1 as week,
+      count(decode(book_status_other ,'4',id,'6',id,'7',id,'8',id))
+      +count(decode(pay_status,'1',id))
+      as "LM成功订单",
+      to_char(avg(decode(book_status_other,'4',book_total_price,'6',book_total_price,'7',book_total_price,'8',book_total_price,decode(pay_status,'1',book_total_price))),'9990.00') as "LM客单价",
+      count(decode(book_status_other ,'3',id)) as  "LM用戶取消订单",
+      count(decode(book_status_other ,'9',id)) as  "cc取消订单LM",
+      count(decode(book_status_other ,'5',id)) as  "no-show订单LM"
+      from
+
+      t_lm_order
+      where
+      price_code in ('LMBAR','LMBAR2')
+      and
+      CONTACT_NAME  not like '%测试%'
+      and
+      guest_names  not like '%测试%'
+      and
+      hotel_name  not like '%测试%'
+      and
+      CONTACT_NAME  not like '%test%'
+      and
+      guest_names  not like '%test%'
+      and
+      hotel_name  not like '%test%'
+      and
+      CONTACT_TEL not like '15811213288'
+      GROUP BY trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw')
+      order by trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw') desc
+
+    ) lt
+    
+    on tt.week = lt.week
+    
+    left join 
+    
+    (
+      SELECT
+      (trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw'))-1 as week,
+      count(*) as "订单总数",
+      count(decode(book_status_other ,'3',id)) as  "用戶取消订单",
+      count(decode(book_status_other ,'9',id)) as  "cc取消订单",
+      count(decode(book_status_other ,'5',id)) as  "no-show订单"
+      from
+
+      t_lm_order
+      where
+      CONTACT_NAME  not like '%测试%'
+      and
+      guest_names  not like '%测试%'
+      and
+      hotel_name  not like '%测试%'
+      and
+      CONTACT_NAME  not like '%test%'
+      and
+      guest_names  not like '%test%'
+      and
+      hotel_name  not like '%test%'
+      and
+      CONTACT_TEL not like '15811213288'
+      GROUP BY trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw')
+      order by trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw') desc
+
+    ) st
+    
+    on tt.week = st.week
+    
+    
+    left join 
+    
+    (
+      select 
+
+      (trunc(case when (to_char(ope_time,'hh24') < 4) then trunc(ope_time) else (ope_time)+1 end ,'iw'))-1 as week , 
+
+      to_char(trunc(sysdate,'dd') +  avg(confirmtime) / 86400,'hh24:mi:ss') as CGPJ
+
+      from 
+
+      (select t1.*, (to_date(to_char(t2.confirm_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') - 
+      to_date(to_char(t1.ope_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')) * 24*60*60 as confirmtime from 
+      (select tho.order_num, tho.ope_time, lo.price_code from T_HIS_ORDER tho left join t_lm_order lo on tho.order_num=lo.fog_order_num 
+       where tho.ope_memo = 'FOG创建订单' and
+      tho.ope_time is not null and lo.price_code in ('BAR','BAR2')) t1 inner join 
+      (select order_num, ope_time as confirm_time from T_HIS_ORDER 
+      where ope_memo in ('CC确认' ,'CC取消') and ope_time is not null ) t2 on t1.order_num = t2.order_num and t1.ope_time <= t2.confirm_time) tt
+      where tt.confirmtime > 0
+      group by
+
+      trunc(case when (to_char(ope_time,'hh24') < 4) then trunc(ope_time) else (ope_time)+1 end ,'iw')
+
+      order by
+
+      trunc(case when (to_char(ope_time,'hh24') < 4) then trunc(ope_time) else (ope_time)+1 end ,'iw') desc
+
+    ) cj
+    on tt.week = cj.week
+    
+    left join 
+    
+    (
+      select 
+
+      (trunc(case when (to_char(ope_time,'hh24') < 4) then trunc(ope_time) else (ope_time)+1 end ,'iw'))-1 as week , 
+
+      to_char(trunc(sysdate,'dd') +  avg(confirmtime) / 86400,'hh24:mi:ss') as CGPJ
+
+      from 
+
+      (select t1.*, (to_date(to_char(t2.confirm_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') - 
+      to_date(to_char(t1.ope_time,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss')) * 24*60*60 as confirmtime from 
+      (select tho.order_num, tho.ope_time, lo.price_code from T_HIS_ORDER tho left join t_lm_order lo on tho.order_num=lo.fog_order_num 
+       where tho.ope_memo = 'FOG创建订单' and
+      tho.ope_time is not null and lo.price_code in ('LMBAR','LMBAR2')) t1 inner join 
+      (select order_num, ope_time as confirm_time from T_HIS_ORDER 
+      where ope_memo in ('CC确认' ,'CC取消') and ope_time is not null) t2 on t1.order_num = t2.order_num and t1.ope_time <= t2.confirm_time) tt
+      where tt.confirmtime > 0
+      group by
+
+      trunc(case when (to_char(ope_time,'hh24') < 4) then trunc(ope_time) else (ope_time)+1 end ,'iw')
+
+      order by
+
+      trunc(case when (to_char(ope_time,'hh24') < 4) then trunc(ope_time) else (ope_time)+1 end ,'iw') desc
+
+    ) lj
+    on tt.week = lj.week
+    
+    left join 
+    
+    (
+      select 
+      (trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw'))-1 as week , 
+      nvl(count(prop),0) AS XQJD
+      from t_lm_b_prop
+      GROUP BY trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw')
+      order by trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw') desc
+    ) xjd
+    on tt.week = xjd.week
+    
+    left join 
+    
+    (
+      select 
+      (trunc(tt.effect_date+1,'iw'))-1 as week , 
+      count(tt.hotel_id) AS RSJD
+      from
+      (
+      select distinct effect_date, hotel_id
+      from t_lm_plan
+      where status='1'
+      ) tt
+
+      GROUP BY trunc(tt.effect_date+1,'iw')
+      order by trunc(tt.effect_date+1,'iw') desc
+    ) rsj
+    on tt.week = rsj.week
+    
+    order by tt.week desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="QunaerDataReport">
+    <![CDATA[
+    select to_char(dt.week,'yyyy-mm-dd') AS Week,dt.NSHT AS 订单总数,dt.DONHT AS 成功订单,dt.NUR AS 客人取消订单,dt.IOSN AS cc取消订单,dt.ANDN AS "no-show订单" from (
+    SELECT
+    (trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw'))-1 as week,
+    nvl(count(*),0) as NSHT,
+    nvl(count(decode(book_status_other ,'4',id,'6',id,'7',id,'8',id)),0) as DONHT,
+    nvl(count(decode(book_status_other ,'3',id)),0) as NUR,
+    nvl(count(decode(book_status_other ,'9',id)),0) as IOSN,
+    nvl(count(decode(book_status_other ,'5',id)),0) as ANDN
+    from
+    t_lm_order
+    where
+    price_code in ('LMBAR2','LMBAR')
+    and
+    ORDER_CHANNEL = 'QUNAR'
+    and
+    CONTACT_NAME  not like '%测试%'
+    and
+    guest_names  not like '%测试%'
+    and
+    hotel_name  not like '%测试%'
+    and
+    CONTACT_NAME  not like '%test%'
+    and
+    guest_names  not like '%test%'
+    and
+    hotel_name  not like '%test%'
+    and
+    CONTACT_TEL not like '15811213288'
+    GROUP BY trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw')
+    order by trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw') desc
+    ) dt
+
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="CCCancelDataReport">
+    <![CDATA[
+    select
+    to_char(at.week,'yyyy-mm-dd') as Week,
+    nvl(at."订单总量",0) AS 订单总量,
+    nvl(at."BAR_订单量",0) AS "BAR_订单量",
+    nvl(at."LM_订单量",0) AS "LM_订单量",
+    case when nvl(at."订单总量",0)=0 then '0.00%' else to_char(nvl(at."LM_订单量",0)/nvl(at."订单总量",0)*100,'9990.99') || '%' end as "LM订单%" ,
+    nvl(bt."cc取消单",0) AS cc取消单,
+    nvl(bt."BAR_cc取消单",0) AS "BAR_cc取消单",
+    case when nvl(at."BAR_订单量",0)=0 then '0.00%' else to_char(nvl(bt."BAR_cc取消单",0)/nvl(at."BAR_订单量",0)*100,'9990.99') || '%' end as "BAR_cc取消单%" ,
+    nvl(bt."LM_cc取消单",0) AS "LM_cc取消单",
+    case when nvl(at."LM_订单量",0) = 0 then '0.00%' else to_char(nvl(bt."LM_cc取消单",0)/nvl(at."LM_订单量",0)*100,'9990.99') || '%' end as "LM_cc取消单%",
+    case when nvl(bt."cc取消单",0) = 0 then '0.00%' else to_char(nvl(bt."BAR_cc取消单",0)/nvl(bt."cc取消单",0)*100,'9990.99') || '%' end as BAR取消单占比
+    
+    from
+    (SELECT
+    (trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw'))-1 as week,
+    count(*) as "订单总量",
+    count(decode(price_code,'BAR',id,'BARB',id)) as  "BAR_订单量",
+    count(decode(price_code,'LMBAR',id,'LMBAR2',id)) as  "LM_订单量"
+    from
+
+    t_lm_order
+    where
+    CONTACT_NAME  not like '%测试%'
+    and
+    guest_names  not like '%测试%'
+    and
+    hotel_name  not like '%测试%'
+    and
+    CONTACT_NAME  not like '%test%'
+    and
+    guest_names  not like '%test%'
+    and
+    hotel_name  not like '%test%'
+    and
+    CONTACT_TEL not like '15811213288'
+    GROUP BY trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw')
+    order by trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw') desc)at
+
+    left join
+    (SELECT
+    (trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw'))-1 as week,
+    count(*) as "cc取消单",
+    count(decode(price_code ,'BAR',id,'BARB',id)) as  "BAR_cc取消单",
+    count(decode(price_code ,'LMBAR',id,'LMBAR2',id)) as  "LM_cc取消单"
+
+    from
+
+    t_lm_order
+    where
+    book_status_other ='9'
+    and
+    CONTACT_NAME  not like '%测试%'
+    and
+    guest_names  not like '%测试%'
+    and
+    hotel_name  not like '%测试%'
+    and
+    CONTACT_NAME  not like '%test%'
+    and
+    guest_names  not like '%test%'
+    and
+    hotel_name  not like '%test%'
+    and
+    CONTACT_TEL not like '15811213288'
+    GROUP BY trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw')
+    order by trunc(case when (to_char(create_time,'hh24') < 4) then trunc(create_time) else (create_time)+1 end ,'iw') desc)bt
+
+    on at.WEEK = bt.WEEK
+
+
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="DuplicateOrderDataReport">
+    <![CDATA[
+    select to_char(at.week, 'yyyy-mm-dd') as "Week",
+       nvl(at.重复预订,0) AS 重复预订,
+       case
+         when nvl(at.取消预订的,0) = 0 then
+          '0.00%'
+         else
+          to_char(nvl(at.重复预订,0) / nvl(at.取消预订的,0) * 100, '9990.99') || '%'
+       end as "重复预订取消单占比%",
+       nvl(bt.BAR_重复预订,0) AS "BAR_重复预订",
+        case
+                  when nvl(at.BAR_客服取消单,0) = 0 then
+                  '0.00%'
+                  else
+                  to_char( nvl(bt.BAR_重复预订,0) / nvl(at.BAR_客服取消单,0) *100, '9990.99') || '%'
+                end as "BAR_重复预订占比%",
+                nvl(bt.LM_重复预订,0) AS "LM_重复预订",
+        case
+                  when nvl(at.LM_客服取消单,0) = 0 then
+                  '0.00%'
+                  else
+                  to_char(nvl(bt.LM_重复预订,0) / nvl(at.LM_客服取消单,0) * 100, '9990.99') || '%'
+                end as "LM_重复预订占比%"
+
+          from (SELECT (trunc(case
+                                when (to_char(create_time, 'hh24') < 4) then
+                                  trunc(create_time)
+                                else
+                                  (create_time) + 1
+                              end,
+                              'iw')) - 1 as week,
+                        nvl(count(*),0) as "订单总量",
+                        nvl(count(decode(price_code,
+                                    'BAR',
+                                    id,
+                                    'BARB',
+                                    id)),0) as "BAR_客服取消单",
+                        nvl(count(decode(price_code,
+                                    'LMBAR',
+                                    id,
+                                    'LMBAR2',
+                                    id)),0) as "LM_客服取消单",
+                        nvl(count(decode(ORDER_CANCLE_REASON, 'CRC02', id)),0) as "重复预订",
+                        nvl(count(decode(book_status_other, '9', id)),0) as "取消预订的"
+                  from t_lm_order
+                  where CONTACT_NAME not like '%测试%'
+                    and guest_names not like '%测试%'
+                    and hotel_name not like '%测试%'
+                    and CONTACT_NAME not like '%test%'
+                    and guest_names not like '%test%'
+                    and hotel_name not like '%test%'
+                    and CONTACT_TEL not like '15811213288'
+                  GROUP BY trunc(case
+                                  when (to_char(create_time, 'hh24') < 4) then
+                                    trunc(create_time)
+                                  else
+                                    (create_time) + 1
+                                end,
+                                'iw')
+                  order by trunc(case
+                                  when (to_char(create_time, 'hh24') < 4) then
+                                    trunc(create_time)
+                                  else
+                                    (create_time) + 1
+                                end,
+                                'iw') desc) at
+
+          left join (SELECT (trunc(case
+                                      when (to_char(create_time, 'hh24') < 4) then
+                                      trunc(create_time)
+                                      else
+                                      (create_time) + 1
+                                    end,
+                                    'iw')) - 1 as week,
+                            nvl(count(*),0) as "cc取消单",
+                            nvl(count(decode(price_code,
+                                          'BAR',
+                                          id,
+                                          'BARB',
+                                          id)),0) as "BAR_重复预订",
+                            nvl(count(decode(price_code,
+                                          'LMBAR',
+                                          id,
+                                          'LMBAR2',
+                                          id)),0) as "LM_重复预订"
+            
+                        from t_lm_order
+                      where ORDER_CANCLE_REASON = 'CRC02'
+                        and CONTACT_NAME not like '%测试%'
+                        and guest_names not like '%测试%'
+                        and hotel_name not like '%测试%'
+                        and CONTACT_NAME not like '%test%'
+                        and guest_names not like '%test%'
+                        and hotel_name not like '%test%'
+                        and CONTACT_TEL not like '15811213288'
+                      GROUP BY trunc(case
+                                        when (to_char(create_time, 'hh24') < 4) then
+                                        trunc(create_time)
+                                        else
+                                        (create_time) + 1
+                                      end,
+                                      'iw')
+                      order by trunc(case
+                                        when (to_char(create_time, 'hh24') < 4) then
+                                        trunc(create_time)
+                                        else
+                                        (create_time) + 1
+                                      end,
+                                      'iw') desc) bt
+
+        on at.WEEK = bt.WEEK
+
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="FRCancelDataReport">
+    <![CDATA[
+      select '2012-05-10' AS d1,'' AS d2,'' AS d3,'' AS d4,'' AS d5,'' AS d6,'' AS d7,'' AS d8,'' AS d9,'' AS d10,'' AS d11,'' AS d12,
+      '' AS d13,'' AS d14,'' AS d15,'' AS d16,'' AS d17,'' AS d18,'' AS d19
+      from dual
+      
+      
+      select * from t_lm_order t where t.book_status_other=9
+
+
+select * from t_lm_order t where t.order_cancle_reason='CRC01'
+
+
+where t.price_code in ('BAR','BARB')
+
+
+where t.price_code in ('LMBAR','LMBAR2')
+
+
+where t.price_code in ('LMBAR','LMBAR2') and t.is_reserve='0'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="CohortAnalysisReport">
+    <![CDATA[
+      select tt.days AS 日期, tt.NSHT AS 新用户数, dt.NUR AS 新用户且下毛单, ct.IOSN AS 下单总用户, et.ANDN AS 新用户且下成功单, ft.WPN AS "新用户2-7天回访", gt.LGUR AS "新用户8-14天回访",
+      ht.IOSLG AS "新用户15-30天回访", jt.ANDLG AS "新用户31-90天回访", kt.ODTL AS "新用户2-7天下毛单", lt.SUODTL AS "新用户2-7天下成功单",mt.CONS AS "新用户8-14天下毛单", nt.SUOD AS "新用户8-14天下成功单"
+, ot.SUODP AS "新用户15-30天下毛单", pt.LMSUOD AS "新用户15-30天下成功单", qt.LMODP AS "新用户31-90天下毛单", rt.BRSUOD AS "新用户31-90天下成功单", ut.BRODP AS 老用户, vt.URCOD AS 下毛单老用户, wt.URCODCONS AS 下成功单老用户
+from
+(
+select to_char(lu.createtime, 'yyyy-MM-dd') as days, count(distinct lu.login_mobile) as NSHT from
+t_lm_user lu
+where createtime is not null 
+group by to_char(lu.createtime, 'yyyy-MM-dd') order by to_char(lu.createtime, 'yyyy-MM-dd') desc
+) tt
+
+left join 
+(
+ select to_char(t3.create_time, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS NUR from
+(select t1.*, t2.createtime from
+   (select fog_order_num,create_time,book_status_other, login_mobile from t_lm_order) t1
+  left join
+   (select login_mobile, createtime from t_lm_user）t2 on
+   t1.login_mobile = t2.login_mobile) t3
+
+where
+(to_char(t3.create_time, 'yyyy-MM-dd')=to_char(t3.createtime, 'yyyy-MM-dd') or t3.createtime is null)
+
+group by
+to_char(t3.create_time, 'yyyy-MM-dd')
+order by
+to_char(t3.create_time, 'yyyy-MM-dd') desc
+
+) dt 
+
+on tt.days=dt.days
+
+left join
+
+(
+	select to_char(t3.create_time, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS IOSN from
+	(select t1.*, t2.createtime from
+	(select fog_order_num,create_time,book_status_other, login_mobile from t_lm_order) t1
+	left join 
+	(select login_mobile, createtime from t_lm_user）t2 on 
+	t1.login_mobile = t2.login_mobile) t3
+
+	group by 
+	to_char(t3.create_time, 'yyyy-MM-dd')
+	order by
+	to_char(t3.create_time, 'yyyy-MM-dd') desc
+
+) ct
+
+on tt.days=ct.days
+
+left join
+
+(
+	select to_char(t3.create_time, 'yyyy-MM-dd') AS days, count(distinct login_mobile) AS ANDN from
+	(select t1.*, t2.createtime from
+	   (select fog_order_num,create_time,pay_status, book_status_other, login_mobile from t_lm_order) t1
+	  left join 
+	   (select login_mobile, createtime from t_lm_user）t2 on 
+	   t1.login_mobile = t2.login_mobile) t3
+
+	where 
+	(to_char(t3.create_time, 'yyyy-MM-dd')=to_char(t3.createtime, 'yyyy-MM-dd') or t3.createtime is null)
+	and (t3.book_status_other in (4,6,7,8) or t3.pay_status=1)
+
+	group by 
+	to_char(t3.create_time, 'yyyy-MM-dd')
+	order by
+	to_char(t3.create_time, 'yyyy-MM-dd') desc
+
+) et
+
+on tt.days=et.days
+
+left join
+
+(
+	select to_char(t3.createtime,'yyyy-MM-dd') AS days, count(distinct t3.mobile) AS WPN
+	from
+	(select t1.mobile, t1.today_login, t2.createtime from (select mobile, today_login from t_lm_user_action) t1 left join
+	(select login_mobile, createtime from t_lm_user) t2 on t1.mobile = t2.login_mobile) t3
+
+	where
+	to_date(to_char(t3.today_login, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 1
+	and 
+	to_date(to_char(t3.today_login, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 7
+
+	group by to_char(t3.createtime,'yyyy-MM-dd')
+	order by to_char(t3.createtime,'yyyy-MM-dd') desc
+
+) ft
+
+on tt.days=ft.days
+
+left join
+
+(
+	select to_char(t3.createtime,'yyyy-MM-dd') AS days, count(distinct t3.mobile) AS LGUR 
+	from 
+	(select t1.mobile, t1.today_login, t2.createtime from (select mobile, today_login from t_lm_user_action) t1 left join 
+	(select login_mobile, createtime from t_lm_user) t2 on t1.mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.today_login, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 8
+	and 
+	to_date(to_char(t3.today_login, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 14
+
+	group by to_char(t3.createtime,'yyyy-MM-dd')
+	order by to_char(t3.createtime,'yyyy-MM-dd') desc
+
+) gt 
+
+on tt.days=gt.days
+
+left join
+
+(
+	select to_char(t3.createtime,'yyyy-MM-dd') AS days, count(distinct t3.mobile)  AS IOSLG 
+	from 
+	(select t1.mobile, t1.today_login, t2.createtime from (select mobile, today_login from t_lm_user_action) t1 left join 
+	(select login_mobile, createtime from t_lm_user) t2 on t1.mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.today_login, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 15
+	and 
+	to_date(to_char(t3.today_login, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 30
+
+	group by to_char(t3.createtime,'yyyy-MM-dd')
+	order by to_char(t3.createtime,'yyyy-MM-dd') desc
+
+) ht
+
+on tt.days=ht.days
+
+left join
+
+(
+	select to_char(t3.createtime,'yyyy-MM-dd') AS days, count(distinct t3.mobile) AS ANDLG
+	from 
+	(select t1.mobile, t1.today_login, t2.createtime from (select mobile, today_login from t_lm_user_action) t1 left join 
+	(select login_mobile, createtime from t_lm_user) t2 on t1.mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.today_login, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 31
+	and
+	to_date(to_char(t3.today_login, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 90
+
+	group by to_char(t3.createtime,'yyyy-MM-dd')
+	order by to_char(t3.createtime,'yyyy-MM-dd') desc
+
+) jt
+
+on tt.days=jt.days
+
+left join
+
+(
+	select  to_char(t3.createtime, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS ODTL from
+	(select t1.*, t2.createtime from
+	(select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	left join
+	(select login_mobile, createtime from t_lm_user）t2 on
+	t1.login_mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 1
+	and 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 7
+
+
+	group by
+	to_char(t3.createtime, 'yyyy-MM-dd')
+	order by
+	to_char(t3.createtime, 'yyyy-MM-dd') desc
+
+) kt 
+
+on tt.days=kt.days
+
+left join
+
+(
+	select  to_char(t3.createtime, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS SUODTL from
+	(select t1.*, t2.createtime from
+	(select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	left join
+	(select login_mobile, createtime from t_lm_user）t2 on
+	t1.login_mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 1
+	and 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 7
+	and (t3.book_status_other in (4,6,7,8) or t3.pay_status = 1)
+
+	group by
+	to_char(t3.createtime, 'yyyy-MM-dd')
+	order by
+	to_char(t3.createtime, 'yyyy-MM-dd') desc
+
+) lt
+
+on tt.days=lt.days
+
+left join
+
+(
+	select  to_char(t3.createtime, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS CONS from 
+	(select t1.*, t2.createtime from
+	(select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	left join
+	(select login_mobile, createtime from t_lm_user）t2 on
+	t1.login_mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 8
+	and 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 14
+
+
+	group by
+	to_char(t3.createtime, 'yyyy-MM-dd')
+	order by
+	to_char(t3.createtime, 'yyyy-MM-dd') desc
+
+) mt
+
+on tt.days=mt.days
+
+left join
+
+(
+	select  to_char(t3.createtime, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS SUOD from 
+	(select t1.*, t2.createtime from
+	(select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	left join
+	(select login_mobile, createtime from t_lm_user）t2 on
+	t1.login_mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 8
+	and 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 14
+	and (t3.book_status_other in (4,6,7,8) or t3.pay_status = 1)
+
+	group by
+	to_char(t3.createtime, 'yyyy-MM-dd')
+	order by
+	to_char(t3.createtime, 'yyyy-MM-dd') desc
+
+) nt
+
+on tt.days=nt.days
+
+left join
+
+(
+	select  to_char(t3.createtime, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS SUODP from 
+	(select t1.*, t2.createtime from
+	(select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	left join
+	(select login_mobile, createtime from t_lm_user）t2 on
+	t1.login_mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 15
+	and 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 30
+
+
+	group by
+	to_char(t3.createtime, 'yyyy-MM-dd')
+	order by
+	to_char(t3.createtime, 'yyyy-MM-dd') desc
+
+) ot
+
+on tt.days=ot.days
+
+left join
+
+(
+	select  to_char(t3.createtime, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS LMSUOD from 
+	(select t1.*, t2.createtime from
+	(select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	left join
+	(select login_mobile, createtime from t_lm_user）t2 on
+	t1.login_mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 15
+	and 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 30
+	and (t3.book_status_other in (4,6,7,8) or t3.pay_status = 1)
+
+	group by
+	to_char(t3.createtime, 'yyyy-MM-dd')
+	order by
+	to_char(t3.createtime, 'yyyy-MM-dd') desc
+
+) pt
+
+on tt.days=pt.days
+
+left join
+
+(
+	select  to_char(t3.createtime, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS LMODP from 
+	(select t1.*, t2.createtime from
+	(select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	left join
+	(select login_mobile, createtime from t_lm_user）t2 on
+	t1.login_mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 31
+	and 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 90
+
+
+	group by
+	to_char(t3.createtime, 'yyyy-MM-dd')
+	order by
+	to_char(t3.createtime, 'yyyy-MM-dd') desc
+
+) qt
+
+on tt.days=qt.days
+
+left join
+
+(
+	select  to_char(t3.createtime, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS BRSUOD from 
+	(select t1.*, t2.createtime from
+	(select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	left join
+	(select login_mobile, createtime from t_lm_user）t2 on
+	t1.login_mobile = t2.login_mobile) t3
+
+	where 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')>=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 31
+	and 
+	to_date(to_char(t3.create_time, 'yyyy-MM-dd'),'yyyy-MM-dd')<=to_date(to_char(t3.createtime, 'yyyy-MM-dd'),'yyyy-MM-dd') + 90
+	and (t3.book_status_other in (4,6,7,8) or t3.pay_status = 1)
+
+	group by
+	to_char(t3.createtime, 'yyyy-MM-dd')
+	order by
+	to_char(t3.createtime, 'yyyy-MM-dd') desc
+
+) rt
+
+on tt.days=rt.days
+
+left join
+
+(
+	select to_char(t3.today_login, 'yyyy-MM-dd') AS days, count(distinct t3.mobile) AS BRODP from
+	(select t1.mobile, t1.today_login, t2.createtime from (select mobile, today_login from t_lm_user_action) t1 left join
+	(select login_mobile, createtime from t_lm_user) t2 on t1.mobile = t2.login_mobile) t3
+	where
+	to_char(t3.today_login, 'yyyy-MM-dd') <> to_char(t3.createtime, 'yyyy-MM-dd')
+	group by to_char(t3.today_login, 'yyyy-MM-dd') order by to_char(t3.today_login, 'yyyy-MM-dd') desc
+
+) ut
+
+on tt.days=ut.days
+
+left join
+
+(
+	select to_char(t3.create_time, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS URCOD from
+	(select t1.*, t2.createtime from
+	   (select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	  left join
+	   (select login_mobile, createtime from t_lm_user）t2 on
+	   t1.login_mobile = t2.login_mobile) t3
+
+	where
+	to_char(t3.create_time, 'yyyy-MM-dd')<>to_char(t3.createtime, 'yyyy-MM-dd')
+
+	group by
+	to_char(t3.create_time, 'yyyy-MM-dd')
+	order by
+	to_char(t3.create_time, 'yyyy-MM-dd') desc
+
+) vt
+
+on tt.days=vt.days
+
+left join
+
+(
+	select to_char(t3.create_time, 'yyyy-MM-dd') AS days, count(distinct t3.login_mobile) AS URCODCONS from
+	(select t1.*, t2.createtime from
+	   (select fog_order_num,create_time,book_status_other, pay_status, login_mobile from t_lm_order) t1
+	  left join
+	   (select login_mobile, createtime from t_lm_user）t2 on
+	   t1.login_mobile = t2.login_mobile) t3
+
+	where
+	to_char(t3.create_time, 'yyyy-MM-dd')<>to_char(t3.createtime, 'yyyy-MM-dd')
+	and (t3.book_status_other in (4,6,7,8) or t3.pay_status = 1)
+
+
+	group by
+	to_char(t3.create_time, 'yyyy-MM-dd')
+	order by
+	to_char(t3.create_time, 'yyyy-MM-dd') desc
+
+) wt
+
+on tt.days=wt.days
+
+order by tt.days desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="HotelSalesDataReport">
+    <![CDATA[
+  select t1.*, nvl(t2.初始定单,0) as 初始定单, nvl(t2.后续订单,0) as 后续订单
+  from (select gt.*, st.上线天数, st.售空天数, st.被标满房, st.库存总量
+       
+          from (select kt.*, nvl(ht.SALES_ACCOUNT,'待填') as 销售
+               
+                  from (select tlbp.PROP as 酒店编号,
+                               tlbp.CITYID as 所在城市,
+                               nvl(tlbp.TRADEAREA_ZH, '待填') as 商圈,
+                               tlbp.PROP_NAME_ZH as 酒店中文名,
+                               (tlbp.DIAMOND_RATING + tlbp.STAR_RATING) as 星级,
+                               dt.days_gross_order as 昨日毛订单,
+                               dt.month_gross_order as 本月毛订单,
+                               dt.days_order_hotel_confirm as 昨日酒店确定单数,
+                               dt.month_order_hotel_confirm as 本月酒店确定单数,
+                               dt.days_order_confirm as 昨日成功单,
+                               dt.month_order_confirm as 本月成功单,
+                               dt.days_cancel as 昨日客户取消单,
+                               dt.month_cancel as 本月客户取消单,
+                               dt.cc_days_cancel as 昨日客服取消单,
+                               dt.cc_month_cancel as 本月客服取消单,
+                               dt.month_AVG_PRICE as 本月平均价,
+                               dt.TICKET_COUNT_MONTH as 本月使用券数
+                       
+                          from T_LM_B_PROP tlbp
+                         right join
+                       
+                         (select t.HOTEL_ID,
+                                sum(t.days_gross_order) as days_gross_order,
+                                sum(t.month_gross_order) as month_gross_order,
+                                sum(t.days_order_hotel_confirm) as days_order_hotel_confirm,
+                                sum(t.month_order_hotel_confirm) as month_order_hotel_confirm,
+                                sum(t.days_order_confirm) as days_order_confirm,
+                                sum(t.month_order_confirm) as month_order_confirm,
+                                sum(t.days_cancel) as days_cancel,
+                                sum(t.month_cancel) as month_cancel,
+                                sum(t.cc_days_cancel) as cc_days_cancel,
+                                sum(t.cc_month_cancel) as cc_month_cancel,
+                                sum(t.month_AVG_PRICE) as month_AVG_PRICE,
+                                sum(t.TICKET_COUNT_MONTH) as TICKET_COUNT_MONTH
+                        
+                           from (select HOTEL_ID,
+                                        count(*) as days_gross_order,
+                                        0 as month_gross_order,
+                                        count(decode(FOG_RESVSTATUS,
+                                                     '1',
+                                                     id)) as days_order_hotel_confirm,
+                                        0 as month_order_hotel_confirm,
+                                        count(decode(book_status_other,
+                                                     '4',
+                                                     id,
+                                                     '6',
+                                                     id,
+                                                     '7',
+                                                     id,
+                                                     '8',
+                                                     id,
+                                                     decode(pay_status,
+                                                            '1',
+                                                            id))) as days_order_confirm,
+                                        0 as month_order_confirm,
+                                        count(decode(book_status_other,
+                                                     '3',
+                                                     id)) as days_cancel,
+                                        0 as month_cancel,
+                                        count(decode(book_status_other,
+                                                     '9',
+                                                     id)) as cc_days_cancel,
+                                        0 as cc_month_cancel,
+                                        0 as month_AVG_PRICE,
+                                        0 as TICKET_COUNT_MONTH
+                                
+                                   from T_LM_ORDER
+                                  where CREATE_TIME >= TRUNC(SYSDATE) - 20 / 24
+                                    and CREATE_TIME <= TRUNC(SYSDATE) + 4 / 24
+                                    and (PRICE_CODE = 'LMBAR' or
+                                        PRICE_CODE = 'LMBAR2')
+                                    and BOOK_TOTAL_PRICE >= 3
+                                    and HOTEL_NAME not like '% 请勿预订 %'
+                                    and CONTACT_TEL not like 15821224460
+                                    and GUEST_NAMEs not like '% 测试%'
+                                    and CONTACT_NAME not like '% 测试%'
+                                    and length(CONTACT_TEL) = 11
+                                  group by HOTEL_ID
+                                
+                                 union
+                                
+                                 select HOTEL_ID,
+                                        0 as days_gross_order,
+                                        count(*) as month_gross_order,
+                                        0 as days_order_hotel_confirm,
+                                        count(decode(FOG_RESVSTATUS,
+                                                     '1',
+                                                     id)) as month_order_hotel_confirm,
+                                        0 as days_order_confirm,
+                                        count(decode(book_status_other,
+                                                     '4',
+                                                     id,
+                                                     '6',
+                                                     id,
+                                                     '7',
+                                                     id,
+                                                     '8',
+                                                     id,
+                                                    decode(pay_status,
+                                                            '1',
+                                                            id))) as month_order_confirm,
+                                        0 as days_cancel,
+                                        count(decode(book_status_other,
+                                                     '3',
+                                                     id)) as month_cancel,
+                                        0 as cc_days_cancel,
+                                        count(decode(book_status_other,
+                                                     '9',
+                                                    id)) as cc_month_cancel,
+                                        trunc(nvl(avg(decode(book_status_other,
+                                                             '4',
+                                                             book_total_price,
+                                                             '6',
+                                                             book_total_price,
+                                                             '7',
+                                                             book_total_price,
+                                                             '8',
+                                                             book_total_price,
+                                                            
+                                                             decode(pay_status,
+                                                                    '1',
+                                                                    book_total_price))),
+                                                  0),
+                                              2) as month_AVG_PRICE,
+                                        nvl(sum(TICKET_COUNT), 0) as TICKET_COUNT_MONTH
+                                   from T_LM_ORDER
+                                  where CREATE_TIME >=
+                                        trunc(sysdate, 'mm') + 4 / 24
+                                    and CREATE_TIME <= TRUNC(SYSDATE) + 4 / 24
+                                    and (PRICE_CODE = 'LMBAR' or
+                                        PRICE_CODE = 'LMBAR2')
+                                    and BOOK_TOTAL_PRICE >= 3
+                                    and HOTEL_NAME not like '% 请勿预订 %'
+                                    and CONTACT_TEL not like 15821224460
+                                    and GUEST_NAMEs not like '% 测试%'
+                                    and CONTACT_NAME not like '% 测试%'
+                                    and length(CONTACT_TEL) = 11
+                                
+                                  group by HOTEL_ID) t
+                          group by t.HOTEL_ID) dt on tlbp.PROP = dt.HOTEL_ID) kt
+               
+                  left join
+               
+                 (select HOTEL_ID, SALES_ACCOUNT
+                   from t_lm_sales_history
+                  where STATUS = 1) ht on kt.酒店编号 = ht.HOTEL_ID
+                 order by kt.本月毛订单) gt
+       
+          left join
+       
+         (select at.*, nvl(bt.售空天数, 0) as 售空天数
+        
+           from (select p.hotel_id,
+                        count(distinct p.EFFECT_DATE) as 上线天数,
+                        count(distinct
+                              decode(p.IS_ROOMFUL, '1', p.EFFECT_DATE)) as 被标满房,
+                        nvl(sum(ROOM_NUM), 0) + nvl(sum(HOLD_ROOM_NUM), 0) +
+                        nvl(sum(holde0), 0) as 库存总量
+                   from T_LM_PLAN p,
+                        (select sum(HOLD_ROOM_NUM) as holde0, hotel_id
+                           from T_LM_PLAN
+                          where STATUS in ('0')
+                            and EFFECT_DATE >= trunc(sysdate, 'mm') + 4 / 24
+                            and EFFECT_DATE <= TRUNC(SYSDATE) + 4 / 24
+                          group by hotel_id) t
+                  where p.hotel_id = t.hotel_id(+)
+                    and STATUS in ('1')
+                    and EFFECT_DATE >= trunc(sysdate, 'mm') + 4 / 24
+                    and EFFECT_DATE <= TRUNC(SYSDATE) + 4 / 24
+                  group by p.hotel_id) at
+        
+           left join
+        
+          (select HOTEL_ID, count(distinct EFFECT_DATE) as 售空天数
+         
+            from T_LM_PLAN
+           where EFFECT_DATE >= trunc(sysdate, 'mm') + 4 / 24
+             and EFFECT_DATE <= TRUNC(SYSDATE) + 4 / 24
+             and HOLD_ROOM_NUM > 0
+             and ROOM_NUM <= 0
+             and STATUS in ('1')
+             and IS_ROOMFUL = '0'
+           group by HOTEL_ID) bt
+        
+         on at.HOTEL_ID = bt.HOTEL_ID) st on gt.酒店编号 = st.HOTEL_ID) t1
+
+  left join
+
+(select at.* , bt.后续订单 from
+(select hotel_id, count(firstordertime) as 初始定单 from (select login_mobile, hotel_id, create_time as firstordertime from t_lm_order where create_time in (
+select firstorder from (select distinct login_mobile,
+                    min(create_time) AS FirstOrder
+                    from t_lm_order
+                   where BOOK_TOTAL_PRICE >= 3
+                     and HOTEL_NAME not like '%请勿预订%'
+                     and CONTACT_TEL not like 15821224460
+                     and GUEST_NAMEs not like '%测试%'
+                     and CONTACT_NAME not like '%测试%'
+                     and length(LOGIN_MOBILE) = 11
+                     and (book_status_other in (8) or pay_status = 1)
+                   group by login_mobile)) ) group by hotel_id) at
+
+left join
+(select hotel_id, sum(followorder) as 后续订单 from
+(select at.*, bt.followordernum-1 as followorder from
+(select login_mobile, hotel_id, create_time as firstordertime from t_lm_order where create_time in (
+select firstorder from (select distinct login_mobile,
+                    min(create_time) AS FirstOrder
+                    from t_lm_order
+                   where BOOK_TOTAL_PRICE >= 3
+                     and HOTEL_NAME not like '%请勿预订%'
+                     and CONTACT_TEL not like 15821224460
+                     and GUEST_NAMEs not like '%测试%'
+                     and CONTACT_NAME not like '%测试%'
+                     and length(LOGIN_MOBILE) = 11
+                     and (book_status_other in (8) or pay_status = 1)
+                   group by login_mobile))) at left join
+
+(select login_mobile, count(id) as followordernum from t_lm_order where
+BOOK_TOTAL_PRICE >= 3
+                     and HOTEL_NAME not like '%请勿预订%'
+                     and CONTACT_TEL not like 15821224460
+                     and GUEST_NAMEs not like '%测试%'
+                     and CONTACT_NAME not like '%测试%'
+                     and length(LOGIN_MOBILE) = 11
+                     and (book_status_other in (8) or pay_status = 1) group by login_mobile) bt
+
+on at.login_mobile = bt.login_mobile ) group by hotel_id) bt
+on at.hotel_id = bt.hotel_id) t2
+
+on t1.酒店编号 = t2.HOTEL_ID
+order by 本月毛订单 desc
+
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="PodinnsDataReport">
+    <![CDATA[
+    SELECT DAYD,
+    NVL(SUM("毛订单"), 0)  AS 毛订单,
+    NVL(SUM("创建失败单"), 0)   AS 创建失败单,
+    NVL(SUM("APP取消"), 0)   AS APP取消,
+    NVL(SUM("NOSHOW"), 0)   AS NOSHOW,
+    NVL(SUM("成功单"), 0)   AS 成功单,
+    NVL(SUM("入住中"), 0)   AS 入住中,
+    NVL(SUM("已离店"), 0)   AS 已离店,
+    NVL(SUM("布丁取消"), 0)   AS 布丁取消
+    
+  FROM
+    (SELECT (TRUNC(
+      CASE
+        WHEN (TO_CHAR(create_time,'hh24') < 4)
+        THEN TRUNC(create_time)-1
+        ELSE (create_time)
+      END ))         AS DAYD,
+      COUNT(id)              AS "毛订单",
+      CASE
+        WHEN book_status_other IN ('2')
+       
+        THEN COUNT(id)
+      END AS "创建失败单",
+      CASE
+        WHEN book_status_other IN ('3')
+       
+        THEN COUNT(id)
+      END AS "APP取消",
+      CASE
+        WHEN book_status_other IN ('5')
+       
+        THEN COUNT(id)
+      END AS "NOSHOW",
+      CASE
+        WHEN book_status_other IN ('4')
+       
+        THEN COUNT(id)
+      END AS "成功单",
+      CASE
+        WHEN book_status_other IN ('6','7')
+       
+        THEN COUNT(id)
+      END AS "入住中",
+      CASE
+        WHEN book_status_other IN ('8')
+       
+        THEN COUNT(id)
+      END AS "已离店",
+      CASE
+        WHEN book_status_other IN ('9')
+       
+        THEN COUNT(id)
+      END AS "布丁取消"
+ 
+    FROM t_lm_order
+    WHERE CONTACT_NAME NOT LIKE '%测试%'
+    AND guest_names NOT LIKE '%测试%'
+    AND hotel_name NOT LIKE '%测试%'
+    AND CONTACT_NAME NOT LIKE '%test%'
+    AND guest_names NOT LIKE '%test%'
+    AND hotel_name NOT LIKE '%test%'
+    AND CONTACT_TEL NOT LIKE '15811213288'
+    AND VENDOR IN ('PODINNS')
+    AND ((:StartDTime IS NULL) OR (create_time >= to_date (:StartDTime,'yyyy-MM-dd hh24:mi:ss')))
+    AND ((:EndDTime IS NULL) OR (create_time <= to_date (:EndDTime,'yyyy-MM-dd hh24:mi:ss')))
+    GROUP BY TRUNC(
+      CASE
+        WHEN (TO_CHAR(create_time,'hh24') < 4)
+        THEN TRUNC(create_time)-1
+        ELSE (create_time)
+      END ),book_status_other 
+      
+    ORDER BY TRUNC(
+      CASE
+        WHEN (TO_CHAR(create_time,'hh24') < 4)
+        THEN TRUNC(create_time)-1
+        ELSE (create_time)
+      END ) DESC
+    )
+  GROUP BY DAYD
+  ORDER BY DAYD DESC
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="OrderSearchDataReport">
+    <![CDATA[
+      select lo.hotel_id,lb.prop_name_zh,lb.cityid,ls.sales_account,count(lo.id) as "毛订单", count(case when lo.book_status_other in (4,5,6,7,8) then lo.id end) as "确认可住单" ,
+      count(case when lo.book_status_other in ('8') then lo.id end) as "离店单", count(case when lo.book_status_other in (3) then lo.id end) as "用户取消单",
+      count(case when lo.book_status_other in (9) then lo.id end) as "CC取消单"  
+      from t_lm_order lo 
+      left join t_lm_b_prop lb on lo.hotel_id = lb.prop
+      left join t_lm_sales_history ls on lo.hotel_id = ls.hotel_id and ls.status='1'
+      where ((:CREATEDATE is null) or (lo.create_time>= to_date(:CREATEDATE,'yyyy-MM-dd hh24:mi:ss')))
+      and ((:ENDDATE is null) or (lo.create_time<= to_date(:ENDDATE,'yyyy-MM-dd hh24:mi:ss')))  
+      and ((:CITYID is null) or (lb.cityid=:CITYID))
+      and ((:SALES is null) or (ls.sales_account=:SALES))
+      and lo.price_code in ('LMBAR2') group by lo.hotel_id,lb.prop_name_zh,lb.cityid,ls.sales_account
+      order by count(lo.id) desc
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="OrderManageSearchDataReport">
+    <![CDATA[
+      select tlo.ID,tlo.ORDER_NUM,tlo.FOG_ORDER_NUM,tlo.VENDOR,tlo.hotel_id,tlb.prop_name_zh,tlc.name_cn,tlo.create_time,tlo.in_date,
+      floor((CAST(min(tho.ope_time) AS DATE)- CAST(tlo.create_time AS DATE))* 24 * 60) AS confirmTime,
+      tlo.fog_resvstatus,tlo.book_status_other
+      from t_lm_order tlo 
+      left join t_lm_b_prop tlb on tlo.hotel_id=tlb.prop
+      left join t_lm_city tlc on tlo.city_id = tlc.city_id 
+      left join t_his_order tho on tlo.fog_order_num=tho.order_num and (ope_event='cc-confirm' or ope_event='cc-cancle')
+      where (:STARTDTIME IS NULL OR (tlo.create_time >= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      AND (:ENDDTIME IS NULL OR (to_date(:ENDDTIME, 'yyyy.mm.dd  hh24:mi:ss') >= tlo.create_time)) 
+      AND (:PRICECODE  IS NULL OR (tlo.Price_Code in (SELECT REGEXP_SUBSTR (:PRICECODE , '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PRICECODE ) - LENGTH (REPLACE (:PRICECODE , ',', ''))))) 
+      group by tlo.ID,tlo.ORDER_NUM,tlo.FOG_ORDER_NUM,tlo.VENDOR,tlo.hotel_id,tlb.prop_name_zh,tlc.name_cn,tlo.create_time,tlo.in_date,
+      tho.ope_time,tlo.create_time,
+      tlo.fog_resvstatus,tlo.book_status_other
+       ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="GeneralDataReportSelectList">
+    <![CDATA[
+      select to_char(count(bt.fog_order_num) * 4) AS 订单数, bt.dt AS Month from
+      (select to_char(t.create_time,'yyyy-mm') AS DT,t.fog_order_num from t_lm_order t 
+      where t.book_status_other in ('4','6','7','8')
+      and (:STARTDTIME IS NULL OR (t.create_time >= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      AND (:ENDDTIME IS NULL OR (to_date(:ENDDTIME, 'yyyy.mm.dd  hh24:mi:ss') >= t.create_time)) 
+      ) bt group by dt
+       ]]>
+  </sql>
+</sqlList>

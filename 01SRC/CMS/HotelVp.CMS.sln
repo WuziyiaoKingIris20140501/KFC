@@ -1,0 +1,210 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 Interface", "01 Interface", "{8336ACA9-D68E-42B9-BE4C-855AABF32707}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 Implementation", "02 Implementation", "{80D2A296-AA83-48E3-B93C-0BAF091664F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 Bussiness", "03 Bussiness", "{3C6227FE-7618-4083-A0C0-ACADD6EE96BA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05 ResourceAccess", "05 ResourceAccess", "{7630BF80-6DF7-49E8-A4C7-283D640A3DCF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 BussinessEntity", "04 BussinessEntity", "{8C5E13E7-9D17-47BE-BD1A-3CFBB6EA698D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.CMS.Domain.Interface", "CMS\HotelVp.CMS.Domain.Interface\HotelVp.CMS.Domain.Interface.csproj", "{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.CMS.Domain.Implementation", "CMS\HotelVp.CMS.Domain.Implementation\HotelVp.CMS.Domain.Implementation.csproj", "{A444A247-18EF-4A1F-9672-FAB003FDCB5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.CMS.Domain.Process", "CMS\HotelVp.CMS.Domain.Process\HotelVp.CMS.Domain.Process.csproj", "{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.CMS.Domain.Entity", "CMS\HotelVp.CMS.Domain.Entity\HotelVp.CMS.Domain.Entity.csproj", "{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.CMS.Domain.ServiceAdapter", "CMS\HotelVp.CMS.Domain.ServiceAdapter\HotelVp.CMS.Domain.ServiceAdapter.csproj", "{FA4C3142-CD06-497B-8A56-890A31063EEE}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "CMSWeb", "CMSWeb", "{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}"
+	ProjectSection(WebsiteProperties) = preProject
+		SccProjectName = "SAK"
+		SccAuxPath = "SAK"
+		SccLocalPath = "SAK"
+		SccProvider = "SAK"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		ProjectReferences = "{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}|HotelVp.CMS.Domain.Entity.dll;{A444A247-18EF-4A1F-9672-FAB003FDCB5B}|HotelVp.CMS.Domain.Implementation.dll;{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}|HotelVp.CMS.Domain.Interface.dll;{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}|HotelVp.CMS.Domain.Process.dll;{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}|HotelVp.CMS.Domain.Resource.dll;{FA4C3142-CD06-497B-8A56-890A31063EEE}|HotelVp.CMS.Domain.ServiceAdapter.dll;{8954506C-B345-4A6C-892C-C3B880066A4E}|HotelVp.CMS.Domain.DataAccess.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/CMSWeb"
+		Debug.AspNetCompiler.PhysicalPath = "CMSWeb\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\CMSWeb\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/CMSWeb"
+		Release.AspNetCompiler.PhysicalPath = "CMSWeb\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\CMSWeb\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "18271"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC} = {6541D223-BF0C-43BD-9AD6-A880A2E48CBC}
+		{FA4C3142-CD06-497B-8A56-890A31063EEE} = {FA4C3142-CD06-497B-8A56-890A31063EEE}
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B} = {A444A247-18EF-4A1F-9672-FAB003FDCB5B}
+		{8954506C-B345-4A6C-892C-C3B880066A4E} = {8954506C-B345-4A6C-892C-C3B880066A4E}
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B} = {A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823} = {1C70D3F4-C0D5-42E6-9618-A48DC5C64823}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.CMS.Domain.Resource", "CMS\HotelVp.CMS.Domain.ResourceAccess\HotelVp.CMS.Domain.Resource.csproj", "{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelVp.CMS.Domain.DataAccess", "CMS\HotelVp.CMS.Domain.DataAccess\HotelVp.CMS.Domain.DataAccess.csproj", "{8954506C-B345-4A6C-892C-C3B880066A4E}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 9
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://10.0.0.24:8080/tfs/hotelvp
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = CMS\\HotelVp.CMS.Domain.DataAccess\\HotelVp.CMS.Domain.DataAccess.csproj
+		SccProjectTopLevelParentUniqueName1 = HotelVp.CMS.sln
+		SccProjectName1 = CMS/HotelVp.CMS.Domain.DataAccess
+		SccLocalPath1 = CMS\\HotelVp.CMS.Domain.DataAccess
+		SccProjectUniqueName2 = CMS\\HotelVp.CMS.Domain.Interface\\HotelVp.CMS.Domain.Interface.csproj
+		SccProjectTopLevelParentUniqueName2 = HotelVp.CMS.sln
+		SccProjectName2 = CMS/HotelVp.CMS.Domain.Interface
+		SccLocalPath2 = CMS\\HotelVp.CMS.Domain.Interface
+		SccProjectUniqueName3 = CMS\\HotelVp.CMS.Domain.Entity\\HotelVp.CMS.Domain.Entity.csproj
+		SccProjectTopLevelParentUniqueName3 = HotelVp.CMS.sln
+		SccProjectName3 = CMS/HotelVp.CMS.Domain.Entity
+		SccLocalPath3 = CMS\\HotelVp.CMS.Domain.Entity
+		SccProjectUniqueName4 = CMS\\HotelVp.CMS.Domain.ServiceAdapter\\HotelVp.CMS.Domain.ServiceAdapter.csproj
+		SccProjectTopLevelParentUniqueName4 = HotelVp.CMS.sln
+		SccProjectName4 = CMS/HotelVp.CMS.Domain.ServiceAdapter
+		SccLocalPath4 = CMS\\HotelVp.CMS.Domain.ServiceAdapter
+		SccProjectUniqueName5 = CMS\\HotelVp.CMS.Domain.Process\\HotelVp.CMS.Domain.Process.csproj
+		SccProjectTopLevelParentUniqueName5 = HotelVp.CMS.sln
+		SccProjectName5 = CMS/HotelVp.CMS.Domain.Process
+		SccLocalPath5 = CMS\\HotelVp.CMS.Domain.Process
+		SccWebProject6 = true
+		SccProjectUniqueName6 = CMSWeb
+		SccProjectName6 = CMSWeb
+		SccLocalPath6 = CMSWeb
+		SccProjectEnlistmentChoice6 = 2
+		SccProjectUniqueName7 = CMS\\HotelVp.CMS.Domain.ResourceAccess\\HotelVp.CMS.Domain.Resource.csproj
+		SccProjectTopLevelParentUniqueName7 = HotelVp.CMS.sln
+		SccProjectName7 = CMS/HotelVp.CMS.Domain.ResourceAccess
+		SccLocalPath7 = CMS\\HotelVp.CMS.Domain.ResourceAccess
+		SccProjectUniqueName8 = CMS\\HotelVp.CMS.Domain.Implementation\\HotelVp.CMS.Domain.Implementation.csproj
+		SccProjectTopLevelParentUniqueName8 = HotelVp.CMS.sln
+		SccProjectName8 = CMS/HotelVp.CMS.Domain.Implementation
+		SccLocalPath8 = CMS\\HotelVp.CMS.Domain.Implementation
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Debug|x86.ActiveCfg = Debug|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Debug|x86.Build.0 = Debug|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Release|Any CPU.ActiveCfg = Release|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Release|Any CPU.Build.0 = Release|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Release|Mixed Platforms.Build.0 = Release|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Release|x86.ActiveCfg = Release|x86
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC}.Release|x86.Build.0 = Release|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Debug|x86.ActiveCfg = Debug|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Debug|x86.Build.0 = Debug|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Release|Any CPU.ActiveCfg = Release|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Release|Any CPU.Build.0 = Release|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Release|Mixed Platforms.Build.0 = Release|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Release|x86.ActiveCfg = Release|x86
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B}.Release|x86.Build.0 = Release|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Debug|x86.ActiveCfg = Debug|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Debug|x86.Build.0 = Debug|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Release|Any CPU.ActiveCfg = Release|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Release|Any CPU.Build.0 = Release|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Release|Mixed Platforms.Build.0 = Release|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Release|x86.ActiveCfg = Release|x86
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823}.Release|x86.Build.0 = Release|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Debug|x86.ActiveCfg = Debug|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Debug|x86.Build.0 = Debug|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Release|Any CPU.ActiveCfg = Release|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Release|Any CPU.Build.0 = Release|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Release|Mixed Platforms.Build.0 = Release|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Release|x86.ActiveCfg = Release|x86
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81}.Release|x86.Build.0 = Release|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Debug|x86.ActiveCfg = Debug|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Debug|x86.Build.0 = Debug|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Release|Any CPU.ActiveCfg = Release|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Release|Any CPU.Build.0 = Release|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Release|Mixed Platforms.Build.0 = Release|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Release|x86.ActiveCfg = Release|x86
+		{FA4C3142-CD06-497B-8A56-890A31063EEE}.Release|x86.Build.0 = Release|x86
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Release|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B66EEC3B-64B2-402A-8BCB-2AD53185FB1B}.Release|x86.ActiveCfg = Debug|Any CPU
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Debug|x86.ActiveCfg = Debug|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Debug|x86.Build.0 = Debug|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Release|Any CPU.ActiveCfg = Release|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Release|Any CPU.Build.0 = Release|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Release|Mixed Platforms.Build.0 = Release|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Release|x86.ActiveCfg = Release|x86
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B}.Release|x86.Build.0 = Release|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Debug|x86.ActiveCfg = Debug|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Debug|x86.Build.0 = Debug|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Release|Any CPU.ActiveCfg = Release|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Release|Any CPU.Build.0 = Release|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Release|Mixed Platforms.Build.0 = Release|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Release|x86.ActiveCfg = Release|x86
+		{8954506C-B345-4A6C-892C-C3B880066A4E}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6541D223-BF0C-43BD-9AD6-A880A2E48CBC} = {8336ACA9-D68E-42B9-BE4C-855AABF32707}
+		{A444A247-18EF-4A1F-9672-FAB003FDCB5B} = {80D2A296-AA83-48E3-B93C-0BAF091664F3}
+		{1C70D3F4-C0D5-42E6-9618-A48DC5C64823} = {3C6227FE-7618-4083-A0C0-ACADD6EE96BA}
+		{FA4C3142-CD06-497B-8A56-890A31063EEE} = {7630BF80-6DF7-49E8-A4C7-283D640A3DCF}
+		{A6FE9EEE-529E-484E-B9BE-EE12D2BDDE8B} = {7630BF80-6DF7-49E8-A4C7-283D640A3DCF}
+		{8954506C-B345-4A6C-892C-C3B880066A4E} = {7630BF80-6DF7-49E8-A4C7-283D640A3DCF}
+		{A8177B5B-D05D-4CAB-A2EB-6F5097608E81} = {8C5E13E7-9D17-47BE-BD1A-3CFBB6EA698D}
+	EndGlobalSection
+EndGlobal

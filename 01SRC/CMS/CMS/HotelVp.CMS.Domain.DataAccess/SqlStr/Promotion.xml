@@ -1,0 +1,710 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_fc_city">
+    <![CDATA[  
+      select CITY_ID AS CITYID, area_id AS areaid, name_cn AS name_zh, name_en, name_cn AS CITYNM from t_lm_b_city order by pinyin
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_list">
+    <![CDATA[  
+      select prop as HOTELID ,prop_name_zh as HOTELNM from t_lm_b_prop t order by prop
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotelgroup_list">
+    <![CDATA[  
+      select group_code as GROUPCODE,name_zh as GROUPNM from t_lm_b_hotelgroup t order by id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_usergroup_list">
+    <![CDATA[  
+      select id AS USERGROUPID, usergroup_name AS USERGROUPNM from t_lm_usergroup t order by id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotelroom_list">
+    <![CDATA[  
+     select ROOM_CODE AS HOTELROOMCODE,ROOM_NAME AS HOTELROOMNM from t_room t where HOTEL_ID=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_insert">
+    <![CDATA[  
+     select id from t_lm_promotionmsg t where pro_title=:TITLE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_insert_all">
+    <![CDATA[  
+     select  
+    tlp.pro_title, '' as ERRMSG
+    from t_lm_promotionmsg tlp
+    left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+    where 
+    (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+    OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+    OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+    OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+    AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND (:COMMONLIST IS NULL) AND tlp.pro_title<>:TITLE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_insert_city">
+    <![CDATA[  
+     select tt.pro_title, wm_concat(cc.commlist) as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+      (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND tlp.pro_title<>:TITLE) tt
+      inner join (
+      SELECT REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS commlist
+            FROM DUAL
+            CONNECT BY ROWNUM <=
+            LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))) cc 
+      on cc.commlist = tt.city_id
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_insert_group">
+    <![CDATA[  
+     select tt.pro_title, wm_concat(cc.commlist) as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+       (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND tlp.pro_title<>:TITLE) tt
+      inner join (
+      SELECT REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS commlist
+            FROM DUAL
+            CONNECT BY ROWNUM <=
+            LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))) cc 
+      on cc.commlist = tt.hotelgroup_id
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_insert_hotel">
+    <![CDATA[  
+      select tt.pro_title, wm_concat(cc.commlist) as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+       (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND tlp.pro_title<>:TITLE) tt
+      inner join (
+      SELECT REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS commlist
+            FROM DUAL
+            CONNECT BY ROWNUM <=
+            LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))) cc 
+      on cc.commlist = tt.hotel_id
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_insert_room">
+    <![CDATA[  
+     select tt.pro_title, wm_concat(cc.commlist) as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+      (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND tlpd.hotel_id=:HOTELID AND tlp.pro_title<>:TITLE) tt
+      inner join (
+      SELECT REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS commlist
+            FROM DUAL
+            CONNECT BY ROWNUM <=
+            LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))) cc 
+      on cc.commlist = tt.room_id
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_Update">
+    <![CDATA[  
+     select id from t_lm_promotionmsg t where pro_title=:TITLE AND id <> :ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_insert">
+    <![CDATA[  
+  insert into t_lm_promotionmsg
+  (id, start_date, end_date, pro_title, priority, pro_content, rate_code, pro_image_id, status, create_time, update_time, operate_user,pro_method_id)
+    values
+  (:ID, TO_DATE(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'), TO_DATE(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'), :TITLE , :PRIORITY, :CONTENT, :RATECODE,:IMAGEID, '0', sysdate, sysdate, :OPERATEUSER,:PROMETHODID)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_update">
+    <![CDATA[  
+  update t_lm_promotionmsg set start_date=TO_DATE(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'),end_date=TO_DATE(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'),
+   pro_title=:TITLE ,priority=:PRIORITY, pro_content=:CONTENT,rate_code=:RATECODE,pro_image_id=:IMAGEID,status=:STATUS,update_time=sysdate,operate_user= :OPERATEUSER,pro_method_id=:PROMETHODID
+   where id=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_detail_update">
+    <![CDATA[  
+    update t_lm_promotionmsg_detail set status = '0',update_time=sysdate
+    where promotionmsg_id = :ID and status <> '0'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_detail_all_insert">
+    <![CDATA[  
+    insert into t_lm_promotionmsg_detail
+    (id, promotionmsg_id, pro_type, city_id, hotel_id, status, create_time, update_time, LINK_URL)
+    SELECT t_lm_promotionmsg_detail_seq.nextval, :ID,:PROTYPE,:COMMONLIST AS city_id,:HOTELID, '1',sysdate, sysdate, :LINKURL FROM DUAL
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_detail_city_insert">
+    <![CDATA[  
+    insert into t_lm_promotionmsg_detail
+    (id, promotionmsg_id, pro_type, city_id, hotel_id, status, create_time, update_time, LINK_URL)
+    SELECT t_lm_promotionmsg_detail_seq.nextval, :ID,:PROTYPE,REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS city_id, :HOTELID , '1',sysdate, sysdate, :LINKURL
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_detail_group_insert">
+    <![CDATA[  
+    insert into t_lm_promotionmsg_detail
+    (id, promotionmsg_id, pro_type, hotelgroup_id, hotel_id, status, create_time, update_time, LINK_URL)
+    SELECT t_lm_promotionmsg_detail_seq.nextval, :ID,:PROTYPE,REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS hotelgroup_id, :HOTELID , '1',sysdate, sysdate, :LINKURL
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_detail_hotel_insert">
+    <![CDATA[  
+    insert into t_lm_promotionmsg_detail 
+    (id, promotionmsg_id, pro_type, hotelgroup_id, hotel_id, status, create_time, update_time, LINK_URL)
+    SELECT t_lm_promotionmsg_detail_seq.nextval, :ID,:PROTYPE, :HOTELID ,REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS hotel_id, '1',sysdate, sysdate, :LINKURL
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_detail_room_insert">
+    <![CDATA[  
+    insert into t_lm_promotionmsg_detail
+    (id, promotionmsg_id, pro_type, hotel_id, room_id,status, create_time, update_time, LINK_URL)
+    SELECT t_lm_promotionmsg_detail_seq.nextval, :ID,:PROTYPE, :HOTELID ,REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS room_id, '1',sysdate, sysdate, :LINKURL
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_usergroup_insert">
+    <![CDATA[  
+    insert into t_lm_promotionmsg_detail
+    (id, promotionmsg_id, pro_type, usergroup_id, status, create_time, update_time, LINK_URL)
+    
+    SELECT t_lm_promotionmsg_detail_seq.nextval, :ID,:PROTYPE,REGEXP_SUBSTR (:USERGROUPLIST, '[^,]+', 1,rownum) AS usergroup_id, '1',sysdate, sysdate, :LINKURL
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:USERGROUPLIST) - LENGTH (REPLACE (:USERGROUPLIST, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_ing">
+    <![CDATA[  
+      select tlp.ID, tlp.pro_title AS PROTITLE,tlp.start_date AS STARTDATE, tlp.end_date AS ENDDATE,
+      (CASE tlp.status WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS,
+      (CASE tpd.pro_type WHEN '0' THEN '全局促销'  WHEN '1' THEN '城市促销'  WHEN '2' THEN '酒店集团促销'  WHEN '3' THEN '酒店促销' WHEN '4' THEN '房型促销' ELSE ''  END ) as PROTYPENM,
+      '编辑' AS MODIFYFIELD,tlp.RATE_CODE AS RATECODE
+      from t_lm_promotionmsg tlp
+      left join (select promotionmsg_id, pro_type from t_lm_promotionmsg_detail where pro_type <> '5' and status = '1' group by promotionmsg_id, pro_type) tpd
+      on tlp.id = tpd.promotionmsg_id
+      where tlp.status='1'
+      AND (to_date(to_char(tlp.start_date, 'yyyy/mm/dd'), 'yyyy/mm/dd') <= to_date(to_char(sysdate, 'yyyy/mm/dd'), 'yyyy/mm/dd'))
+      AND (to_date(to_char(sysdate, 'yyyy/mm/dd'), 'yyyy/mm/dd')<=to_date(to_char(tlp.end_date, 'yyyy/mm/dd'), 'yyyy/mm/dd'))
+      order by end_date asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_review_select">
+    <![CDATA[  
+      select tlp.ID, tlp.pro_title AS PROTITLE,tlp.start_date AS STARTDATE, tlp.end_date AS ENDDATE,
+      (CASE tlp.status WHEN '0' THEN '下线'  WHEN '1' THEN '上线'  ELSE ''  END ) as ONLINEDIS,
+      (CASE tpd.pro_type WHEN '0' THEN '全局促销'  WHEN '1' THEN '城市促销'  WHEN '2' THEN '酒店集团促销'  WHEN '3' THEN '酒店促销' WHEN '4' THEN '房型促销' ELSE ''  END ) as PROTYPENM,
+      '编辑' AS MODIFYFIELD
+      from t_lm_promotionmsg tlp
+      left join (select promotionmsg_id, pro_type from t_lm_promotionmsg_detail where pro_type <> '5' and status = '1' group by promotionmsg_id, pro_type) tpd
+      on tlp.id = tpd.promotionmsg_id
+      where
+      ((:ProTitle IS NULL) OR (tlp.pro_title LIKE '%'||:ProTitle||'%'))
+      AND ((:StartBeginDTime IS NULL) OR (to_date(:StartBeginDTime, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date))
+      AND ((:StartEndDTime IS NULL) OR (tlp.start_date <= to_date(:StartEndDTime, 'yyyy.mm.dd hh24:mi:ss')))
+      AND ((:EndBeginDTime IS NULL) OR (to_date(:EndBeginDTime, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      AND ((:EndEndDTime IS NULL) OR (tlp.end_date <= to_date(:EndEndDTime, 'yyyy.mm.dd hh24:mi:ss')))
+      order by tlp.id desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_main_select">
+    <![CDATA[  
+        select tlp.ID, tlp.pro_title AS PROTITLE,to_char(tlp.start_date, 'yyyy-mm-dd hh24:mi:ss') AS STARTDATE, to_char(tlp.end_date, 'yyyy-mm-dd hh24:mi:ss') AS ENDDATE,
+      tlp.STATUS,
+      tpd.pro_type AS PROTYPE,
+      tlp.PRIORITY, 
+      tlp.pro_content AS CONTENT,
+      tlp.RATE_CODE AS RATECODE,
+      tlp.pro_image_id AS IMAGEID,
+      tbi.HTP_PATH AS IMAGEPATH,
+      tlp.PRO_METHOD_ID
+      from t_lm_promotionmsg tlp
+      left join (select promotionmsg_id, pro_type from t_lm_promotionmsg_detail where pro_type <> '5' and status = '1' 
+      group by promotionmsg_id, pro_type) tpd
+      on tlp.id = tpd.promotionmsg_id
+      left join t_image tbi
+      on tlp.pro_image_id = tbi.id
+      where
+      tlp.ID =:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_detail_select">
+    <![CDATA[  
+    select
+    wm_concat(tlpd.city_id) AS CITY_ID,
+    wm_concat(tlpd.hotelgroup_id) AS HOTELGROUP_ID,
+    wm_concat(tlpd.hotel_id) AS HOTEL_ID,
+    wm_concat(tlpd.room_id) AS ROOM_ID,
+    wm_concat(tlc.cityid) AS CITYID,
+    wm_concat(tlg.hotelgroupid) AS HOTELGROUPID,
+    wm_concat(tbp.hotelid) AS HOTELID,
+    wm_concat(ftr.roomid) AS ROOMID,
+    wm_concat(tlup.usergroupid) AS USERGROUPID,wm_concat(tlpd.link_url) AS LINKURL
+    from t_lm_promotionmsg_detail tlpd
+    left join (select city_id,'['||city_id||']'||name_cn AS cityid from t_lm_b_city) tlc on tlc.city_id = tlpd.city_id
+    left join (select group_code,'['||group_code||']'||name_zh AS hotelgroupid from t_lm_b_hotelgroup) tlg on tlg.group_code = tlpd.hotelgroup_id
+    left join (select prop, '['||prop||']'||prop_name_zh AS hotelid from T_LM_B_PROP) tbp on tbp.prop = tlpd.hotel_id
+    left join (select HOTEL_ID AS prop, ROOM_CODE AS ROOM_ID, '['||ROOM_CODE||']'||ROOM_NAME AS roomid from t_room) ftr on ftr.prop=tlpd.hotel_id and ftr.ROOM_ID=tlpd.room_id
+    left join (select ID, '['||ID||']'||USERGROUP_NAME AS usergroupid from t_lm_usergroup) tlup on tlup.ID = tlpd.usergroup_id
+    where tlpd.promotionmsg_id=:ID and tlpd.status='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionimages_insert">
+    <![CDATA[  
+  insert into t_lm_b_images
+  (id, title, IMG_TYPE, htp_path, dns_path, status, create_time, update_time, operate_user)
+  values
+  (:ID, :TITLE, '01',:PATH, :PATH, '1', sysdate, sysdate, :OPERATEUSER)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_t_images_insert">
+    <![CDATA[  
+  insert into t_image
+  (id, title, img_type, htp_path, dns_path, source, is_cover, hotel_id, extend, is_process, resolution, room_type_code, create_time, update_time, seq, status, htp_path_bak)
+values
+  (:ID, :TITLE, '3', :PATH, '', 'HVP', '0', '', '', '1', '', '', sysdate, sysdate, 0, '1', '')
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionimages_update">
+    <![CDATA[  
+   update t_lm_b_images
+     set 
+         title =:TITLE,
+         htp_path = :PATH,
+         dns_path = :PATH,
+         update_time = sysdate,
+         operate_user = :OPERATEUSER
+   where id = :ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_t_images_update">
+    <![CDATA[  
+   update t_image
+     set 
+         title =:TITLE,
+         htp_path = :PATH,
+         update_time = sysdate
+   where id = :ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotionmsg_detail_select_back">
+    <![CDATA[  
+    select 
+    wm_concat(CITY_ID) AS CITYID, 
+    wm_concat(HOTELGROUP_ID) AS HOTELGROUPID,
+    wm_concat(HOTEL_ID) AS HOTELID,
+    wm_concat(ROOM_ID) AS ROOMID,
+    wm_concat(USERGROUP_ID) AS USERGROUPID
+    from t_lm_promotionmsg_detail t where PROMOTIONMSG_ID=:ID and status='1'
+    
+        select tpd.promotionmsg_id, tpd.pro_type, tpd.city_id, tpd.hotelgroup_id, tpd.hotel_id, tpd.room_id, tpd.usergroup_id  
+        from t_lm_promotionmsg tlp
+        left join 
+        (select promotionmsg_id, pro_type, city_id, hotelgroup_id, hotel_id, room_id, usergroup_id  
+        from t_lm_promotionmsg_detail where status='1') tpd
+        on tlp.id = tpd.promotionmsg_id
+        where
+        tlp.ID =:ID
+        order by tpd.pro_type asc
+    ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_update">
+    <![CDATA[  
+    update t_lm_promotion
+      set 
+          status = '0'
+    where promotionmsg_id = :ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_detail_all_insert">
+    <![CDATA[  
+   insert into t_lm_promotion
+   (id, start_date, end_date, hotel_id, room_type_code, rate_code, pro_desc, 
+   pro_content, pro_type, create_time, update_time, operate_user, priority, 
+   pro_image_id, status, usergroup, promotionmsg_id,pro_method_id,LINK_URL)
+   select t_lm_promotion_seq.nextval,TO_DATE(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'), TO_DATE(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'),
+   :HOTELID,:COMMONLIST,:RATECODE,:TITLE,:CONTENT,:PROTYPE,Sysdate,Sysdate,:OPERATEUSER,:PRIORITY,:IMAGEID,:STATUS,:USERGROUPLIST,:ID,:PROMETHODID,:LINKURL from dual
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_detail_city_insert">
+    <![CDATA[  
+    insert into t_lm_promotion
+   (id, start_date, end_date, hotel_id, rate_code, pro_desc, 
+   pro_content, pro_type, create_time, update_time, operate_user, priority, 
+   pro_image_id, status, usergroup, city_id, promotionmsg_id,pro_method_id,LINK_URL)
+   select t_lm_promotion_seq.nextval,TO_DATE(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'), TO_DATE(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'),
+   :HOTELID,:RATECODE,:TITLE,:CONTENT,:PROTYPE,Sysdate,Sysdate,:OPERATEUSER,:PRIORITY,:IMAGEID,:STATUS,:USERGROUPLIST,REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS city_id,:ID,:PROMETHODID,:LINKURL  from dual
+   CONNECT BY ROWNUM <=
+      LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_detail_group_insert">
+    <![CDATA[  
+     insert into t_lm_promotion
+   (id, start_date, end_date, hotel_id, rate_code, pro_desc, 
+   pro_content, pro_type, create_time, update_time, operate_user, priority, 
+   pro_image_id, status, usergroup, hotelgroup_id, promotionmsg_id,pro_method_id,LINK_URL)
+   select t_lm_promotion_seq.nextval,TO_DATE(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'), TO_DATE(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'),
+   :HOTELID,:RATECODE,:TITLE,:CONTENT,:PROTYPE,Sysdate,Sysdate,:OPERATEUSER,:PRIORITY,:IMAGEID,:STATUS,:USERGROUPLIST,REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS hotelgroup_id,:ID,:PROMETHODID,:LINKURL  from dual
+   CONNECT BY ROWNUM <=
+      LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_detail_hotel_insert">
+    <![CDATA[  
+     insert into t_lm_promotion
+   (id, start_date, end_date, hotel_id, rate_code, pro_desc, 
+   pro_content, pro_type, create_time, update_time, operate_user, priority, 
+   pro_image_id, status, usergroup, hotelgroup_id, promotionmsg_id,pro_method_id,LINK_URL)
+   select t_lm_promotion_seq.nextval,TO_DATE(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'), TO_DATE(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'),
+   REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS hotel_id,:RATECODE,:TITLE,:CONTENT,:PROTYPE,Sysdate,Sysdate,:OPERATEUSER,:PRIORITY,:IMAGEID,:STATUS,:USERGROUPLIST,:HOTELID,:ID,:PROMETHODID,:LINKURL from dual
+   CONNECT BY ROWNUM <=
+      LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_detail_room_insert">
+    <![CDATA[  
+      insert into t_lm_promotion
+   (id, start_date, end_date, hotel_id, room_type_code, rate_code, pro_desc, 
+   pro_content, pro_type, create_time, update_time, operate_user, priority, 
+   pro_image_id, status, usergroup, promotionmsg_id,pro_method_id,LINK_URL)
+   select t_lm_promotion_seq.nextval,TO_DATE(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss'), TO_DATE(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'),
+   :HOTELID,REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS room_type_code,:RATECODE,:TITLE,:CONTENT,:PROTYPE,Sysdate,Sysdate,:OPERATEUSER,:PRIORITY,:IMAGEID,:STATUS,:USERGROUPLIST,:ID,:PROMETHODID,:LINKURL from dual
+   CONNECT BY ROWNUM <=
+      LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_update_all">
+    <![CDATA[  
+     select  
+    tlp.pro_title, '' as ERRMSG
+    from t_lm_promotionmsg tlp
+    left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+    where 
+    (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+    OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+    OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+    OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+    AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND (:COMMONLIST IS NULL) AND tlp.pro_title<>:TITLE AND tlp.id<>:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_update_city">
+    <![CDATA[  
+     select tt.pro_title, wm_concat(cc.commlist) as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+      (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND tlp.pro_title<>:TITLE AND tlp.id<>:ID) tt
+      inner join (
+      SELECT REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS commlist
+            FROM DUAL
+            CONNECT BY ROWNUM <=
+            LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))) cc 
+      on cc.commlist = tt.city_id OR tt.city_id='000000'
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_update_city_chk">
+    <![CDATA[  
+     select tt.pro_title, '' as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+      (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND tlp.pro_title<>:TITLE AND tlp.id<>:ID
+      AND :COMMONLIST IS NULL) tt
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_update_group">
+    <![CDATA[  
+     select tt.pro_title, wm_concat(cc.commlist) as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+       (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND tlp.pro_title<>:TITLE AND tlp.id<>:ID) tt
+      inner join (
+      SELECT REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS commlist
+            FROM DUAL
+            CONNECT BY ROWNUM <=
+            LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))) cc 
+      on cc.commlist = tt.hotelgroup_id OR tt.hotelgroup_id='000000'
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_update_group_chk">
+    <![CDATA[  
+     select tt.pro_title, '' as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+       (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND tlp.pro_title<>:TITLE AND tlp.id<>:ID
+      AND :COMMONLIST IS NULL) tt
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_update_hotel">
+    <![CDATA[  
+      select tt.pro_title, wm_concat(cc.commlist) as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+       (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND tlp.pro_title<>:TITLE AND tlp.id<>:ID) tt
+      inner join (
+      SELECT REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS commlist
+            FROM DUAL
+            CONNECT BY ROWNUM <=
+            LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))) cc 
+      on cc.commlist = tt.hotel_id OR tt.hotel_id='000000'
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_update_hotel_chk">
+    <![CDATA[  
+      select tt.pro_title, '' as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+       (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (:HOTELID IS NULL) AND tlp.pro_title<>:TITLE AND tlp.id<>:ID
+      AND :COMMONLIST IS NULL) tt
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_update_room">
+    <![CDATA[  
+     select tt.pro_title, wm_concat(cc.commlist) as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+      (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND (tlpd.hotel_id=:HOTELID OR tlpd.hotel_id='000000') AND tlp.pro_title<>:TITLE AND tlp.id<>:ID) tt
+      inner join (
+      SELECT REGEXP_SUBSTR (:COMMONLIST, '[^,]+', 1,rownum) AS commlist
+            FROM DUAL
+            CONNECT BY ROWNUM <=
+            LENGTH (:COMMONLIST) - LENGTH (REPLACE (:COMMONLIST, ',', ''))) cc 
+      on cc.commlist = tt.room_id OR tt.room_id='000000'
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_promotion_check_err_update_room_chk">
+    <![CDATA[  
+     select tt.pro_title, '' as ERRMSG from (
+      select  
+      tlp.id,tlp.start_date, tlp.end_date, tlp.pro_title, tlp.priority, 
+      tlp.status,tlpd.pro_type,tlpd.city_id,tlpd.hotelgroup_id,tlpd.hotel_id,tlpd.room_id
+      from t_lm_promotionmsg tlp
+      left join t_lm_promotionmsg_detail tlpd on tlp.id=tlpd.promotionmsg_id and tlpd.status='1' and tlpd.pro_type <> 5
+      where 
+      (((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)) 
+      OR ((tlp.start_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date))
+      OR ((to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.start_date) and (tlp.end_date <= to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss'))) 
+      OR ((tlp.start_date <= to_date(:STARTDTIME, 'yyyy.mm.dd hh24:mi:ss')) and (to_date(:ENDDTIME, 'yyyy.mm.dd hh24:mi:ss') <= tlp.end_date)))
+      AND tlp.priority=:PRIORITY AND tlpd.pro_type=:PROTYPE AND tlp.status='1' AND :HOTELID IS NULL AND tlp.pro_title<>:TITLE AND tlp.id<>:ID
+      AND :COMMONLIST IS NULL) tt
+      group by tt.pro_title
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_promotion_method">
+    <![CDATA[  
+       select * from t_lm_promotion_method where (:NAME IS NULL OR NAME like '%'||:NAME||'%') order by seq asc 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_promotion_method_insert">
+    <![CDATA[  
+       insert into t_lm_promotion_method 
+       (ID,NAME,SEQ) 
+       VALUES(:ID,:NAME,:SEQ)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_promotion_method_update">
+    <![CDATA[  
+       UPDATE t_lm_promotion_method SET
+       NAME=:NAME,
+       SEQ=:SEQ
+       WHERE ID=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_promotion_method_delete">
+    <![CDATA[  
+       DELETE t_lm_promotion_method 
+       WHERE ID=:ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="get_t_promotion_method_maxSeq">
+    <![CDATA[  
+      select * from (select seq from t_lm_promotion_method  where seq is not null order by seq desc) where rownum<=1 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="get_t_promotion_fengmian_pic">
+    <![CDATA[  
+    select 'http://images.hubs1.net/images/'||uploadimagename as picPath,uploadimagename  from t_image
+      where prop = :HOTELID and isdefault = 'Y' and rownum = 1
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="get_t_promotion_fengmian_pic_back">
+    <![CDATA[  
+  select picPath,uploadimagename from (
+  select 'http://images.hubs1.net/images/'||uploadimagename as picPath,uploadimagename
+  from t_image
+  where prop =:HOTELID and imagecatid in(6,7,1,5)
+  order by decode(imagecatid,6,1,7,2,1,3,5,4)
+  )where  rownum = 1
+      ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="get_t_promotion_yuantu_pic">
+    <![CDATA[  
+       select ' http://images.hubs1.net/jiudian/'|| floor(t.prop/1000) ||'/'||t.prop|| '/' || t.image ||  '.' ||
+       t.image_type "imageUrl",imagecatid as "imageCate",t.caption as "caption",t.uploadimagename as "uploadimagename"
+       from t_image t  
+       where t.prop = :HOTELID and t.imagecatid in(6,7,1,5,8)
+       order by decode(imagecatid,6,1,7,2,1,3,5,4,8,5)
+        ]]>
+  </sql>
+</sqlList>

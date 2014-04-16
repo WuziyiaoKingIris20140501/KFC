@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_push_all_user_count">
+    <![CDATA[  
+      select nvl(count(tlu.login_mobile), 0) AS ALLCOUNT from t_lm_user tlu
+      where tlu.devicetoken IS NOT NULL 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_push_info_all_user_count">
+    <![CDATA[  
+      select nvl(count(tlu.id), 0) AS ALLCOUNT from t_lm_user tlu  where tlu.platform_code='IOS' and tlu.version >= '3.2' and tlu.THIRD_PARTY_ID IS NULL and (tlu.regchanel_code is null or tlu.regchanel_code <> 'QUNAR')
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_push_user_group_count">
+    <![CDATA[  
+      select nvl(count(ult.login_mobile), 0) AS ALLCOUNT from t_lm_usergroup up
+      inner join t_lm_ugroup_ult ult
+      on up.id = ult.usergroup_id
+      inner join t_lm_user tlu
+      on tlu.login_mobile = ult.login_mobile AND tlu.devicetoken IS NOT NULL
+      inner join (   
+      SELECT REGEXP_SUBSTR (:UserGroups, '[^,]+', 1,rownum) AS commlist
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserGroups) - LENGTH (REPLACE (:UserGroups, ',', ''))) dt
+      on up.id=dt.commlist
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_push_info_user_group_count">
+    <![CDATA[  
+      select nvl(count(ult.id), 0) AS ALLCOUNT from t_lm_usergroup up
+      inner join t_lm_ugroup_ult ult
+      on up.id = ult.usergroup_id
+      inner join t_lm_user tlu
+      on tlu.id = ult.login_mobile AND tlu.platform_code='IOS' and tlu.version >= '3.2' and tlu.THIRD_PARTY_ID IS NULL and (tlu.regchanel_code is null or tlu.regchanel_code <> 'QUNAR')
+      inner join (   
+      SELECT REGEXP_SUBSTR (:UserGroups, '[^,]+', 1,rownum) AS commlist
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:UserGroups) - LENGTH (REPLACE (:UserGroups, ',', ''))) dt
+      on up.id=dt.commlist
+  ]]>
+  </sql>
+  
+
+  <sql database="TUANDB" sqlId="getuserinfo_by_user">
+    <![CDATA[  
+      select id, login_mobile, sign_key, htk_flg, sign_flg, sign_date, deviceid, createtime, version,
+       devicetoken, regchanel_code, platform_code, last_verify_time, weibo_account, third_party_id,
+        third_party_vendor, push_status,CLIENT_CODE
+      from t_lm_user WHERE login_mobile=:USERID
+  ]]>
+  </sql>
+
+</sqlList>

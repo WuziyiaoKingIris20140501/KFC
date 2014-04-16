@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_count">
+    <![CDATA[  
+    select Count(*) from 
+    (select su.id,
+    su.UNIT_NAME,
+    count(suh.hotel_id),
+    su.INVOICE_NAME,
+    su.SETTLEMENT_PER,
+    su.SETTLEMENT_TEL
+    from 
+    t_lm_settlement_unit su
+    left join T_LM_SETTLEMENT_UNIT_HOTEL suh on su.id=suh.unit_id
+    left join t_lm_b_prop bp on suh.hotel_id = bp.prop
+    where 
+    ((:UnitName IS NULL) OR (su.UNIT_NAME like '%'||:UnitName||'%'))
+    AND ((:CityID IS NULL) OR (bp.cityid = :CityID))
+    AND ((:InvoiceName IS NULL) OR (su.INVOICE_NAME like '%'||:InvoiceName||'%'))
+    group by su.id,su.UNIT_NAME,su.INVOICE_NAME,su.SETTLEMENT_PER,su.SETTLEMENT_TEL
+    ) dt
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_select_back">
+    <![CDATA[  
+    select su.id AS UNITID,
+    su.UNIT_NAME AS UNITNAME,
+    to_char(count(suh.hotel_id))||'家' AS HOTELNM,
+    su.INVOICE_NAME AS INVOICENM,
+    su.SETTLEMENT_PER AS PER,
+    su.SETTLEMENT_TEL AS TEL
+    from 
+    t_lm_settlement_unit su
+    left join T_LM_SETTLEMENT_UNIT_HOTEL suh on su.id=suh.unit_id
+    left join t_lm_b_prop bp on suh.hotel_id = bp.prop
+    where 
+    ((:UnitName IS NULL) OR (su.UNIT_NAME like '%'||:UnitName||'%'))
+    AND ((:CityID IS NULL) OR (bp.cityid = :CityID))
+    AND ((:InvoiceName IS NULL) OR (su.INVOICE_NAME like '%'||:InvoiceName||'%'))
+    group by su.id,su.UNIT_NAME,su.INVOICE_NAME,su.SETTLEMENT_PER,su.SETTLEMENT_TEL
+    order by count(suh.hotel_id) desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_select">
+    <![CDATA[  
+    select distinct
+  dt.UNITID,dt.UNITNAME,
+  dt.INVOICENM,dt.PER,dt.TEL,dt.HOTELCN,
+  case when dt.HOTELCN=1 then bp.prop_name_zh else dt.HOTELCN || '家' end AS HOTELNM
+  from
+  (
+  select su.id AS UNITID,
+  su.UNIT_NAME AS UNITNAME,
+  to_char(count(suh.hotel_id)) AS HOTELCN,
+  su.INVOICE_NAME AS INVOICENM,
+  su.SETTLEMENT_PER AS PER,
+  su.SETTLEMENT_TEL AS TEL
+  from
+  t_lm_settlement_unit su
+  left join T_LM_SETTLEMENT_UNIT_HOTEL suh on su.id=suh.unit_id
+  left join t_lm_b_prop bp on suh.hotel_id = bp.prop
+  where
+  ((:UnitName IS NULL) OR (su.UNIT_NAME like '%'||:UnitName||'%'))
+  AND ((:CityID IS NULL) OR (bp.cityid = :CityID))
+  AND ((:InvoiceName IS NULL) OR (su.INVOICE_NAME like '%'||:InvoiceName||'%'))
+  group by su.id,su.UNIT_NAME,su.INVOICE_NAME,su.SETTLEMENT_PER,su.SETTLEMENT_TEL
+  order by count(suh.hotel_id) desc
+  ) dt
+  left join T_LM_SETTLEMENT_UNIT_HOTEL suh on dt.UNITID=suh.unit_id
+  left join t_lm_b_prop bp on suh.hotel_id = bp.prop and dt.HOTELCN=1
+  order by dt.HOTELCN desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_detail_select">
+    <![CDATA[  
+    select 
+    id, unit_name, invoice_name, settlement_term,term_stdt, hotel_tax, 
+    settlement_address, settlement_per, settlement_tel, settlement_fax, 
+    settlement_sales, bill_item, hotel_taxno, hotel_payno, status, '' AS settlement_sales_nm
+    from t_lm_settlement_unit
+    where id=:UnitID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_detail_hotel_select">
+    <![CDATA[  
+    select 
+    suh.hotel_id AS HOTELID,bp.prop_name_zh AS HOTELNM, '' AS ODTYPE, suh.price_code AS PRICECD, suh.vendor AS VENDOR, '0' AS ACTYPE
+    from t_lm_settlement_unit_hotel suh
+    left join t_lm_b_prop bp on suh.hotel_id=bp.prop
+    where suh.status='1' AND 
+    suh.unit_id = :UnitID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_insert">
+    <![CDATA[  
+    insert into t_lm_settlement_unit
+  (id, unit_name, invoice_name, settlement_term,term_stdt, hotel_tax, settlement_address, settlement_per, settlement_tel, settlement_fax, settlement_sales, bill_item, hotel_taxno, hotel_payno, status, create_user, create_time, update_user, update_time)
+values
+  (:ID,:UNIT_NAME,:INVOICE_NAME,:SETTLEMENT_TERM,:TERM_STDT, :HOTEL_TAX,:SETTLEMENT_ADDRESS,:SETTLEMENT_PER,:SETTLEMENT_TEL,:SETTLEMENT_FAX,:SETTLEMENT_SALES,:BILL_ITEM,:HOTEL_TAXNO,:HOTEL_PAYNO,:STATUS,:CREATE_USER,sysdate,:CREATE_USER,sysdate)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_update">
+    <![CDATA[  
+    update t_lm_settlement_unit
+   set unit_name = :UNIT_NAME,
+       invoice_name = :INVOICE_NAME,
+       settlement_term = :SETTLEMENT_TERM,
+       term_stdt = :TERM_STDT,
+       hotel_tax = :HOTEL_TAX,
+       settlement_address = :SETTLEMENT_ADDRESS,
+       settlement_per = :SETTLEMENT_PER,
+       settlement_tel = :SETTLEMENT_TEL,
+       settlement_fax = :SETTLEMENT_FAX,
+       settlement_sales = :SETTLEMENT_SALES,
+       bill_item = :BILL_ITEM,
+       hotel_taxno = :HOTEL_TAXNO,
+       hotel_payno = :HOTEL_PAYNO,
+       status = :STATUS,
+       update_user = :CREATE_USER,
+       update_time = sysdate
+ where id = :ID
+  ]]>
+  </sql>
+
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_hotel_update">
+    <![CDATA[  
+      update t_lm_settlement_unit_hotel
+      set
+      status = '0',
+      update_user = :CREATE_USER,
+      update_time = sysdate
+      where unit_id = :UNIT_ID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_settlement_unit_hotel_save">
+    <![CDATA[  
+      merge into t_lm_settlement_unit_hotel t1
+      using (select :UNIT_ID AS unit_id,:HOTEL_ID AS hotel_id,:PRICE_CODE AS price_code, :VENDOR AS vendor, :STATUS AS status, :CREATE_USER AS create_user from dual) t2
+      on (t1.unit_id = t2.unit_id and t1.hotel_id = t2.hotel_id)
+      when matched then
+      update set t1.price_code=t2.price_code,t1.vendor=t2.vendor,t1.status=t2.status,t1.create_user=t2.create_user,t1.create_time=sysdate,t1.update_user=t2.create_user,t1.update_time=sysdate
+      where t1.unit_id = t2.unit_id and t1.hotel_id = t2.hotel_id
+      when not matched then
+      insert values (t2.unit_id, t2.hotel_id,t2.price_code,t2.vendor,t2.status,t2.create_user,sysdate,t2.create_user,sysdate)
+  ]]>
+  </sql>
+
+</sqlList>

@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AllAmountLabel" xml:space="preserve">
+    <value>总金额</value>
+  </data>
+  <data name="AmountBigRemain" xml:space="preserve">
+    <value>输入的金额数大于金额的剩余数！</value>
+  </data>
+  <data name="Cities" xml:space="preserve">
+    <value>发放城市：</value>
+  </data>
+  <data name="CodeLabel" xml:space="preserve">
+    <value>代码</value>
+  </data>
+  <data name="ConfirmSave" xml:space="preserve">
+    <value>领用券一旦保存后，不能修改，确定要保存吗？</value>
+  </data>
+  <data name="customernumberErrorMsg" xml:space="preserve">
+    <value>自定义优惠券号码必须为10位数字！</value>
+  </data>
+  <data name="CustomNumber" xml:space="preserve">
+    <value>自定义优惠券号码（请输入10位数字）：</value>
+  </data>
+  <data name="EndDateLabel" xml:space="preserve">
+    <value>结束日期</value>
+  </data>
+  <data name="IncludeAmountNotEqualAllAmount" xml:space="preserve">
+    <value>内含抵用券的金额数之和与领用券总金额数不相等！</value>
+  </data>
+  <data name="Leaf" xml:space="preserve">
+    <value>张</value>
+  </data>
+  <data name="NameLabel" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="NoData" xml:space="preserve">
+    <value>没有数据</value>
+  </data>
+  <data name="NoLimit" xml:space="preserve">
+    <value>无限制</value>
+  </data>
+  <data name="PackageAllAmount" xml:space="preserve">
+    <value>领用券总金额：</value>
+  </data>
+  <data name="PackageEndDate" xml:space="preserve">
+    <value>最晚可领用日期：</value>
+  </data>
+  <data name="PackageInCludeTicket" xml:space="preserve">
+    <value>内含抵用券：</value>
+  </data>
+  <data name="PackageList" xml:space="preserve">
+    <value>优惠券礼包列表</value>
+  </data>
+  <data name="PackageNameLabel" xml:space="preserve">
+    <value>领用券名称：</value>
+  </data>
+  <data name="PackageSettingTitle" xml:space="preserve">
+    <value>领用券总体规则设置</value>
+  </data>
+  <data name="PackageStartDate" xml:space="preserve">
+    <value>最早可领用日期：</value>
+  </data>
+  <data name="PromptAddFaild" xml:space="preserve">
+    <value>领用券新增失败</value>
+  </data>
+  <data name="PromptAddSuccess" xml:space="preserve">
+    <value>领用券新增成功！</value>
+  </data>
+  <data name="PromptAllAmountIsNaN" xml:space="preserve">
+    <value>优惠券总金额必须为必须大于等于0的数字！</value>
+  </data>
+  <data name="PromptAllAmountNoEmpty" xml:space="preserve">
+    <value>领用券总金额不能为空，且必须为大于等于0的数字！</value>
+  </data>
+  <data name="PromptAmountError" xml:space="preserve">
+    <value>内含抵用券输入的金额数大于总金额的剩余数！</value>
+  </data>
+  <data name="PromptDelete" xml:space="preserve">
+    <value>你确定要删除这条内容吗 ?</value>
+  </data>
+  <data name="PromptEndDateIsEmpty" xml:space="preserve">
+    <value>最晚可领用日期不能为空！</value>
+  </data>
+  <data name="PromptIncludeTicketIsEmpty" xml:space="preserve">
+    <value>内含抵用券没有设置！</value>
+  </data>
+  <data name="PromptStartDateIsEmpty" xml:space="preserve">
+    <value>最早可领用日期不能为空！</value>
+  </data>
+  <data name="PromptTicketAmountError" xml:space="preserve">
+    <value>内含抵用券的金额输入不正确，不能为空且必须为数字！</value>
+  </data>
+  <data name="PromptTicketAmountIsEmpty" xml:space="preserve">
+    <value>优惠券总金额不能为空！</value>
+  </data>
+  <data name="PromptTicketCountAmountIsNan" xml:space="preserve">
+    <value>内含抵用券的张数和金额必须为大于0的数字！</value>
+  </data>
+  <data name="PromptTicketCountError" xml:space="preserve">
+    <value>内含抵用券的张数输入不正确，不能为空且必须为数字！</value>
+  </data>
+  <data name="PromptTicketNameIsEmpty" xml:space="preserve">
+    <value>优惠券名称不能为空！</value>
+  </data>
+  <data name="Remain" xml:space="preserve">
+    <value>剩余</value>
+  </data>
+  <data name="Remark" xml:space="preserve">
+    <value>(注意：领用券一旦保存后，不能修改。)</value>
+  </data>
+  <data name="StartDateLabel" xml:space="preserve">
+    <value>开始日期</value>
+  </data>
+  <data name="TicketOfHadSetting" xml:space="preserve">
+    <value>已经设置的优惠券</value>
+  </data>
+  <data name="UsePlatform" xml:space="preserve">
+    <value>领用平台限制：</value>
+  </data>
+  <data name="UserChannel" xml:space="preserve">
+    <value>销售渠道：</value>
+  </data>
+  <data name="UserConsumeCount" xml:space="preserve">
+    <value>不同用户可领用次数：</value>
+  </data>
+  <data name="UserGroup" xml:space="preserve">
+    <value>领用券用户组：</value>
+  </data>
+  <data name="Yuan" xml:space="preserve">
+    <value>元</value>
+  </data>
+  <data name="UserRepCount" xml:space="preserve">
+    <value>同一用户可领用次数：</value>
+  </data>
+  <data name="promptUserCountIsEmpty" xml:space="preserve">
+    <value>不同用户可领用次数不能为空！</value>
+  </data>
+  <data name="promptUserCountIsNaN" xml:space="preserve">
+    <value>不同用户可领用次数必须为大于0的整数！</value>
+  </data>
+  <data name="promptUserRepCountIsEmpty" xml:space="preserve">
+    <value>同一用户可领用次数不能为空！</value>
+  </data>
+  <data name="promptUserRepCountIsNaN" xml:space="preserve">
+    <value>同一用户可领用次数必须为大于0的整数！</value>
+  </data>
+  <data name="PackageType" xml:space="preserve">
+    <value>优惠券类型：</value>
+  </data>
+</root>

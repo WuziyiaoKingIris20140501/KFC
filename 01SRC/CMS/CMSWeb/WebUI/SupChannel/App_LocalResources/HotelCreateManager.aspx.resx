@@ -1,0 +1,288 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DiamondRating" xml:space="preserve">
+    <value>diamondrating</value>
+  </data>
+  <data name="EventInsertBalMessage" xml:space="preserve">
+    <value>酒店结算信息保存 - 酒店ID：{0} 酒店名称：{1} 价格代码：{2} 房型代码：{3} 入住时间开始日：{4} 入住时间结束日：{5} 佣金类型：{6} 佣金值：{7} </value>
+  </data>
+  <data name="EventInsertMessage" xml:space="preserve">
+    <value>SUP酒店基础信息保存 - 酒店ID：{0} 酒店名称：{1} 酒店英文名：{2} 城市：{3} 酒店星级：{4} 酒店地址：{5} 常规单电话：{6} 常规单传真：{7} 酒店经度：{8} 酒店纬度：{9} 酒店商圈：{10} 开业时间：{11} 最后装修日期：{12} 酒店一句话描述：{13} 酒店详情：{14} LM酒店上下线：{15} 酒店拼音：{16} 酒店总房数：{17} 酒店简拼：{18} 邮编：{19} 最低限价：{20} 常规联系人：{21} 联系人电话：{22} 联系人邮箱：{23}</value>
+  </data>
+  <data name="EventInsertSalesMessage" xml:space="preserve">
+    <value>酒店基础信息保存 - 酒店ID：{0} 酒店名称：{1}  LM传真：{2} LM联系电话：{3} LM联系人：{4} LM联系邮箱：{5} 销售人员：{6} 合同开始日期：{7} 合同结束日期：{8} </value>
+  </data>
+  <data name="Online" xml:space="preserve">
+    <value>online</value>
+  </data>
+  <data name="OnlineType" xml:space="preserve">
+    <value>hotelstatus</value>
+  </data>
+  <data name="StarRating" xml:space="preserve">
+    <value>starmeth</value>
+  </data>
+  <data name="UpdateBalSuccess" xml:space="preserve">
+    <value>酒店结算信息保存成功！</value>
+  </data>
+  <data name="UpdateError1" xml:space="preserve">
+    <value>酒店基础信息保存失败！</value>
+  </data>
+  <data name="UpdateError10" xml:space="preserve">
+    <value>联系人长度不能超过32位中文字符，请修改！</value>
+  </data>
+  <data name="UpdateError101" xml:space="preserve">
+    <value>酒店拼音长度不能超过1000位字符，请修改！</value>
+  </data>
+  <data name="UpdateError102" xml:space="preserve">
+    <value>酒店房间数不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError103" xml:space="preserve">
+    <value>酒店房间数为正整数，请修改！</value>
+  </data>
+  <data name="UpdateError104" xml:space="preserve">
+    <value>酒店简拼长度不能超过1000位字符，请修改！</value>
+  </data>
+  <data name="UpdateError105" xml:space="preserve">
+    <value>酒店城市不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError106" xml:space="preserve">
+    <value>酒店地址不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError107" xml:space="preserve">
+    <value>酒店商圈不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError108" xml:space="preserve">
+    <value>常规联系人不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError109" xml:space="preserve">
+    <value>常规联系人长度不能超过33位中文字符，请修改！</value>
+  </data>
+  <data name="UpdateError11" xml:space="preserve">
+    <value>联系人邮箱长度不能超过100位字符，请修改！</value>
+  </data>
+  <data name="UpdateError110" xml:space="preserve">
+    <value>联系人电话不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError111" xml:space="preserve">
+    <value>联系人电话长度不能超过30位字符，请修改！</value>
+  </data>
+  <data name="UpdateError112" xml:space="preserve">
+    <value>酒店一句话描述不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError113" xml:space="preserve">
+    <value>联系人邮箱不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError114" xml:space="preserve">
+    <value>酒店详情长度不能超过666位中文字符，请修改！</value>
+  </data>
+  <data name="UpdateError115" xml:space="preserve">
+    <value>酒店拼音不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError116" xml:space="preserve">
+    <value>酒店简拼不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError117" xml:space="preserve">
+    <value>最低安全价格为正整数，请修改！</value>
+  </data>
+  <data name="UpdateError118" xml:space="preserve">
+    <value>酒店城市不合法，请修改！</value>
+  </data>
+  <data name="UpdateError12" xml:space="preserve">
+    <value>酒店英文名长度不能超过100位字符，请修改！</value>
+  </data>
+  <data name="UpdateError13" xml:space="preserve">
+    <value>酒店签约信息保存失败！</value>
+  </data>
+  <data name="UpdateError14" xml:space="preserve">
+    <value>酒店销售人员不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError15" xml:space="preserve">
+    <value>合同开始日和结束日不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError16" xml:space="preserve">
+    <value>酒店结算信息保存失败！</value>
+  </data>
+  <data name="UpdateError17" xml:space="preserve">
+    <value>入住开始日和入住日不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError18" xml:space="preserve">
+    <value>房型不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError19" xml:space="preserve">
+    <value>佣金类型为百分比，值为0~100数字。类型为固定金额，值为0~9999数字。如有小数点，请保留2位小数。请修改！</value>
+  </data>
+  <data name="UpdateError2" xml:space="preserve">
+    <value>酒店名称长度不能超过33位中文字符，请修改！</value>
+  </data>
+  <data name="UpdateError21" xml:space="preserve">
+    <value>酒店经纬度不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError22" xml:space="preserve">
+    <value>酒店基础信息保存失败！该酒店信息已存在，请检查酒店名称，地址，电话，传真，经纬度是否正确！</value>
+  </data>
+  <data name="UpdateError3" xml:space="preserve">
+    <value>酒店中文名不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError31" xml:space="preserve">
+    <value>酒店经纬度格式不正确，请修改！</value>
+  </data>
+  <data name="UpdateError32" xml:space="preserve">
+    <value>小贴士内容不能包含符号，请修改！</value>
+  </data>
+  <data name="UpdateError33" xml:space="preserve">
+    <value>酒店基础信息保存失败！该酒店城市信息不存在，请检查是否正确！</value>
+  </data>
+  <data name="UpdateError4" xml:space="preserve">
+    <value>酒店地址长度不能超过50位中文字符，请修改！</value>
+  </data>
+  <data name="UpdateError5" xml:space="preserve">
+    <value>酒店网站长度不能超过200位英文字符，请修改！</value>
+  </data>
+  <data name="UpdateError6" xml:space="preserve">
+    <value>常规单电话长度不能超过40位字符，请修改！</value>
+  </data>
+  <data name="UpdateError61" xml:space="preserve">
+    <value>常规单电话不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError7" xml:space="preserve">
+    <value>常规单传真长度不能超过20位字符，请修改！</value>
+  </data>
+  <data name="UpdateError71" xml:space="preserve">
+    <value>常规单传真不能为空，请修改！</value>
+  </data>
+  <data name="UpdateError8" xml:space="preserve">
+    <value>酒店一句话描述长度不能超过333位中文字符，请修改！</value>
+  </data>
+  <data name="UpdateError9" xml:space="preserve">
+    <value>小贴士长度不能超过1000位英文字符，请修改！</value>
+  </data>
+  <data name="UpdateSalesError2" xml:space="preserve">
+    <value>酒店签约信息保存失败，该销售人员不存在，请确认！</value>
+  </data>
+  <data name="UpdateSalesSuccess" xml:space="preserve">
+    <value>酒店签约信息保存成功！</value>
+  </data>
+  <data name="UpdateSuccess" xml:space="preserve">
+    <value>酒店基础信息保存成功！酒店ID：{0}</value>
+  </data>
+  <data name="WarningMessage" xml:space="preserve">
+    <value>该酒店信息错误，请确认！</value>
+  </data>
+</root>

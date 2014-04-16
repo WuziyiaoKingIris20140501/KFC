@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Error1" xml:space="preserve">
+    <value>选择酒店不能为空，请修改！</value>
+  </data>
+  <data name="Error2" xml:space="preserve">
+    <value>持续日期不能为空，请修改！</value>
+  </data>
+  <data name="InsertSuccess" xml:space="preserve">
+    <value>酒店销售计划保存成功！</value>
+  </data>
+  <data name="Error7" xml:space="preserve">
+    <value>酒店销售计划保存失败！</value>
+  </data>
+  <data name="EventInsertMessage" xml:space="preserve">
+    <value>酒店销售计划保存 - 酒店ID：{0}  房型ID：{1}  持续开始日期：{2}  持续结束日期：{3}  开放时间：{4}  价格代码：{5}  房量：{6}  状态：{7}  星期：{8}  单人价：{9}  二人价：{10}  三人价：{11}  四人价：{12}  加床价：{13}   网络价：{14}  早餐数量：{15}  每份早餐价格：{16}  免费宽带：{17}  浮动值：{18}  浮动类型：{19}  是否保留房：{20}  保存计划类型：{21}   保存计划时间：{22}  保存计划持续时间：{23}  保存计划持续星期：{24}  计划ID：{25}   计划供应商：{26}</value>
+  </data>
+  <data name="PriceType" xml:space="preserve">
+    <value>pricetype</value>
+  </data>
+  <data name="Error3" xml:space="preserve">
+    <value>选择房型未选择，请修改！</value>
+  </data>
+  <data name="Error8" xml:space="preserve">
+    <value>酒店销售计划保存失败！错误：</value>
+  </data>
+  <data name="Error9" xml:space="preserve">
+    <value>该酒店无房型销售 请确认！</value>
+  </data>
+  <data name="Error4" xml:space="preserve">
+    <value>房量必须为非负整数，请修改！</value>
+  </data>
+  <data name="BreakFastNum" xml:space="preserve">
+    <value>breakfastnum</value>
+  </data>
+  <data name="IsNetwork" xml:space="preserve">
+    <value>isnetwork</value>
+  </data>
+  <data name="OffSetunit" xml:space="preserve">
+    <value>offsetunit</value>
+  </data>
+  <data name="RoomStatus" xml:space="preserve">
+    <value>roomstatus</value>
+  </data>
+  <data name="WeekType" xml:space="preserve">
+    <value>weektype</value>
+  </data>
+  <data name="Error10" xml:space="preserve">
+    <value>选择的酒店不是有效酒店，请修改！</value>
+  </data>
+  <data name="Error11" xml:space="preserve">
+    <value>未选择星期，请修改！</value>
+  </data>
+  <data name="Error12" xml:space="preserve">
+    <value>二人价不能为空，请修改！</value>
+  </data>
+  <data name="Error13" xml:space="preserve">
+    <value>单人价，二人价，三人价，四人价，加床价，网络价，每份早餐价格输入值必须为数字，请修改！</value>
+  </data>
+  <data name="Error14" xml:space="preserve">
+    <value>浮动值必须为非负整数，请修改！</value>
+  </data>
+  <data name="IsReserve" xml:space="preserve">
+    <value>isreserve</value>
+  </data>
+  <data name="Error15" xml:space="preserve">
+    <value>二人价输入值必须为大于0的数字，请修改！</value>
+  </data>
+  <data name="SaveType" xml:space="preserve">
+    <value>savetype</value>
+  </data>
+  <data name="Error16" xml:space="preserve">
+    <value>保存销售计划-未选择星期，请修改！</value>
+  </data>
+  <data name="Error17" xml:space="preserve">
+    <value>保存销售计划-持续日期与时间不能为空，请修改！</value>
+  </data>
+  <data name="Error18" xml:space="preserve">
+    <value>保存销售计划-时间不能为空，请修改！</value>
+  </data>
+  <data name="CxlId" xml:space="preserve">
+    <value>cxlid</value>
+  </data>
+  <data name="GuaId" xml:space="preserve">
+    <value>guaid</value>
+  </data>
+  <data name="EffHour" xml:space="preserve">
+    <value>effhour</value>
+  </data>
+  <data name="Error20" xml:space="preserve">
+    <value>二人价不能低于最低安全价格：{0}，请修改！</value>
+  </data>
+  <data name="SupHotelType" xml:space="preserve">
+    <value>suphoteltype</value>
+  </data>
+  <data name="Error21" xml:space="preserve">
+    <value>计划供应商不能为空，请修改！</value>
+  </data>
+  <data name="Error22" xml:space="preserve">
+    <value>开放时间不能为空，请修改！</value>
+  </data>
+  <data name="Error19" xml:space="preserve">
+    <value>选择的酒店与房型不符合，请重新选择酒店！</value>
+  </data>
+</root>

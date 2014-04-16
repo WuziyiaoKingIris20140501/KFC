@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_ex_select_byhotelid">
+    <![CDATA[  
+    select * from t_lm_hotel_ex where hotel_id=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_ex_insert">
+    <![CDATA[  
+    INSERT INTO t_lm_hotel_ex(HOTEL_ID,TYPE,LINKMAN,LINKTEL,LINKMAIL,LINKFAX,REMARK,EX_TIME,EX_MODE,CREATE_TIME,CREATE_USER,STATUS)
+    VALUES(:HOTELID,:TYPE,:LINKMAN,:LINKTEL,:LINKMAIL,:LINKFAX,:REMARK,:EXTIME,:EXMODE,sysdate,:CREATEUSER,:STATUS)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_ex_update">
+    <![CDATA[  
+    update t_lm_hotel_ex 
+    set LINKMAN=:LINKMAN,LINKTEL=:LINKTEL,LINKMAIL=:LINKMAIL,LINKFAX=:LINKFAX,REMARK=:REMARK,EX_TIME=:EXTIME,EX_MODE=:EXMODE,UPDATE_TIME=SYSDATE,UPDATE_USER=:UPDATEUSER,STATUS=:STATUS
+    where HOTEL_ID=:HOTELID and TYPE=:TYPE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_ex_save">
+    <![CDATA[
+    merge into t_lm_hotel_ex t1
+      using (select :HOTELID AS HOTEL_ID, :TYPE AS TYPE ,:LINKMAN AS LINKMAN,:LINKTEL AS LINKTEL,:LINKMAIL AS LINKMAIL, :LINKFAX AS LINKFAX, :REMARK AS REMARK, :EXTIME AS EX_TIME, :EXMODE AS EX_MODE, :STATUS AS STATUS, :CREATEUSER AS CREATE_USER from dual) t2 
+      on (t1.HOTEL_ID = t2.HOTEL_ID and t1.TYPE = t2.TYPE)
+      when matched then
+         update set t1.LINKMAN=t2.LINKMAN,t1.LINKTEL=t2.LINKTEL,t1.LINKMAIL=t2.LINKMAIL,t1.LINKFAX=t2.LINKFAX,t1.REMARK=t2.REMARK, t1.EX_TIME=t2.EX_TIME,t1.EX_MODE=t2.EX_MODE,t1.UPDATE_TIME=sysdate, t1.UPDATE_USER=t2.CREATE_USER
+         where t1.HOTEL_ID = t2.HOTEL_ID and t1.TYPE = t2.TYPE
+      when not matched then
+         insert values (:HOTELID,:TYPE,:LINKMAN,:LINKTEL,:LINKMAIL,:LINKFAX,:REMARK,:EXTIME,:EXMODE,sysdate,sysdate,:CREATEUSER,:CREATEUSER,:STATUS, '', '', '', '')
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotel_ex_update_by_consultroom">
+    <![CDATA[  
+    update t_lm_hotel_ex 
+    set REMARK=:REMARK,LINKMAN=:LINKMAN,LINKTEL=:LINKTEL,UPDATE_TIME=SYSDATE,UPDATE_USER=:UPDATEUSER
+    where HOTEL_ID=:HOTELID and TYPE=:TYPE
+  ]]>
+  </sql>
+
+</sqlList>

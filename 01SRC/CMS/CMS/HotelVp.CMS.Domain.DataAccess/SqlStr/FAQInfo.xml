@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+
+  <sql database="TUANDB" sqlId="t_lm_qa_select">
+    <![CDATA[  
+    select * from T_LM_QA order by SEQ 
+  ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_qa_insert">
+    <![CDATA[
+       INSERT INTO T_LM_QA(ID,  QUSETION_HEAD,  ANSWER_BODY, CREATE_TIME,SEQ) VALUES 
+       (:ID,  :QUSETION_HEAD,  :ANSWER_BODY,SYSDATE,:SEQ)
+    ]]>
+  </sql>
+
+  <sql database ="TUANDB" sqlId="t_lm_qa_update">
+    <![CDATA[
+       UPDATE T_LM_QA SET QUSETION_HEAD=:QUSETION_HEAD, ANSWER_BODY=:ANSWER_BODY  WHERE ID=:ID
+    ]]>
+  </sql>
+  
+  <sql database ="TUANDB" sqlId="t_lm_qa_delete">
+    <![CDATA[
+       delete from T_LM_QA WHERE ID=:ID
+    ]]>
+  </sql>
+</sqlList>

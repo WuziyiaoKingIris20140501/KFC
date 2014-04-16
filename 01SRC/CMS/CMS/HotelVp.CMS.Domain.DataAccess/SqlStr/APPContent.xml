@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  
+  <sql database="TUANDB" sqlId="t_lm_b_city">
+    <![CDATA[  
+    select id, city_id, area_id, name_cn, name_en, name_jp, seq, dareaid, gbcode, 
+    pinyin, pinyin_short, sname, lname, zipcode, phonecode, hotelnum, longitude, latitude, 
+    status, create_time, update_time 
+    from t_lm_b_city where status='1' order by seq
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_platform">
+    <![CDATA[  
+    select platform_code AS platformcode, platform_name AS platformname from t_lm_b_platform where status='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_link">
+    <![CDATA[  
+    select PROP,LINKMAN, LINKEMAIL, LINKTEL, LINKFAX from t_lm_b_prop where PROP=:PROP
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_names_select">
+    <![CDATA[  
+    select PROP,prop_name_zh AS PROPNM from t_lm_b_prop where prop in (SELECT REGEXP_SUBSTR (:PROPS, '[^,]+', 1,rownum)
+      FROM DUAL
+      CONNECT BY ROWNUM <=
+      LENGTH (:PROPS) - LENGTH (REPLACE (:PROPS, ',', '')))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_infos_select">
+    <![CDATA[  
+   select tlb.PROP,tlb.prop_name_zh AS PROPNM, 
+  (CASE WHEN tlb.diamond_rating Is null or tlb.diamond_rating < 1 THEN '0' ELSE '1' END) AS DIAHOTEL,
+  (CASE WHEN tlb.diamond_rating Is null or tlb.diamond_rating < 1 THEN tlb.star_rating ELSE  tlb.diamond_rating  END ) AS STAR,
+  (CASE WHEN  tlb.TRADEAREA_ZH IS NULL OR tlb.TRADEAREA_ZH='' THEN tpf.TRADEAREA_ZH ELSE tlb.TRADEAREA_ZH END ) AS AREANM
+  from t_lm_b_prop tlb 
+  left join FOG_T_PROP tpf on tlb.PROP=tpf.PROP
+  where tlb.prop in (SELECT REGEXP_SUBSTR (:PROPS, '[^,]+', 1,rownum)
+  FROM DUAL
+  CONNECT BY ROWNUM <=
+  LENGTH (:PROPS) - LENGTH (REPLACE (:PROPS, ',', '')))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_hotelroom_name">
+    <![CDATA[  
+     select ROOM_CODE AS HOTELROOMCODE,ROOM_NAME AS HOTELROOMNM from t_room t where HOTEL_ID=:HOTELID and ROOM_CODE = :ROOMID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_fog_compare">
+    <![CDATA[  
+    select
+      tlbp.prop AS HOTELID,
+      tlbp.prop_name_zh AS HOTELNMZH,
+      tlbp.prop_name_en AS HOTELNMEN,
+      tlbp.status AS FOGSTATUS,
+      tlbp.cityid AS CITY,
+      tlbp.diamond_rating AS DIAMOND,
+      tlbp.star_rating AS STAR,
+      tlbp.opening_date AS OPENDT,
+      tlbp.renovated_date AS RENOVATIONDT,
+      tlbp.tradearea_id AS TRADEAREA,
+      tlbp.tradearea_zh AS TRADEAREANM,
+      tlbp.address1_zh AS ADDRESS,
+      tlbp.website AS WEBSITE,
+      tlbp.linktel AS LINKTEL,
+      tlbp.linkfax AS LINKFAX,
+      tlbp.linkman AS LINKMAN,
+      tlbp.linkemail AS LINKMAIL,
+      tlbp.longitude AS LONGITUDE,
+      tlbp.latitude AS LATITUDE,
+      tlbp.HOTEL_DESCRIPTION_ZH AS DESCZH,
+      ftp.prop_name_zh AS HOTELNMZH_F,
+      ftp.prop_name_en AS HOTELNMEN_F,
+      ftp.status AS FOGSTATUS_F,
+      ftp.cityid AS CITY_F,
+      ftp.diamond_rating AS DIAMOND_F,
+      ftp.star_rating AS STAR_F,
+      ftp.opening_date AS OPENDT_F,
+      ftp.renovated_date AS RENOVATIONDT_F,
+      ftp.tradearea_id AS TRADEAREA_F,
+      ftp.tradearea_zh AS TRADEAREANM_F,
+      ftp.address1_zh AS ADDRESS_F,
+      ftp.website AS WEBSITE_F,
+      tlh.tel AS LINKTEL_F,
+      tlh.fax AS LINKFAX_F,
+      tlh.linkman AS LINKMAN_F,
+      tlh.mail AS LINKMAIL_F,
+      ftp.longitude AS LONGITUDE_F,
+      ftp.latitude AS LATITUDE_F,
+      ftpd.property_zh AS DESCZH_F
+      from t_lm_b_prop tlbp
+      left join FOG_t_prop ftp on tlbp.prop=ftp.prop
+      left join t_lm_hotel tlh on ftp.prop=tlh.hotel_id
+      left join fog_t_prop_desc ftpd on ftp.prop=ftpd.prop
+      where 
+      ((:CITYID IS NULL) OR (tlbp.cityid=:CITYID))
+      AND ((:PROP IS NULL) OR (tlbp.prop=:PROP))
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_nm">
+    <![CDATA[  
+    update t_lm_b_prop set prop_name_zh=(select prop_name_zh from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_nmen">
+    <![CDATA[  
+    update t_lm_b_prop set prop_name_en=(select prop_name_en from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_status">
+    <![CDATA[  
+    update t_lm_b_prop set status=(select status from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_city">
+    <![CDATA[  
+    update t_lm_b_prop set cityid=(select cityid from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_diamond">
+    <![CDATA[  
+    update t_lm_b_prop set diamond_rating=(select diamond_rating from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_star">
+    <![CDATA[  
+    update t_lm_b_prop set star_rating=(select star_rating from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_open">
+    <![CDATA[  
+    update t_lm_b_prop set opening_date=(select opening_date from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_ren">
+    <![CDATA[  
+    update t_lm_b_prop set renovated_date=(select renovated_date from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_tra">
+    <![CDATA[  
+    update t_lm_b_prop set tradearea_id=(select tradearea_id from fog_t_prop where prop=:HOTELID),tradearea_zh=(select tradearea_zh from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_address">
+    <![CDATA[  
+    update t_lm_b_prop set address1_zh=(select address1_zh from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_web">
+    <![CDATA[  
+    update t_lm_b_prop set website=(select website from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_tel">
+    <![CDATA[  
+    update t_lm_b_prop set linktel=(select tel from t_lm_hotel where hotel_id=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_fax">
+    <![CDATA[  
+    update t_lm_b_prop set linkfax=(select fax from t_lm_hotel where hotel_id=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_man">
+    <![CDATA[  
+    update t_lm_b_prop set linkman=(select linkman from t_lm_hotel where hotel_id=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_mail">
+    <![CDATA[  
+    update t_lm_b_prop set linkemail=(select mail from t_lm_hotel where hotel_id=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_long">
+    <![CDATA[  
+    update t_lm_b_prop set longitude=(select longitude from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_lati">
+    <![CDATA[  
+    update t_lm_b_prop set latitude=(select latitude from fog_t_prop where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_update_desc">
+    <![CDATA[  
+    update t_lm_b_prop set HOTEL_DESCRIPTION_ZH=(select property_zh from fog_t_prop_desc where prop=:HOTELID) where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_plan_history_select">
+    <![CDATA[
+  select 
+  thp.id, thp.plan_id, thp.order_num, thp.ope_source, thp.ope_time, 
+  thp.operator, thp.ope_memo, thp.ope_msg, thp.ope_event 
+  from t_his_plan thp
+  inner join t_lm_plan tlp on thp.plan_id = tlp.id
+  where 
+  tlp.hotel_id=:HOTELID
+  AND ((:STARTDT IS NULL) OR (TO_DATE(:STARTDT, 'yyyy-MM-dd') <= tlp.effect_date))
+  AND ((:ENDDT IS NULL) OR (TO_DATE(:ENDDT, 'yyyy-MM-dd') >= tlp.effect_date))
+  order by thp.ope_time desc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelGroup_select">
+    <![CDATA[  
+    select cg.id AS HGroupID, cg.coregroup_name AS HGroupNM, nvl(cgd.iCount,0) AS DCOUNT, cg.create_user||' 于 '||TO_CHAR(create_time, 'yyyy-mm-dd hh24:mi:ss') AS CREATEINFO
+    from t_lm_corehotelgroup cg
+    left join (select coregroupid, count(id) AS iCount from t_lm_corehotelgroup_detail where status ='1' and (:GTYPE IS NULL OR GType=:GTYPE) and (:CUSER IS NULL OR CREATE_USER = :CUSER) group by coregroupid) cgd
+    on cg.id=cgd.coregroupid
+    where 
+    cg.id = :HGROUPID and 
+    cg.status='1'
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelGroup_list_select">
+    <![CDATA[  
+    select gt.id, gt.coregroupid, gt.hotel_id AS HOTELID, gt.prop_name_zh AS HOTELNM,
+    gt.linkman AS LINKPER,gt.linktel AS LINKTEL,nvl(dt.RCOUNT,0) AS RCN, '' AS ONLINES,'' AS HVPMG,gt.STATUS AS FOGSTATUS,gt.ONLINE_STATUS AS ONLINESTATUS
+    from (select cgd.id, cgd.coregroupid, cgd.hotel_id, bp.prop_name_zh,bp.linkman,bp.linktel,bp.STATUS,bp.ONLINE_STATUS
+    from t_lm_corehotelgroup_detail cgd
+    left join t_lm_b_prop bp on cgd.hotel_id =bp.prop
+    where 
+    cgd.coregroupid=:HGROUPID and cgd.Gtype=:GTYPE and (:CUSER IS NULL OR cgd.CREATE_USER = :CUSER) 
+    and cgd.status='1') gt
+    left join
+    (select tp.hotel_id,count(tp.room_type_code) AS RCOUNT from t_lm_plan tp
+    where 
+    tp.effect_date = TO_DATE(:DTime, 'yyyy/mm/dd') 
+    and tp.status='1'
+    group by tp.hotel_id) dt
+    on gt.hotel_id=dt.hotel_id
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelGroup_check">
+    <![CDATA[  
+    select id from t_lm_corehotelgroup_detail where coregroupid=:HGROUPID and hotel_id=:HOTELID and status='1' and GType=:GTYPE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotel_check">
+    <![CDATA[  
+    select prop from t_lm_b_prop where prop=:HOTELID
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelGroup_list_add">
+    <![CDATA[
+    merge into t_lm_corehotelgroup_detail t1
+    using (select :HGROUPID AS coregroupid, :HOTELID AS hotel_id,:CREATEUSER AS create_user,:GTYPE AS GType from dual) t2 
+    on (t1.coregroupid = t2.coregroupid and t1.hotel_id = t2.hotel_id and t1.GType = t2.GType)
+    when matched then
+        update set t1.status='1', t1.update_time=sysdate, update_user=t2.create_user
+        where t1.coregroupid = t2.coregroupid and t1.hotel_id = t2.hotel_id and t1.GType = t2.GType
+    when not matched then
+    insert values (t_lm_coregroup_detail_seq.nextval, t2.coregroupid, t2.hotel_id, '1', sysdate, t2.create_user, sysdate, t2.create_user, t2.GType)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_hotelGroup_list_del">
+    <![CDATA[  
+    Update t_lm_corehotelgroup_detail set status='0', update_time=sysdate,update_user=:CREATEUSER
+    where coregroupid=:HGROUPID and hotel_id=:HOTELID and status='1' and GType=:GTYPE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_lm_b_prop_selectbypic">
+    <![CDATA[  
+    SELECT * FROM t_lm_b_prop where prop=:PROP
+      ]]>
+</sql>
+</sqlList>

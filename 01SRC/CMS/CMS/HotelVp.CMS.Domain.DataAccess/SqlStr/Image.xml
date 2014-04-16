@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlList>
+  <sql database="TUANDB" sqlId="t_image_insert">
+    <![CDATA[  
+       insert into T_IMAGE 
+       (id,img_type,htp_path,source,is_cover,hotel_id,create_time,seq,htp_path_bak)
+       values(:IMAGEID,:IMGTYPE,:HTPPATH,：SOURCE,:ISCOVER,:HOTELID,:CREATETIME,:SEQ,:HTPPATHBAK)
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_updateimageid_byhotelid">
+    <![CDATA[  
+       update t_room set image_id=:IMAGEID where hotel_id=:HOTELID and room_code=:ROOMCODE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_room_selectimageid_byhotelid">
+    <![CDATA[  
+       select * from t_room where hotel_id=:HOTELID and room_code=:ROOMCODE
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_image_selectbyid">
+    <![CDATA[  
+      select * from T_IMAGE left join t_room on t_image.id=t_room.image_id where T_IMAGE.ID=:ID and T_IMAGE.status=1 order by T_IMAGE.seq asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_image_select">
+    <![CDATA[  
+      select * from T_IMAGE left join t_room on t_image.id=t_room.image_id where T_IMAGE.hotel_ID=:HOTELID and T_IMAGE.status=1 order by T_IMAGE.seq asc
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_image_updatecoverpic">
+    <![CDATA[  
+      update T_IMAGE set Is_Cover=:ISCOVER,seq=:SEQ where ID=:ID 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_image_update">
+    <![CDATA[  
+      update T_IMAGE set seq=:SEQ where ID=:ID 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_image_delete">
+    <![CDATA[  
+      update T_IMAGE set status=0 where ID=:ID 
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_image_updatedetails">
+    <![CDATA[  
+      update T_IMAGE set Is_Cover=0 where hotel_ID=:HOTELID and Is_Cover=1
+  ]]>
+  </sql>
+
+  <sql database="TUANDB" sqlId="t_image_updatedetails_repeat">
+    <![CDATA[  
+      update T_IMAGE set IS_COVER=:ISCOVER,IMG_TYPE=:IMGTYPE where ID=:ID 
+  ]]>
+  </sql>
+
+</sqlList>
